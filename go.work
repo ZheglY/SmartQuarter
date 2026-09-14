@@ -1,0 +1,10 @@
+go 1.26.0
+
+use (
+	./services/max-gateway
+	./services/identity-service
+	./services/issue-service
+	./services/ai-worker
+	./services/community-service
+)
+

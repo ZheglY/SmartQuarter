@@ -1,0 +1,169 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      service:
+        description: Service to republish (main branch only)
+        type: choice
+        default: all
+        options:
+          - all
+          - max-gateway
+          - identity-service
+          - issue-service
+          - ai-worker
+          - community-service
+
+permissions:
+  contents: read
+
+# PR updates supersede earlier runs. Each main run publishes its own SHA tags independently.
+concurrency:
+  group: ci-cd-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Check (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [max-gateway, identity-service, issue-service, ai-worker, community-service]
+    defaults:
+      run:
+        working-directory: services/${{ matrix.service }}
+        shell: bash
+    env:
+      GOWORK: "off"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: '1.26.x'
+          cache-dependency-path: |
+            services/${{ matrix.service }}/go.mod
+            services/${{ matrix.service }}/go.sum
+      - name: Formatting
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [[ -n "$unformatted" ]]; then
+            printf 'Run gofmt on:\n%s\n' "$unformatted"
+            exit 1
+          fi
+      - name: Module consistency
+        run: |
+          go mod tidy -diff
+          go mod verify
+      - name: Vet
+        run: go vet ./...
+      - name: Tests with race detector
+        run: go test -race -count=1 ./...
+      - name: Build
+        run: go build -mod=readonly ./...
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Build container
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: services/${{ matrix.service }}
+          push: false
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+  ci:
+    name: CI
+    if: ${{ always() }}
+    needs: [check]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every service check
+        env:
+          CHECK_RESULT: ${{ needs.check.result }}
+        run: test "$CHECK_RESULT" = success
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Validate local deployment and scripts
+        run: |
+          docker compose -f deploy/docker-compose.yml config --quiet
+          bash -n scripts/service-changed.sh
+          bash scripts/test-service-changed.sh
+
+  publish:
+    name: Publish (${{ matrix.service }})
+    needs: [ci]
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [max-gateway, identity-service, issue-service, ai-worker, community-service]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Select changed service
+        id: select
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REQUESTED_SERVICE: ${{ inputs.service }}
+          BASE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          SERVICE: ${{ matrix.service }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          if [[ "$EVENT_NAME" == workflow_dispatch ]]; then
+            changed=false
+            if [[ "$REQUESTED_SERVICE" == all || "$REQUESTED_SERVICE" == "$SERVICE" ]]; then
+              changed=true
+            fi
+          else
+            changed="$(bash scripts/service-changed.sh "$BASE_SHA" "$HEAD_SHA" "$SERVICE")"
+          fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          echo "image=ghcr.io/${REPOSITORY,,}/$SERVICE" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+        if: steps.select.outputs.changed == 'true'
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        if: steps.select.outputs.changed == 'true'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish image
+        id: image
+        if: steps.select.outputs.changed == 'true'
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: services/${{ matrix.service }}
+          push: true
+          tags: ${{ steps.select.outputs.image }}:sha-${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+      - name: Record release
+        if: steps.select.outputs.changed == 'true'
+        env:
+          IMAGE: ${{ steps.select.outputs.image }}
+          DIGEST: ${{ steps.image.outputs.digest }}
+          SHA: ${{ github.sha }}
+        run: |
+          printf '### %s\n\nTag: `%s:sha-%s`\n\nDeploy by digest: `%s@%s`\n' \
+            "$IMAGE" "$IMAGE" "$SHA" "$IMAGE" "$DIGEST" >> "$GITHUB_STEP_SUMMARY"

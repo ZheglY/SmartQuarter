@@ -1,0 +1,13 @@
+# Repository maintainer is the initial fallback owner.
+# Replace service entries with real collaborators or GitHub teams with write access.
+* @ZheglY
+/services/max-gateway/ @ZheglY
+/services/identity-service/ @ZheglY
+/services/issue-service/ @ZheglY
+/services/ai-worker/ @ZheglY
+/services/community-service/ @ZheglY
+/contracts/ @ZheglY
+/.github/ @ZheglY
+/go.work @ZheglY
+/deploy/ @ZheglY
+

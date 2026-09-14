@@ -1,0 +1,90 @@
+name: smartquarter
+
+# Development only: public entry point is max-gateway.
+# Databases, Redis and S3 will be added with the corresponding adapters.
+services:
+  max-gateway:
+    build:
+      context: ../services/max-gateway
+    environment:
+      HTTP_ADDR: ":8080"
+    ports:
+      - "127.0.0.1:8080:8080"
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 15s
+
+  identity-service:
+    build:
+      context: ../services/identity-service
+    environment:
+      HTTP_ADDR: ":8080"
+    expose:
+      - "8080"
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 15s
+
+  issue-service:
+    build:
+      context: ../services/issue-service
+    environment:
+      HTTP_ADDR: ":8080"
+    expose:
+      - "8080"
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 15s
+
+  ai-worker:
+    build:
+      context: ../services/ai-worker
+    environment:
+      HTTP_ADDR: ":8080"
+    expose:
+      - "8080"
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 15s
+
+  community-service:
+    build:
+      context: ../services/community-service
+    environment:
+      HTTP_ADDR: ":8080"
+    expose:
+      - "8080"
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 15s
+
