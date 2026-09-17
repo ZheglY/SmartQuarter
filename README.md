@@ -1,30 +1,60 @@
-# SmartQuarter
+# SmartQuarter — Умный Квартал
 
-Каркас Go-монорепозитория: пять независимых модулей, HTTP health endpoints, JSON-логи,
-конфигурация из окружения и graceful shutdown. Бизнес-логика пока не реализована.
+Каркас MAX Mini App для жителей и председателя дома. Целевой сценарий:
+фото → проблема → подтверждения → заявление по шаблону → ручная отправка председателем.
+MVP включает четыре Go-сервиса, без AI Worker.
 
-| Сервис | Ответственность | Локальный порт |
+| Компонент | Зона ответственности | Локальный HTTP-порт |
 | --- | --- | --- |
-| max-gateway | MAX, входное API, маршрутизация, уведомления | 8080 |
-| identity-service | Пользователи, дома, роли | 8081 |
-| issue-service | Проблемы, фото, подтверждения, заявления | 8082 |
-| ai-worker | Асинхронный анализ фото и генерация текста | 8083 |
-| community-service | Объявления, опросы, календарь | 8084 |
+| max-gateway | MAX, HTTP API, auth/session, gRPC-клиенты, уведомления | 8080 |
+| identity-service | Пользователи, дома, memberships, роли | 8081 |
+| issue-service | Проблемы, файлы, подтверждения, статусы, шаблоны заявлений | 8082 |
+| community-service | Объявления; позже опросы, календарь и инициативы | 8084 |
+| web/miniapp | Будущий React + TypeScript интерфейс в MAX | Пока не запускается |
 
-## Запуск
+## Структура
 
-Нужен Go 1.26.x; для контейнеров — Docker с Compose v2.
+```text
+services/                         отдельный go.mod и Dockerfile у каждого сервиса
+  max-gateway/                    внешний HTTP, MAX, сессии и внутренние клиенты
+  identity-service/               собственные domain/usecase, PostgreSQL и gRPC
+  issue-service/                  то же + storage/s3 и statement/templates
+  community-service/              собственные domain/usecase, PostgreSQL и gRPC
+web/miniapp/                       app, pages, features, shared, public, tests
+contracts/
+  proto/smartquarter/{identity,issue,community}/v1/
+  openapi/                        будущий публичный API Gateway
+  events/                         будущие события уведомлений
+deploy/docker-compose.yml         локальный запуск четырёх Go-каркасов
+tests/e2e/                        место для сквозных проверок
+docs/                            архитектура и место для материалов сдачи
+go.work                          локальный workspace четырёх модулей
+```
+
+Структура адаптирована по восьми PDF: [решения и источники](docs/architecture.md).
+Назначение внутренних каталогов описано в README каждого сервиса и [Mini App](web/miniapp/README.md).
+
+## Текущее состояние
+
+Реализованы только прежние `GET /healthz`, чтение `HTTP_ADDR`, JSON-логи через slog и graceful shutdown.
+Новые каталоги содержат `.gitkeep`: gRPC, авторизация, бизнес-логика, React, proto/OpenAPI,
+миграции, шаблоны заявлений и внешние интеграции ещё не реализованы.
+PostgreSQL, Redis и MinIO пока не подключены к Compose. Целевые zap, `/livez`, `/readyz`, `/metrics`
+из документов будут добавлены при реализации инфраструктуры. Это каркас, не готовый к сдаче MVP.
+
+## Запуск и проверки
+
+Нужен Go 1.26.x. Запуск одного сервиса из корня:
 
 ```sh
-cd services/issue-service
-go run ./cmd/app
+go run ./services/issue-service/cmd/app
 # В другом терминале: curl http://localhost:8082/healthz
 ```
 
-Адрес задаётся через `HTTP_ADDR`, например в PowerShell: `$env:HTTP_ADDR = ":9082"`.
-В каждом сервисе есть `.env.example`; Go автоматически `.env` не загружает.
+Параметр `HTTP_ADDR` переопределяет адрес; примеры есть в `services/<name>/.env.example`.
+В PowerShell: `$env:HTTP_ADDR = ":9082"`. Файлы `.env` автоматически не загружаются.
 
-Все каркасы из корня:
+С Docker и Compose v2:
 
 ```sh
 docker compose -f deploy/docker-compose.yml up --build -d
@@ -32,76 +62,34 @@ curl http://localhost:8080/healthz
 docker compose -f deploy/docker-compose.yml down
 ```
 
-Compose публикует только Gateway на localhost:8080. Внутри сети все сервисы слушают 8080
-и доступны по имени, например `http://issue-service:8080/healthz`.
-Маршрутизация Gateway, БД, Redis, S3 и AI пока не подключены. `/healthz` проверяет только жизнь процесса.
+Повторный запуск — та же команда `up`. Наружу опубликован только Gateway на localhost:8080;
+внутри сети HTTP-диагностика сервисов доступна по `<service>:8080`. gRPC пока не слушается.
 
-## Структура и модули
-
-```text
-services/<name>/  cmd/app, internal, go.mod, Dockerfile, README.md
-contracts/       OpenAPI и схемы событий
-web/miniapp/     будущий клиент MAX
-deploy/          локальный Docker Compose
-docs/            границы сервисов
-.github/         CI/CD, CODEOWNERS, Dependabot и шаблон PR
-```
-
-У каждого сервиса свой `go.mod` с путём `github.com/ZheglY/SmartQuarter/services/<name>`.
-Корневой `go.work` объединяет модули для IDE и локальной работы; корневой `go.mod` не нужен.
-Не импортируйте сервисы друг из друга: взаимодействие через HTTP/события и `contracts/`.
-Миграции хранятся в `services/<name>/migrations` у владельца базы.
-
-Зависимости добавляйте из папки своего сервиса через `go get`, затем выполняйте `go mod tidy`
-с `GOWORK=off`. Коммитьте его `go.mod` и `go.sum`. Сейчас внешних зависимостей нет, поэтому
-`go.sum` отсутствует. Не коммитьте локальные `replace`; `go work sync` может менять соседние модули.
-
-Проверка одного сервиса в Linux/macOS/Git Bash:
+Проверка модуля в Linux/macOS/Git Bash:
 
 ```sh
 cd services/issue-service
 export GOWORK=off
-gofmt -w .
-go mod tidy -diff
+gofmt -l .
 go vet ./...
-go test -race ./...
-go build -mod=readonly ./...
+go test ./...
 ```
 
-В PowerShell вместо `export`: `$env:GOWORK = "off"`; восстановить workspace — `Remove-Item Env:GOWORK`.
-Race detector требует C toolchain. На Windows без него используйте `go test ./...`; `-race` проверит Linux CI.
-Для всех сервисов с GNU Make и POSIX shell: `make check`; запуск: `make run SERVICE=issue-service`.
-Корневая команда `go test ./...` для этого multi-module workspace не подходит.
+В PowerShell вместо `export`: `$env:GOWORK = "off"`; вернуть workspace: `Remove-Item Env:GOWORK`.
+Для всех сервисов с GNU Make и POSIX shell: `make check`; исправить форматирование: `make fmt`.
+Корневой `go test ./...` не обходит отдельные модули.
 
-## Работа команды и CI/CD
+## Совместная разработка и CI
 
-Работайте в отдельных ветках через PR в `main`. Назначьте владельцев сервисов в `.github/CODEOWNERS`:
-пока везде указан владелец репозитория `@ZheglY`. Изменения контрактов согласуйте с потребителями.
+Каждый сервис — независимый модуль `github.com/ZheglY/SmartQuarter/services/<name>`.
+Обновляйте его зависимости из собственной папки, выполняйте `GOWORK=off go mod tidy`
+и коммитьте `go.mod`/`go.sum`. Пока внешних зависимостей нет, `go.sum` не требуется.
+Сервисы не импортируют domain-код друг друга и не читают чужие БД; контракты согласуются в PR.
 
-- PR и push в `main`: параллельная проверка всех пяти сервисов — форматирование, модули,
-  vet, тесты с race detector, Go-сборка и Docker-сборка. `GOWORK=off` проверяет независимость модулей.
-- Итоговый check `CI` также проверяет Compose и выбор сервисов для публикации.
-- После успешного CI в `main` публикуются образы изменённых сервисов. Изменения общих контрактов,
-  workflow и конфигурации публикуют все; изменения только документации/frontend — ни одного.
-- Образ: `ghcr.io/zhegly/smartquarter/<service>:sha-<полный SHA коммита>`. Digest записывается в summary;
-  для точного развёртывания и отката используйте `image@sha256:...`. У неизменённых сервисов остаётся
-  предыдущий образ; единого release-тега для всех сервисов нет.
-- Actions → CI/CD → Run workflow на `main` повторно публикует выбранный сервис или все.
-  Используйте это после сбоя либо пропущенного запуска.
-- Публикация использует `GITHUB_TOKEN` с `packages: write`; PR ничего не публикует.
-  Actions закреплены по SHA, обновления Actions/Go-зависимостей/Docker предлагает Dependabot.
+Работа — в ветках через PR в `main`; реальные владельцы назначаются в `.github/CODEOWNERS`.
+В GitHub Actions один check `CI`: `gofmt`, `go vet`, `go test` для всех Go-модулей с `GOWORK=off`.
+Запуск на PR, push в `main` и вручную. Сборки контейнеров, публикации и развёртывания в CI нет.
+Frontend/proto-проверки добавляются после появления соответствующего кода и инструментов.
 
-Администратору: включить Actions и доступ к GHCR; назначить CODEOWNERS; защитить `main`
-обязательным check `CI`, PR и ревью владельцев. Для существующего пакета GHCR дать этому
-репозиторию Actions-доступ. Настройки GitHub не применяются автоматически файлами репозитория.
-
-**Граница CD:** образы автоматически доставляются в GHCR. Развёртывание на сервере ещё не настроено:
-нужны целевая среда, доступы и runtime-конфигурация. После их выбора добавьте deploy job с GitHub
-Environment и проверенным digest. Секреты храните в GitHub Secrets/окружении сервера. Compose — для разработки.
-
-Новый сервис: добавьте модуль/Dockerfile, запись в `go.work`, обе матрицы и список `workflow_dispatch`
-в CI/CD, Compose, Makefile и CODEOWNERS.
-
-Подробнее: [архитектура](docs/architecture.md), [контракты](contracts/README.md).
-Справка: [Go workspaces](https://go.dev/doc/tutorial/workspaces),
-[публикация Docker-образов](https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images).
+Новый Go-сервис добавьте в `go.work`, Compose и CODEOWNERS; CI и Makefile находят модули автоматически.
+Требования к будущим API и материалам сдачи: [контракты](contracts/README.md), [архитектура](docs/architecture.md).

@@ -4,10 +4,12 @@
 /services/max-gateway/ @ZheglY
 /services/identity-service/ @ZheglY
 /services/issue-service/ @ZheglY
-/services/ai-worker/ @ZheglY
 /services/community-service/ @ZheglY
 /contracts/ @ZheglY
 /.github/ @ZheglY
 /go.work @ZheglY
 /deploy/ @ZheglY
 
+
+/web/miniapp/ @ZheglY
+/tests/ @ZheglY

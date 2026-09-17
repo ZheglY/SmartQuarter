@@ -1,19 +1,22 @@
 # issue-service
 
-Проблемы, сообщения о проблемах, фотографии, подтверждения, статусы и заявления.
+Проблемы, фото-метаданные, подтверждения, статусы, timeline и StatementDraft по шаблону без AI. Владеет issue_db.
 
-Запуск из этой папки: `go run ./cmd/app`. Порт по умолчанию — 8082; настройка через `HTTP_ADDR`.
+Запуск из этой папки: `go run ./cmd/app`. HTTP-порт 8082, переопределяется через `HTTP_ADDR`.
+Сейчас работает только прежний `GET /healthz`. Новые каталоги — заготовки, интеграции не подключены.
 
-Сейчас реализован только `GET /healthz` — проверка жизни процесса, без проверки внешних зависимостей.
+- `cmd/app` — существующая точка запуска; `internal/app` — место для будущего wiring.
+- `internal/config` — окружение; `internal/observability` — будущие логи/метрики.
+- `internal/transport/http` — существующий health handler.
+- `internal/gen` — будущий generated protobuf-код из корневых контрактов.
+- `tests/integration` — место для интеграционных тестов; unit-тесты рядом с кодом.
+- `internal/domain` — сущности/инварианты; `internal/usecase` — прикладные сценарии.
+- `internal/repository/postgres` — будущий адаптер pgx/pgxpool собственной БД.
+- `internal/transport/grpc` — будущие бизнес-вызовы; gRPC-сервер пока не запущен.
+- `internal/clients` — межсервисные клиенты; `internal/events` — outbox/events при необходимости.
+- `migrations` — будущие миграции; `testdata/seed` — синтетические данные собственной БД.
+- `internal/storage/s3` — будущие signed uploads/downloads.
+- `internal/statement/templates` — будущие детерминированные шаблоны заявления.
+- `internal/pdf` — место для необязательного PDF-экспорта (Should Have).
 
-- `cmd/app` — сборка зависимостей и запуск.
-- `internal/config` — конфигурация из окружения.
-- `internal/transport/http` — HTTP-обработчики.
-- `internal/domain` — сущности и правила предметной области.
-- `internal/service` — сценарии использования.
-- `internal/repository` — адаптеры хранения; интерфейсы объявляйте у потребителя.
-- `internal/events` — публикация и обработка событий.
-- `migrations` — миграции только собственной базы.
-
-Контракты согласовываются в `contracts/`, правила совместной разработки — в корневом README.
-
+Контракты — в `contracts/`, общие правила — в корневом README и `docs/architecture.md`.

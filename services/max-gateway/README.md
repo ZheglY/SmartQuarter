@@ -1,18 +1,22 @@
 # max-gateway
 
-Входная точка MAX Mini App и webhook, проверка авторизации, маршрутизация и уведомления.
+Публичный HTTP/JSON API и интеграция MAX: auth/session, маршрутизация в gRPC и уведомления.
 
-Запуск из этой папки: `go run ./cmd/app`. Порт по умолчанию — 8080; настройка через `HTTP_ADDR`.
+Запуск из этой папки: `go run ./cmd/app`. HTTP-порт 8080, переопределяется через `HTTP_ADDR`.
+Сейчас работает только прежний `GET /healthz`. Новые каталоги — заготовки, интеграции не подключены.
 
-Сейчас реализован только `GET /healthz` — проверка жизни процесса, без проверки внешних зависимостей.
+- `cmd/app` — существующая точка запуска; `internal/app` — место для будущего wiring.
+- `internal/config` — окружение; `internal/observability` — будущие логи/метрики.
+- `internal/transport/http` — существующий health handler.
+- `internal/gen` — будущий generated protobuf-код из корневых контрактов.
+- `tests/integration` — место для интеграционных тестов; unit-тесты рядом с кодом.
+- `internal/transport/http/middleware`, `internal/transport/webhook` — будущий HTTP-периметр и MAX webhook.
+- `internal/auth`, `internal/session` — проверка MAX initData и прикладная сессия.
+- `internal/cache`, `internal/ratelimit`, `internal/idempotency` — будущие Redis-механизмы.
+- `internal/clients/grpc/{identity,issue,community}` — клиенты предметных сервисов.
+- `internal/clients/max` — MAX Bot API; `internal/notifications` и `internal/events` — уведомления.
+- `configs` — будущие несекретные настройки. Сейчас файлы конфигурации не читаются.
 
-- `cmd/app` — сборка зависимостей и запуск.
-- `internal/config` — конфигурация из окружения.
-- `internal/transport/http` — HTTP-обработчики.
-- `internal/domain` — сущности и правила предметной области.
-- `internal/service` — сценарии использования.
-- `internal/repository` — адаптеры хранения; интерфейсы объявляйте у потребителя.
-- `internal/events` — публикация и обработка событий.
+Бизнес-правила и шаблон заявления принадлежат предметным сервисам.
 
-Контракты согласовываются в `contracts/`, правила совместной разработки — в корневом README.
-
+Контракты — в `contracts/`, общие правила — в корневом README и `docs/architecture.md`.

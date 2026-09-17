@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GOWORK: "off"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: '1.26.x'
+          cache: false
+      - name: Format, vet and test Go modules
+        shell: bash
+        run: |
+          for module in services/*/go.mod; do
+            (
+              cd "$(dirname "$module")"
+              echo "Checking $module"
+              unformatted="$(gofmt -l .)"
+              if [[ -n "$unformatted" ]]; then
+                printf 'Run gofmt on:\n%s\n' "$unformatted"
+                exit 1
+              fi
+              go vet ./...
+              go test ./...
+            )
+          done
+

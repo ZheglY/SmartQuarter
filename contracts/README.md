@@ -1,23 +1,31 @@
-# Межсервисные контракты
+# Контракты
 
-- `openapi/` — REST + JSON, отдельный OpenAPI-файл на сервис.
-- `events/` — JSON Schema событий Redis Streams, версионирование схем.
-- Изменения согласуйте с разработчиками производителей и потребителей в одном PR.
-- Сервисы не импортируют Go-код друг друга и не читают чужие таблицы.
-- Совместимые изменения добавляют необязательные поля; несовместимые получают новую версию.
+Папки подготовлены по «Контрактам приложения.pdf». Файлы API и схемы ещё не реализованы.
 
-Предлагаемый envelope (пока договорённость, не реализованный транспорт):
+| Путь | Назначение |
+| --- | --- |
+| `proto/smartquarter/identity/v1/` | Будущий identity.proto, package smartquarter.identity.v1 |
+| `proto/smartquarter/issue/v1/` | Будущий issue.proto, package smartquarter.issue.v1 |
+| `proto/smartquarter/community/v1/` | Будущий community.proto, package smartquarter.community.v1 |
+| `openapi/` | Будущий openapi.yaml: HTTPS/JSON API Gateway, /api/v1 и MAX webhook |
+| `events/` | Будущие versioned schemas уведомлений, без AI-событий |
 
-```json
-{
-  "event_id": "uuid",
-  "event_type": "issue.analysis_requested",
-  "event_version": 1,
-  "occurred_at": "2026-09-14T10:15:00Z",
-  "payload": {"issue_id": "148", "house_id": "32"}
-}
-```
+React использует HTTP Gateway. Gateway вызывает сервисы по gRPC.
+Domain-структуры сервисов не являются общими контрактами.
 
-Проектируйте идемпотентных consumers, ACK после успешной обработки и повторную доставку.
-События, связанные с записью в БД, публикуйте через transactional outbox.
+Выбранный способ размещения generated Go-кода: `services/<name>/internal/gen/` у каждого
+потребителя/производителя. Источник один — `contracts/proto/`; копии генерируются, а не редактируются.
+Перед добавлением первых proto нужно зафиксировать версии buf/protoc и plugins, настроить генерацию
+и проверку согласованности копий. Сейчас генератора и сгенерированного кода нет.
 
+При реализации сохраняйте стабильные имена/номера полей protobuf (удалённые номера — reserved),
+HTTP error envelope и mapping gRPC status → HTTP. Контекст actor/user/house формирует Gateway
+после авторизации; данные браузера не считаются подтверждёнными правами.
+
+События уведомлений: issue.created, issue.confirmed, issue.status_changed, statement.generated,
+announcement.created; события опросов/календаря/инициатив добавляются с соответствующими функциями.
+Будущий envelope: event_id, event_type, event_version, occurred_at, producer, payload.
+События из БД предполагают outbox; consumer — идемпотентную обработку и ACK после успеха.
+
+Изменения контрактов согласуются с разработчиками обеих сторон. API и proto lint/generation
+появятся в CI после реализации контрактов; текущий CI проверяет только Go.

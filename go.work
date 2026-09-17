@@ -4,7 +4,5 @@ use (
 	./services/max-gateway
 	./services/identity-service
 	./services/issue-service
-	./services/ai-worker
 	./services/community-service
 )
-

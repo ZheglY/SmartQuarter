@@ -54,23 +54,6 @@ services:
       - no-new-privileges:true
     stop_grace_period: 15s
 
-  ai-worker:
-    build:
-      context: ../services/ai-worker
-    environment:
-      HTTP_ADDR: ":8080"
-    expose:
-      - "8080"
-    init: true
-    read_only: true
-    tmpfs:
-      - /tmp
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    stop_grace_period: 15s
-
   community-service:
     build:
       context: ../services/community-service
@@ -87,4 +70,3 @@ services:
     security_opt:
       - no-new-privileges:true
     stop_grace_period: 15s
-
