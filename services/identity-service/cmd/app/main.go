@@ -1,26 +1,20 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"log/slog"
-	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
-	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/config"
-	httptransport "github.com/ZheglY/SmartQuarter/services/identity-service/internal/transport/http"
+	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/app"
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	if err := run(logger); err != nil {
-		logger.Error("application stopped", "error", err)
+	if err := app.Run(); err != nil {
+		slog.Error("application startup error", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 }
+<<<<<<< HEAD
+=======
 
 func run(logger *slog.Logger) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -56,3 +50,4 @@ func run(logger *slog.Logger) error {
 		return nil
 	}
 }
+>>>>>>> origin/main

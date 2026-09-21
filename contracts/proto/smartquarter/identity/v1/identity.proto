@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package smartquarter.identity.v1;
+
+option go_package = "github.com/ZheglY/SmartQuarter/services/identity-service/internal/gen/smartquarter/identity/v1;identityv1";
+
+import "google/protobuf/timestamp.proto";
+
+service IdentityService {
+  rpc UpsertMaxUser(UpsertMaxUserRequest) returns (User);
+  rpc GetUserContext(GetUserContextRequest) returns (UserContext);
+  rpc GetMembership(GetMembershipRequest) returns (Membership);
+  rpc ListMemberships(ListMembershipsRequest) returns (ListMembershipsResponse);
+}
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ROLE_RESIDENT = 1;
+  ROLE_CHAIRMAN = 2;
+  ROLE_ADMIN = 3;
+}
+
+enum MembershipStatus {
+  MEMBERSHIP_STATUS_UNSPECIFIED = 0;
+  MEMBERSHIP_STATUS_ACTIVE = 1;
+  MEMBERSHIP_STATUS_INACTIVE = 2;
+}
+
+message User {
+  string id = 1;
+  int64 max_user_id = 2;
+  string display_name = 3;
+  string username = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message House {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  string city = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message Membership {
+  string id = 1;
+  string user_id = 2;
+  string house_id = 3;
+  Role role = 4;
+  MembershipStatus status = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message UserContext {
+  User user = 1;
+  repeated House houses = 2;
+  repeated Membership memberships = 3;
+  string default_house_id = 4;
+}
+
+message UpsertMaxUserRequest {
+  int64 max_user_id = 1;
+  string display_name = 2;
+  string username = 3;
+}
+
+message GetUserContextRequest {
+  string user_id = 1;
+}
+
+message GetMembershipRequest {
+  string user_id = 1;
+  string house_id = 2;
+}
+
+message ListMembershipsRequest {
+  string user_id = 1;
+}
+
+message ListMembershipsResponse {
+  repeated Membership items = 1;
+}

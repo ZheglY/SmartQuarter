@@ -1,7 +1,7 @@
+.git
+.gitignore
 .env
-.env.*
-bin
-coverage
-*.out
-*.exe
-
+bin/
+tmp/
+*.log
+*.tmp
