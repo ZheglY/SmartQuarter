@@ -20,4 +20,7 @@ type Repository interface {
 
 	// ListHouseByIDs возвращает список домов по их UUID
 	ListHouseByIDs(ctx context.Context, houseIDs []string) ([]House, error)
+
+	// Ping проверяет готовновть сервиса
+	Ping(ctx context.Context) error
 }
