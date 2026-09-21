@@ -1,0 +1,140 @@
+syntax = "proto3";
+package smartquarter.issue.v1;
+option go_package = "github.com/ZheglY/SmartQuarter/services/issue-service/internal/gen/smartquarter/issue/v1;issuev1";
+import "google/protobuf/timestamp.proto";
+
+service IssueService {
+  rpc CreateUpload(CreateUploadRequest) returns (CreateUploadResponse);
+  rpc CompleteUpload(CompleteUploadRequest) returns (Attachment);
+  rpc CreateIssue(CreateIssueRequest) returns (Issue);
+  rpc GetIssue(GetIssueRequest) returns (IssueDetails);
+  rpc ListIssues(ListIssuesRequest) returns (ListIssuesResponse);
+  rpc ConfirmIssue(ConfirmIssueRequest) returns (ConfirmIssueResponse);
+  rpc UpdateIssueStatus(UpdateIssueStatusRequest) returns (Issue);
+  rpc GenerateStatement(GenerateStatementRequest) returns (StatementDraft);
+  rpc GetStatement(GetStatementRequest) returns (StatementDraft);
+  rpc GetAttachmentDownloadURL(GetAttachmentDownloadURLRequest) returns (GetAttachmentDownloadURLResponse);
+}
+
+enum IssueStatus {
+  ISSUE_STATUS_UNSPECIFIED = 0;
+  ISSUE_STATUS_DETECTED = 1;
+  ISSUE_STATUS_CONFIRMING = 2;
+  ISSUE_STATUS_READY_FOR_APPEAL = 3;
+  ISSUE_STATUS_HANDED_TO_CHAIRMAN = 4;
+  ISSUE_STATUS_MARKED_SENT = 5;
+  ISSUE_STATUS_WAITING_RESULT = 6;
+  ISSUE_STATUS_RESOLVED = 7;
+}
+enum IssueCategory {
+  ISSUE_CATEGORY_UNSPECIFIED = 0;
+  ISSUE_CATEGORY_SAFETY = 1;
+  ISSUE_CATEGORY_CLEANLINESS = 2;
+  ISSUE_CATEGORY_UTILITIES = 3;
+  ISSUE_CATEGORY_INFRASTRUCTURE = 4;
+  ISSUE_CATEGORY_OTHER = 5;
+}
+enum AttachmentStatus {
+  ATTACHMENT_STATUS_UNSPECIFIED = 0;
+  ATTACHMENT_STATUS_UPLOADING = 1;
+  ATTACHMENT_STATUS_READY = 2;
+  ATTACHMENT_STATUS_ATTACHED = 3;
+  ATTACHMENT_STATUS_REJECTED = 4;
+  ATTACHMENT_STATUS_EXPIRED = 5;
+}
+message Issue {
+  string id = 1;
+  string house_id = 2;
+  string created_by = 3;
+  IssueCategory category = 4;
+  string description = 5;
+  string location_text = 6;
+  IssueStatus status = 7;
+  int32 confirmations_count = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  string house_address_snapshot = 11;
+  google.protobuf.Timestamp resolved_at = 12;
+}
+message Attachment {
+  string id = 1;
+  string house_id = 2;
+  string issue_id = 3;
+  string uploaded_by = 4;
+  string original_filename = 5;
+  string mime_type = 6;
+  int64 size_bytes = 7;
+  string sha256 = 8;
+  string etag = 9;
+  AttachmentStatus status = 10;
+  google.protobuf.Timestamp upload_expires_at = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}
+message TimelineEvent {
+  string id = 1;
+  string issue_id = 2;
+  string type = 3;
+  string actor_user_id = 4;
+  string payload_json = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+message StatementDraft {
+  string id = 1;
+  string issue_id = 2;
+  int32 version = 3;
+  string status = 4;
+  string body = 5;
+  string chairman_note = 6;
+  string source_snapshot_json = 7;
+  string created_by = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+message CreateUploadRequest {
+  string house_id = 1;
+  string filename = 2;
+  string mime_type = 3;
+  int64 size_bytes = 4;
+}
+message CreateUploadResponse {
+  string upload_id = 1;
+  string put_url = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  // The browser MUST send these headers, especially If-None-Match: *.
+  map<string, string> required_headers = 4;
+}
+message CompleteUploadRequest { string upload_id = 1; string house_id = 2; }
+message CreateIssueRequest {
+  string house_id = 1;
+  string house_address_snapshot = 2;
+  IssueCategory category = 3;
+  string description = 4;
+  string location_text = 5;
+  repeated string attachment_ids = 6;
+}
+message GetIssueRequest { string issue_id = 1; string house_id = 2; }
+message IssueDetails {
+  Issue issue = 1;
+  repeated Attachment attachments = 2;
+  bool confirmed_by_me = 3;
+  repeated TimelineEvent timeline = 4;
+  // Populated only for CHAIRMAN and ADMIN.
+  StatementDraft latest_statement = 5;
+}
+message ListIssuesRequest {
+  string house_id = 1;
+  repeated IssueStatus status = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+  // Restricts the queue to unresolved issues; requires CHAIRMAN/ADMIN.
+  bool chairman_queue = 5;
+}
+message ListIssuesResponse { repeated Issue items = 1; string next_page_token = 2; }
+message ConfirmIssueRequest { string issue_id = 1; string house_id = 2; }
+message ConfirmIssueResponse { int32 confirmation_count = 1; bool confirmed_by_me = 2; }
+message UpdateIssueStatusRequest { string issue_id = 1; string house_id = 2; IssueStatus new_status = 3; }
+message GenerateStatementRequest { string issue_id = 1; string house_id = 2; string chairman_note = 3; }
+message GetStatementRequest { string issue_id = 1; string house_id = 2; }
+message GetAttachmentDownloadURLRequest { string attachment_id = 1; string house_id = 2; }
+message GetAttachmentDownloadURLResponse { string url = 1; google.protobuf.Timestamp expires_at = 2; }
