@@ -37,7 +37,7 @@ func run(logger *slog.Logger) error {
 	}
 	errs := make(chan error, 1)
 	go func() { errs <- server.ListenAndServe() }()
-	logger.Info("application started", "service", "identity-service", "address", cfg.HTTPAddr)
+	logger.Info("application started", "usecase", "identity-usecase", "address", cfg.HTTPAddr)
 
 	select {
 	case err := <-errs:

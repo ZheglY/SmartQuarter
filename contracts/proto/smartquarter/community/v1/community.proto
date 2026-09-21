@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package smartquarter.community.v1;
 
-option go_package = "github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1;communityv1";
+option go_package = "github.com/ZheglY/SmartQuarter/services/community-usecase/internal/gen/community/v1;communityv1";
 
 import "google/protobuf/timestamp.proto";
 

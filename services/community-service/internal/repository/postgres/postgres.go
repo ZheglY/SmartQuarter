@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,7 +27,7 @@ func (r *CommunityRepo) insertOutboxEvent(ctx context.Context, tx pgx.Tx, eventT
 	}
 
 	query := `INSERT INTO outbox_events (event_id, event_type, producer, payload) VALUES ($1, $2, $3, $4)`
-	_, err = tx.Exec(ctx, query, uuid.New().String(), eventType, "community-service", payloadBytes)
+	_, err = tx.Exec(ctx, query, uuid.New().String(), eventType, "community-usecase", payloadBytes)
 	return err
 }
 
@@ -119,7 +118,7 @@ func (r *CommunityRepo) GetPoll(ctx context.Context, houseID, pollID, userID str
 	err := r.db.QueryRow(ctx, queryPoll, pollID, houseID).Scan(&p.ID, &p.HouseID, &p.AuthorUserID, &p.Question, &p.Status, &p.EndsAt, &p.CreatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, fmt.Errorf("poll not found")
+			return nil, domain.ErrNotFound
 		}
 		return nil, err
 	}
@@ -168,7 +167,6 @@ func (r *CommunityRepo) ListPolls(ctx context.Context, houseID string, statuses 
 
 	if len(statuses) > 0 {
 		query += ` AND status = ANY($4) ORDER BY created_at DESC LIMIT $2 OFFSET $3`
-		// В pgx слайсы (statuses) передаются напрямую, без pq.Array
 		rows, err := r.db.Query(ctx, query, houseID, limit, offset, statuses)
 		return r.scanPolls(rows, err)
 	}
@@ -207,15 +205,17 @@ func (r *CommunityRepo) VotePoll(ctx context.Context, houseID, pollID, optionID,
 		return err
 	}
 
-	if res.RowsAffected() > 0 {
-		err = r.insertOutboxEvent(ctx, tx, "poll.voted", map[string]any{
-			"poll_id":   pollID,
-			"house_id":  houseID,
-			"option_id": optionID,
-		})
-		if err != nil {
-			return err
-		}
+	if res.RowsAffected() == 0 {
+		return domain.ErrAlreadyVoted
+	}
+
+	err = r.insertOutboxEvent(ctx, tx, "poll.voted", map[string]any{
+		"poll_id":   pollID,
+		"house_id":  houseID,
+		"option_id": optionID,
+	})
+	if err != nil {
+		return err
 	}
 
 	return tx.Commit(ctx)
@@ -328,11 +328,48 @@ func (r *CommunityRepo) SupportInitiative(ctx context.Context, houseID, initiati
 		return err
 	}
 
-	if res.RowsAffected() > 0 {
-		queryUpdate := `UPDATE initiatives SET supports_count = supports_count + 1 WHERE id = $1`
-		if _, err := tx.Exec(ctx, queryUpdate, initiativeID); err != nil {
-			return err
-		}
+	if res.RowsAffected() == 0 {
+		return domain.ErrAlreadyVoted
 	}
+
+	queryUpdate := `UPDATE initiatives SET supports_count = supports_count + 1 WHERE id = $1`
+	if _, err := tx.Exec(ctx, queryUpdate, initiativeID); err != nil {
+		return err
+	}
+
 	return tx.Commit(ctx)
+}
+
+func (r *CommunityRepo) GetUnpublishedOutboxEvents(ctx context.Context, limit int) ([]domain.OutboxEvent, error) {
+	query := `
+		SELECT event_id, event_type, payload
+		FROM outbox_events
+		WHERE published_at IS NULL
+		ORDER BY occurred_at ASC
+		LIMIT $1
+		FOR UPDATE SKIP LOCKED`
+	rows, err := r.db.Query(ctx, query, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var events []domain.OutboxEvent
+	for rows.Next() {
+		var e domain.OutboxEvent
+		if err := rows.Scan(&e.EventID, &e.EventType, &e.Payload); err != nil {
+			return nil, err
+		}
+		events = append(events, e)
+	}
+	return events, nil
+}
+
+func (r *CommunityRepo) MarkOutboxEventsPublished(ctx context.Context, eventIDs []string) error {
+	if len(eventIDs) == 0 {
+		return nil
+	}
+	query := `UPDATE outbox_events SET published_at = NOW() WHERE event_id = ANY($1)`
+	_, err := r.db.Exec(ctx, query, eventIDs)
+	return err
 }

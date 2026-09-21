@@ -32,7 +32,7 @@ const (
 	CommunityService_SupportInitiative_FullMethodName   = "/smartquarter.community.v1.CommunityService/SupportInitiative"
 )
 
-// CommunityServiceClient is the client API for CommunityService service.
+// CommunityServiceClient is the client API for CommunityService usecase.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CommunityServiceClient interface {
@@ -167,7 +167,7 @@ func (c *communityServiceClient) SupportInitiative(ctx context.Context, in *Supp
 	return out, nil
 }
 
-// CommunityServiceServer is the server API for CommunityService service.
+// CommunityServiceServer is the server API for CommunityService usecase.
 // All implementations must embed UnimplementedCommunityServiceServer
 // for forward compatibility.
 type CommunityServiceServer interface {
@@ -228,7 +228,7 @@ func (UnimplementedCommunityServiceServer) SupportInitiative(context.Context, *S
 func (UnimplementedCommunityServiceServer) mustEmbedUnimplementedCommunityServiceServer() {}
 func (UnimplementedCommunityServiceServer) testEmbeddedByValue()                          {}
 
-// UnsafeCommunityServiceServer may be embedded to opt out of forward compatibility for this service.
+// UnsafeCommunityServiceServer may be embedded to opt out of forward compatibility for this usecase.
 // Use of this interface is not recommended, as added methods to CommunityServiceServer will
 // result in compilation errors.
 type UnsafeCommunityServiceServer interface {
@@ -444,7 +444,7 @@ func _CommunityService_SupportInitiative_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-// CommunityService_ServiceDesc is the grpc.ServiceDesc for CommunityService service.
+// CommunityService_ServiceDesc is the grpc.ServiceDesc for CommunityService usecase.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var CommunityService_ServiceDesc = grpc.ServiceDesc{

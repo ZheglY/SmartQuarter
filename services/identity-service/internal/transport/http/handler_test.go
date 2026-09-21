@@ -23,7 +23,7 @@ func TestHealth(t *testing.T) {
 	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
 		t.Fatal(err)
 	}
-	if body.Status != "ok" || body.Service != "identity-service" {
+	if body.Status != "ok" || body.Service != "identity-usecase" {
 		t.Fatalf("unexpected health response: %+v", body)
 	}
 }
