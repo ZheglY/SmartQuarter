@@ -7,8 +7,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/domain"
-	// Поправить
-	identity v1 "github.com/ZheglY/SmartQuarter/services/identity-service/internal/gen/smartquarter/identity/v1"
+	identityv1 "github.com/ZheglY/SmartQuarter/services/identity-service/internal/gen/smartquarter/identity/v1"
+)
 )
 
 // toProtouser конвертирует доменого пользователя в Protobuf User
