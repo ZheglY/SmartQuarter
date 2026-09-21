@@ -4,4 +4,6 @@ bin
 coverage
 *.out
 *.exe
-
+.tmp
+.tools
+.git
