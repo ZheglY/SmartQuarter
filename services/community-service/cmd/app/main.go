@@ -3,41 +3,88 @@ package main
 import (
 	"context"
 	"errors"
-	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+
 	"github.com/ZheglY/SmartQuarter/services/community-service/internal/config"
-	httptransport "github.com/ZheglY/SmartQuarter/services/community-service/internal/transport/http"
+	communityv1 "github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1"
+	"github.com/ZheglY/SmartQuarter/services/community-service/internal/observability/logs"
+	"github.com/ZheglY/SmartQuarter/services/community-service/internal/repository/postgres"
+	"github.com/ZheglY/SmartQuarter/services/community-service/internal/service"
+	grpc_transport "github.com/ZheglY/SmartQuarter/services/community-service/internal/transport/grpc"
+	http_transport "github.com/ZheglY/SmartQuarter/services/community-service/internal/transport/http"
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger := logs.NewLogger()
+	defer logger.Sync()
+
 	if err := run(logger); err != nil {
-		logger.Error("application stopped", "error", err)
-		os.Exit(1)
+		logger.Fatal("application stopped, zap don`t start", zap.Error(err))
 	}
 }
 
-func run(logger *slog.Logger) error {
+func run(logger *zap.Logger) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
 	cfg := config.Load()
-	server := &http.Server{
-		Addr:              cfg.HTTPAddr,
-		Handler:           httptransport.NewHandler(),
-		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      15 * time.Second,
-		IdleTimeout:       60 * time.Second,
+
+	dbDSN := os.Getenv("DATABASE_URL")
+	if dbDSN == "" {
+		dbDSN = "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
 	}
+
+	pool, err := pgxpool.New(context.Background(), dbDSN)
+	if err != nil {
+		return err
+	}
+	defer pool.Close()
+
+	if err := pool.Ping(context.Background()); err != nil {
+		logger.Warn("Failed to ping DB on startup", zap.Error(err))
+	} else {
+		logger.Info("Connected to PostgreSQL via pgxpool")
+	}
+
+	repo := postgres.NewCommunityRepo(pool)
+	uc := usecase.NewCommunityService(repo)
+	grpcHandler := grpc_transport.NewCommunityHandler(uc, logger)
+
+	grpcPort := ":9090"
+	grpcListener, err := net.Listen("tcp", grpcPort)
+	if err != nil {
+		return err
+	}
+	grpcServer := grpc.NewServer()
+	communityv1.RegisterCommunityServiceServer(grpcServer, grpcHandler)
+	reflection.Register(grpcServer)
+
+	go func() {
+		logger.Info("gRPC server started", zap.String("address", grpcPort))
+		_ = grpcServer.Serve(grpcListener)
+	}()
+
+	httpServer := &http.Server{
+		Addr:              cfg.HTTPAddr,
+		Handler:           http_transport.NewHandler(),
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+
 	errs := make(chan error, 1)
-	go func() { errs <- server.ListenAndServe() }()
-	logger.Info("application started", "service", "community-service", "address", cfg.HTTPAddr)
+	go func() {
+		logger.Info("HTTP health server started", zap.String("address", cfg.HTTPAddr))
+		errs <- httpServer.ListenAndServe()
+	}()
 
 	select {
 	case err := <-errs:
@@ -46,13 +93,10 @@ func run(logger *slog.Logger) error {
 		}
 		return err
 	case <-ctx.Done():
-		logger.Info("shutting down")
+		logger.Info("shutting down gracefully...")
+		grpcServer.GracefulStop()
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		if err := server.Shutdown(shutdownCtx); err != nil {
-			_ = server.Close()
-			return err
-		}
-		return nil
+		return httpServer.Shutdown(shutdownCtx)
 	}
 }

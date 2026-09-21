@@ -1,0 +1,202 @@
+syntax = "proto3";
+
+package smartquarter.community.v1;
+
+option go_package = "github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1;communityv1";
+
+import "google/protobuf/timestamp.proto";
+
+service CommunityService {
+  rpc CreateAnnouncement (CreateAnnouncementRequest) returns (Announcement);
+  rpc ListAnnouncements (ListAnnouncementsRequest) returns (ListAnnouncementsResponse);
+  rpc CreatePoll (CreatePollRequest) returns (Poll);
+  rpc GetPoll(GetPollRequest) returns (PollDetails);
+  rpc ListPolls (ListPollsRequest) returns (ListPollsResponse);
+  rpc VotePoll (VotePollRequest) returns (VotePollResponse);
+  rpc CreateCalendarEvent (CreateCalendarEventRequest) returns (CalendarEvent);
+  rpc ListCalendarEvents (ListCalendarEventsRequest) returns (ListCalendarEventsResponse);
+  rpc CreateInitiative (CreateInitiativeRequest) returns (Initiative);
+  rpc ListInitiatives (ListInitiativesRequest) returns (ListInitiativesResponse);
+  rpc SupportInitiative (SupportInitiativeRequest) returns (SupportInitiativeResponse);
+}
+
+enum AnnouncementStatus {
+  ANNOUNCEMENT_STATUS_UNSPECIFIED = 0;
+  ANNOUNCEMENT_STATUS_PUBLISHED = 1;
+}
+
+enum PollStatus {
+  POLL_STATUS_UNSPECIFIED = 0;
+  POLL_STATUS_OPEN = 1;
+  POLL_STATUS_CLOSED = 2;
+}
+
+enum InitiativeStatus {
+  INITIATIVE_STATUS_UNSPECIFIED = 0;
+  INITIATIVE_STATUS_OPEN = 1;
+  INITIATIVE_STATUS_CLOSED = 2;
+}
+
+message Announcement {
+  string id = 1;
+  string house_id = 2;
+  string author_user_id = 3;
+  string title = 4;
+  string body = 5;
+  AnnouncementStatus status = 6;
+  google.protobuf.Timestamp published_at = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message CreateAnnouncementRequest {
+  string house_id = 1;
+  string title = 2;
+  string body = 3;
+}
+
+message ListAnnouncementsRequest {
+  string house_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListAnnouncementsResponse {
+  repeated Announcement items = 1;
+  string next_page_token = 2;
+}
+
+message PollOption {
+  string id = 1;
+  string text = 2;
+  int32 position = 3;
+}
+
+message Poll {
+  string id = 1;
+  string house_id = 2;
+  string author_user_id = 3;
+  string question = 4;
+  PollStatus status = 5;
+  repeated PollOption options = 6;
+  google.protobuf.Timestamp ends_at = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message PollOptionResult {
+  string option_id = 1;
+  int32 votes_count = 2;
+}
+
+message PollDetails {
+  Poll poll = 1;
+  repeated PollOptionResult results = 2;
+  int32 total_votes = 3;
+  string my_option_id = 4;
+}
+
+message CreatePollRequest {
+  string house_id = 1;
+  string question = 2;
+  repeated string options = 3;
+  google.protobuf.Timestamp ends_at = 4;
+}
+
+message GetPollRequest {
+  string house_id = 1;
+  string poll_id = 2;
+}
+
+message ListPollsRequest {
+  string house_id = 1;
+  repeated PollStatus status = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+}
+
+message ListPollsResponse {
+  repeated Poll items = 1;
+  string next_page_token = 2;
+}
+
+message VotePollRequest {
+  string house_id = 1;
+  string poll_id = 2;
+  string option_id = 3;
+}
+
+message VotePollResponse {
+  string poll_id = 1;
+  string option_id = 2;
+  int32 total_votes = 3;
+  string my_option_id = 4;
+}
+
+message CalendarEvent {
+  string id = 1;
+  string house_id = 2;
+  string created_by = 3;
+  string title = 4;
+  string description = 5;
+  google.protobuf.Timestamp starts_at = 6;
+  google.protobuf.Timestamp ends_at = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message CreateCalendarEventRequest {
+  string house_id = 1;
+  string title = 2;
+  string description = 3;
+  google.protobuf.Timestamp starts_at = 4;
+  google.protobuf.Timestamp ends_at = 5;
+}
+
+message ListCalendarEventsRequest {
+  string house_id = 1;
+  google.protobuf.Timestamp from = 2;
+  google.protobuf.Timestamp to = 3;
+}
+
+message ListCalendarEventsResponse {
+  repeated CalendarEvent items = 1;
+}
+
+message Initiative {
+  string id = 1;
+  string house_id = 2;
+  string author_user_id = 3;
+  string title = 4;
+  string description = 5;
+  InitiativeStatus status = 6;
+  int32 supports_count = 7;
+  bool supported_by_me = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+message CreateInitiativeRequest {
+  string house_id = 1;
+  string title = 2;
+  string description = 3;
+}
+
+message ListInitiativesRequest {
+  string house_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListInitiativesResponse {
+  repeated Initiative items = 1;
+  string next_page_token = 2;
+}
+
+message SupportInitiativeRequest {
+  string house_id = 1;
+  string initiative_id = 2;
+}
+
+message SupportInitiativeResponse {
+  string initiative_id = 1;
+  int32 supports_count = 2;
+  bool supported_by_me = 3;
+}
