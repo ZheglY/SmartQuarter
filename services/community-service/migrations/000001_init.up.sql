@@ -1,6 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Объявления
 CREATE TABLE IF NOT EXISTS announcements (
                                            id UUID PRIMARY KEY,
                                            house_id UUID NOT NULL,
@@ -12,7 +11,6 @@ CREATE TABLE IF NOT EXISTS announcements (
                                            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
--- Опросы
 CREATE TABLE IF NOT EXISTS polls (
                                    id UUID PRIMARY KEY,
                                    house_id UUID NOT NULL,
@@ -37,7 +35,6 @@ CREATE TABLE IF NOT EXISTS poll_votes (
                                         PRIMARY KEY (poll_id, user_id)
 );
 
--- Календарь
 CREATE TABLE IF NOT EXISTS calendar_events (
                                              id UUID PRIMARY KEY,
                                              house_id UUID NOT NULL,
@@ -49,7 +46,6 @@ CREATE TABLE IF NOT EXISTS calendar_events (
                                              created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
--- Инициативы
 CREATE TABLE IF NOT EXISTS initiatives (
                                          id UUID PRIMARY KEY,
                                          house_id UUID NOT NULL,
@@ -68,12 +64,12 @@ CREATE TABLE IF NOT EXISTS initiative_supports (
                                                  PRIMARY KEY (initiative_id, user_id)
 );
 
--- Outbox паттерн
 CREATE TABLE IF NOT EXISTS outbox_events (
                                            event_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                                            event_type VARCHAR(255) NOT NULL,
                                            event_version INT NOT NULL DEFAULT 1,
                                            occurred_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
                                            producer VARCHAR(255) NOT NULL,
-                                           payload JSONB NOT NULL
+                                           payload JSONB NOT NULL,
+                                           published_at TIMESTAMP WITH TIME ZONE -- Добавлено пропущенное поле
 );
