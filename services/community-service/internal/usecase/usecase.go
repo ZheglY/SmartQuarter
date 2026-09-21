@@ -4,8 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/ZheglY/SmartQuarter/services/community-service/internal/domain"
 	"github.com/google/uuid"
+
+	"github.com/ZheglY/SmartQuarter/services/community-service/internal/domain"
 )
 
 type communityUseCase struct {
@@ -41,6 +42,10 @@ func (u *communityUseCase) ListAnnouncements(ctx context.Context, houseID string
 }
 
 func (u *communityUseCase) CreatePoll(ctx context.Context, houseID, authorID, question string, options []string, endsAt time.Time) (*domain.Poll, error) {
+	if endsAt.Before(time.Now()) {
+		return nil, domain.ErrInvalidDate
+	}
+
 	p := &domain.Poll{
 		ID:           uuid.New().String(),
 		HouseID:      houseID,
@@ -75,11 +80,21 @@ func (u *communityUseCase) ListPolls(ctx context.Context, houseID string, status
 }
 
 func (u *communityUseCase) VotePoll(ctx context.Context, houseID, pollID, optionID, userID string) (int32, string, error) {
-	err := u.repo.VotePoll(ctx, houseID, pollID, optionID, userID)
+	details, err := u.repo.GetPoll(ctx, houseID, pollID, userID)
 	if err != nil {
 		return 0, "", err
 	}
-	details, err := u.repo.GetPoll(ctx, houseID, pollID, userID)
+
+	if details.Poll.Status == "CLOSED" || details.Poll.EndsAt.Before(time.Now()) {
+		return 0, "", domain.ErrPollClosed
+	}
+
+	err = u.repo.VotePoll(ctx, houseID, pollID, optionID, userID)
+	if err != nil {
+		return 0, "", err
+	}
+
+	details, err = u.repo.GetPoll(ctx, houseID, pollID, userID)
 	if err != nil {
 		return 0, "", err
 	}
@@ -87,6 +102,10 @@ func (u *communityUseCase) VotePoll(ctx context.Context, houseID, pollID, option
 }
 
 func (u *communityUseCase) CreateCalendarEvent(ctx context.Context, houseID, authorID, title, desc string, startsAt, endsAt time.Time) (*domain.CalendarEvent, error) {
+	if !endsAt.After(startsAt) {
+		return nil, domain.ErrInvalidDate
+	}
+
 	e := &domain.CalendarEvent{
 		ID:          uuid.New().String(),
 		HouseID:     houseID,
@@ -139,7 +158,7 @@ func (u *communityUseCase) SupportInitiative(ctx context.Context, houseID, initi
 	if err != nil {
 		return 0, err
 	}
-	// Fetch updated count
+
 	items, err := u.repo.ListInitiatives(ctx, houseID, userID, 1, 0)
 	if err != nil || len(items) == 0 {
 		return 0, err

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"go.uber.org/zap"
@@ -24,28 +25,56 @@ func NewCommunityHandler(useCase domain.CommunityService, logger *zap.Logger) *C
 	return &CommunityHandler{useCase: useCase, logger: logger}
 }
 
-func extractActorID(ctx context.Context) (string, error) {
+func extractContext(ctx context.Context, requestedHouseID string) (userID, role string, err error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", status.Error(codes.Unauthenticated, "metadata is not provided")
+		return "", "", status.Error(codes.Unauthenticated, "metadata is not provided")
 	}
-	values := md.Get("x-actor-user-id")
-	if len(values) == 0 {
-		return "", status.Error(codes.Unauthenticated, "x-actor-user-id is missing")
+
+	userVals := md.Get("x-actor-user-id")
+	if len(userVals) == 0 {
+		return "", "", status.Error(codes.Unauthenticated, "x-actor-user-id is missing")
 	}
-	return values[0], nil
+
+	roleVals := md.Get("x-actor-role")
+	roleStr := "RESIDENT"
+	if len(roleVals) > 0 {
+		roleStr = roleVals[0]
+	}
+
+	houseVals := md.Get("x-house-id")
+	if len(houseVals) > 0 && houseVals[0] != requestedHouseID {
+		return "", "", status.Error(codes.PermissionDenied, "access to this house is denied")
+	}
+
+	return userVals[0], roleStr, nil
+}
+
+func mapError(err error) error {
+	if errors.Is(err, domain.ErrAlreadyVoted) {
+		return status.Errorf(codes.AlreadyExists, err.Error())
+	}
+	if errors.Is(err, domain.ErrPollClosed) || errors.Is(err, domain.ErrInvalidDate) {
+		return status.Errorf(codes.FailedPrecondition, err.Error())
+	}
+	if errors.Is(err, domain.ErrNotFound) {
+		return status.Errorf(codes.NotFound, err.Error())
+	}
+	return status.Errorf(codes.Internal, "internal server error: %v", err)
 }
 
 func (h *CommunityHandler) CreateAnnouncement(ctx context.Context, req *communityv1.CreateAnnouncementRequest) (*communityv1.Announcement, error) {
-	actorID, err := extractActorID(ctx)
+	actorID, role, err := extractContext(ctx, req.GetHouseId())
 	if err != nil {
 		return nil, err
+	}
+	if role != "CHAIRMAN" && role != "ADMIN" {
+		return nil, status.Error(codes.PermissionDenied, "only chairman or admin can create announcements")
 	}
 
 	ann, err := h.useCase.CreateAnnouncement(ctx, req.GetHouseId(), actorID, req.GetTitle(), req.GetBody())
 	if err != nil {
-		h.logger.Error("failed to create announcement", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 
 	return &communityv1.Announcement{
@@ -61,6 +90,11 @@ func (h *CommunityHandler) CreateAnnouncement(ctx context.Context, req *communit
 }
 
 func (h *CommunityHandler) ListAnnouncements(ctx context.Context, req *communityv1.ListAnnouncementsRequest) (*communityv1.ListAnnouncementsResponse, error) {
+	_, _, err := extractContext(ctx, req.GetHouseId())
+	if err != nil {
+		return nil, err
+	}
+
 	limit := int(req.GetPageSize())
 	offset := 0
 	if req.GetPageToken() != "" {
@@ -69,8 +103,7 @@ func (h *CommunityHandler) ListAnnouncements(ctx context.Context, req *community
 
 	list, err := h.useCase.ListAnnouncements(ctx, req.GetHouseId(), limit, offset)
 	if err != nil {
-		h.logger.Error("failed to list announcements", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 
 	var items []*communityv1.Announcement
@@ -94,15 +127,17 @@ func (h *CommunityHandler) ListAnnouncements(ctx context.Context, req *community
 }
 
 func (h *CommunityHandler) CreatePoll(ctx context.Context, req *communityv1.CreatePollRequest) (*communityv1.Poll, error) {
-	actorID, err := extractActorID(ctx)
+	actorID, role, err := extractContext(ctx, req.GetHouseId())
 	if err != nil {
 		return nil, err
+	}
+	if role != "CHAIRMAN" && role != "ADMIN" {
+		return nil, status.Error(codes.PermissionDenied, "only chairman or admin can create polls")
 	}
 
 	p, err := h.useCase.CreatePoll(ctx, req.GetHouseId(), actorID, req.GetQuestion(), req.GetOptions(), req.GetEndsAt().AsTime())
 	if err != nil {
-		h.logger.Error("failed to create poll", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 
 	var opts []*communityv1.PollOption
@@ -122,18 +157,14 @@ func (h *CommunityHandler) CreatePoll(ctx context.Context, req *communityv1.Crea
 }
 
 func (h *CommunityHandler) GetPoll(ctx context.Context, req *communityv1.GetPollRequest) (*communityv1.PollDetails, error) {
-	actorID, err := extractActorID(ctx)
+	actorID, _, err := extractContext(ctx, req.GetHouseId())
 	if err != nil {
 		return nil, err
 	}
 
 	d, err := h.useCase.GetPoll(ctx, req.GetHouseId(), req.GetPollId(), actorID)
 	if err != nil {
-		if err.Error() == "poll not found" {
-			return nil, status.Errorf(codes.NotFound, "poll not found")
-		}
-		h.logger.Error("failed to get poll details", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 
 	var opts []*communityv1.PollOption
@@ -168,6 +199,11 @@ func (h *CommunityHandler) GetPoll(ctx context.Context, req *communityv1.GetPoll
 }
 
 func (h *CommunityHandler) ListPolls(ctx context.Context, req *communityv1.ListPollsRequest) (*communityv1.ListPollsResponse, error) {
+	_, _, err := extractContext(ctx, req.GetHouseId())
+	if err != nil {
+		return nil, err
+	}
+
 	limit := int(req.GetPageSize())
 	offset := 0
 	if req.GetPageToken() != "" {
@@ -181,8 +217,7 @@ func (h *CommunityHandler) ListPolls(ctx context.Context, req *communityv1.ListP
 
 	list, err := h.useCase.ListPolls(ctx, req.GetHouseId(), statuses, limit, offset)
 	if err != nil {
-		h.logger.Error("failed to list polls", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 
 	var items []*communityv1.Poll
@@ -209,29 +244,30 @@ func (h *CommunityHandler) ListPolls(ctx context.Context, req *communityv1.ListP
 }
 
 func (h *CommunityHandler) VotePoll(ctx context.Context, req *communityv1.VotePollRequest) (*communityv1.VotePollResponse, error) {
-	actorID, err := extractActorID(ctx)
+	actorID, _, err := extractContext(ctx, req.GetHouseId())
 	if err != nil {
 		return nil, err
 	}
 
 	total, myOpt, err := h.useCase.VotePoll(ctx, req.GetHouseId(), req.GetPollId(), req.GetOptionId(), actorID)
 	if err != nil {
-		h.logger.Error("failed to process vote", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 	return &communityv1.VotePollResponse{PollId: req.GetPollId(), OptionId: req.GetOptionId(), TotalVotes: total, MyOptionId: myOpt}, nil
 }
 
 func (h *CommunityHandler) CreateCalendarEvent(ctx context.Context, req *communityv1.CreateCalendarEventRequest) (*communityv1.CalendarEvent, error) {
-	actorID, err := extractActorID(ctx)
+	actorID, role, err := extractContext(ctx, req.GetHouseId())
 	if err != nil {
 		return nil, err
+	}
+	if role != "CHAIRMAN" && role != "ADMIN" {
+		return nil, status.Error(codes.PermissionDenied, "only chairman or admin can create calendar events")
 	}
 
 	e, err := h.useCase.CreateCalendarEvent(ctx, req.GetHouseId(), actorID, req.GetTitle(), req.GetDescription(), req.GetStartsAt().AsTime(), req.GetEndsAt().AsTime())
 	if err != nil {
-		h.logger.Error("failed to create calendar event", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 	return &communityv1.CalendarEvent{
 		Id:          e.ID,
@@ -246,10 +282,14 @@ func (h *CommunityHandler) CreateCalendarEvent(ctx context.Context, req *communi
 }
 
 func (h *CommunityHandler) ListCalendarEvents(ctx context.Context, req *communityv1.ListCalendarEventsRequest) (*communityv1.ListCalendarEventsResponse, error) {
+	_, _, err := extractContext(ctx, req.GetHouseId())
+	if err != nil {
+		return nil, err
+	}
+
 	list, err := h.useCase.ListCalendarEvents(ctx, req.GetHouseId(), req.GetFrom().AsTime(), req.GetTo().AsTime())
 	if err != nil {
-		h.logger.Error("failed to list calendar events", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 	var items []*communityv1.CalendarEvent
 	for _, e := range list {
@@ -268,15 +308,14 @@ func (h *CommunityHandler) ListCalendarEvents(ctx context.Context, req *communit
 }
 
 func (h *CommunityHandler) CreateInitiative(ctx context.Context, req *communityv1.CreateInitiativeRequest) (*communityv1.Initiative, error) {
-	actorID, err := extractActorID(ctx)
+	actorID, _, err := extractContext(ctx, req.GetHouseId())
 	if err != nil {
 		return nil, err
 	}
 
 	i, err := h.useCase.CreateInitiative(ctx, req.GetHouseId(), actorID, req.GetTitle(), req.GetDescription())
 	if err != nil {
-		h.logger.Error("failed to create initiative", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 	return &communityv1.Initiative{
 		Id:            i.ID,
@@ -293,7 +332,7 @@ func (h *CommunityHandler) CreateInitiative(ctx context.Context, req *communityv
 }
 
 func (h *CommunityHandler) ListInitiatives(ctx context.Context, req *communityv1.ListInitiativesRequest) (*communityv1.ListInitiativesResponse, error) {
-	actorID, err := extractActorID(ctx)
+	actorID, _, err := extractContext(ctx, req.GetHouseId())
 	if err != nil {
 		return nil, err
 	}
@@ -306,8 +345,7 @@ func (h *CommunityHandler) ListInitiatives(ctx context.Context, req *communityv1
 
 	list, err := h.useCase.ListInitiatives(ctx, req.GetHouseId(), actorID, limit, offset)
 	if err != nil {
-		h.logger.Error("failed to list initiatives", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 
 	var items []*communityv1.Initiative
@@ -337,15 +375,14 @@ func (h *CommunityHandler) ListInitiatives(ctx context.Context, req *communityv1
 }
 
 func (h *CommunityHandler) SupportInitiative(ctx context.Context, req *communityv1.SupportInitiativeRequest) (*communityv1.SupportInitiativeResponse, error) {
-	actorID, err := extractActorID(ctx)
+	actorID, _, err := extractContext(ctx, req.GetHouseId())
 	if err != nil {
 		return nil, err
 	}
 
 	count, err := h.useCase.SupportInitiative(ctx, req.GetHouseId(), req.GetInitiativeId(), actorID)
 	if err != nil {
-		h.logger.Error("failed to support initiative", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "internal server error")
+		return nil, mapError(err)
 	}
 	return &communityv1.SupportInitiativeResponse{
 		InitiativeId:  req.GetInitiativeId(),

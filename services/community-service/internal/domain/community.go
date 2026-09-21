@@ -2,7 +2,16 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"time"
+)
+
+var (
+	ErrAlreadyVoted = errors.New("already voted")
+	ErrPollClosed   = errors.New("poll is closed")
+	ErrInvalidDate  = errors.New("ends_at must be strictly after starts_at")
+	ErrAccessDenied = errors.New("access denied")
+	ErrNotFound     = errors.New("resource not found")
 )
 
 type Announcement struct {
@@ -69,6 +78,12 @@ type Initiative struct {
 	UpdatedAt     time.Time
 }
 
+type OutboxEvent struct {
+	EventID   string
+	EventType string
+	Payload   []byte
+}
+
 type CommunityRepository interface {
 	CreateAnnouncement(ctx context.Context, a *Announcement) error
 	ListAnnouncements(ctx context.Context, houseID string, limit, offset int) ([]Announcement, error)
@@ -84,6 +99,9 @@ type CommunityRepository interface {
 	CreateInitiative(ctx context.Context, i *Initiative) error
 	ListInitiatives(ctx context.Context, houseID, userID string, limit, offset int) ([]Initiative, error)
 	SupportInitiative(ctx context.Context, houseID, initiativeID, userID string) error
+
+	GetUnpublishedOutboxEvents(ctx context.Context, limit int) ([]OutboxEvent, error)
+	MarkOutboxEventsPublished(ctx context.Context, eventIDs []string) error
 }
 
 type CommunityService interface {
@@ -102,4 +120,3 @@ type CommunityService interface {
 	ListInitiatives(ctx context.Context, houseID, userID string, limit, offset int) ([]Initiative, error)
 	SupportInitiative(ctx context.Context, houseID, initiativeID, userID string) (int32, error)
 }
-	

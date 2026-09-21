@@ -1,8 +1,8 @@
 go 1.26.0
 
 use (
-	./services/max-gateway
+	./services/community-service
 	./services/identity-service
 	./services/issue-service
-	./services/community-service
+	./services/max-gateway
 )

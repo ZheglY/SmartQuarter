@@ -47,7 +47,7 @@ PostgreSQL, Redis и MinIO пока не подключены к Compose. Цел
 Нужен Go 1.26.x. Запуск одного сервиса из корня:
 
 ```sh
-go run ./services/issue-service/cmd/app
+go run ./services/issue-usecase/cmd/app
 # В другом терминале: curl http://localhost:8082/healthz
 ```
 
@@ -68,7 +68,7 @@ docker compose -f deploy/docker-compose.yml down
 Проверка модуля в Linux/macOS/Git Bash:
 
 ```sh
-cd services/issue-service
+cd services/issue-usecase
 export GOWORK=off
 gofmt -l .
 go vet ./...
