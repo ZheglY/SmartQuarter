@@ -1,0 +1,14 @@
+react 19.3.0: MIT
+react-dom 19.3.0: MIT
+react-router-dom 7.18.4: MIT
+react-router 7.18.4: MIT
+scheduler 0.28.0: MIT
+@tanstack/react-query 5.103.2: MIT
+@tanstack/query-core 5.103.2: MIT
+zod 4.6.5: MIT
+lucide-react 1.47.0: ISC
+@fontsource/manrope 5.3.0: OFL-1.1
+cookie 1.1.1: MIT
+set-cookie-parser 2.7.2: MIT
+
+Original application design supplied by the project owner.
