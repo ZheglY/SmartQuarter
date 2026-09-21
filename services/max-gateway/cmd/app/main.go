@@ -3,56 +3,130 @@ package main
 import (
 	"context"
 	"errors"
-	"log/slog"
+	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
+	"google.golang.org/grpc/connectivity"
+
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/config"
-	httptransport "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/transport/http"
+	cpb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/community/v1"
+	pb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/issue/v1"
+	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/identity"
+	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/maxapi"
+	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/notification"
+	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/observability"
+	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/rpc"
+	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/state"
+	transport "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/transport/http"
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	if err := run(logger); err != nil {
-		logger.Error("application stopped", "error", err)
+	if e := run(); e != nil {
+		fmt.Fprintln(os.Stderr, e)
 		os.Exit(1)
 	}
 }
-
-func run(logger *slog.Logger) error {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-
-	cfg := config.Load()
-	server := &http.Server{
-		Addr:              cfg.HTTPAddr,
-		Handler:           httptransport.NewHandler(),
-		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      15 * time.Second,
-		IdleTimeout:       60 * time.Second,
-	}
-	errs := make(chan error, 1)
-	go func() { errs <- server.ListenAndServe() }()
-	logger.Info("application started", "usecase", "max-gateway", "address", cfg.HTTPAddr)
-
-	select {
-	case err := <-errs:
-		if errors.Is(err, http.ErrServerClosed) {
-			return nil
+func run() error {
+	if len(os.Args) == 2 && os.Args[1] == "healthcheck" {
+		addr := os.Getenv("HTTP_ADDR")
+		if addr == "" {
+			addr = ":8080"
 		}
-		return err
-	case <-ctx.Done():
-		logger.Info("shutting down")
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := server.Shutdown(shutdownCtx); err != nil {
-			_ = server.Close()
-			return err
+		_, port, e := net.SplitHostPort(addr)
+		if e != nil {
+			return errors.New("invalid HTTP_ADDR")
+		}
+		res, e := (&http.Client{Timeout: 3 * time.Second}).Get("http://127.0.0.1:" + port + "/livez")
+		if e != nil {
+			return errors.New("gateway unavailable")
+		}
+		res.Body.Close()
+		if res.StatusCode != 200 {
+			return errors.New("gateway not live")
 		}
 		return nil
 	}
+	cfg, e := config.Load()
+	if e != nil {
+		return e
+	}
+	lc := zap.NewProductionConfig()
+	if e = lc.Level.UnmarshalText([]byte(cfg.LogLevel)); e != nil {
+		return errors.New("invalid LOG_LEVEL")
+	}
+	logger, e := lc.Build(zap.Fields(zap.String("service", "max-gateway"), zap.String("environment", cfg.Environment)))
+	if e != nil {
+		return e
+	}
+	defer func() { _ = logger.Sync() }()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	metrics := observability.New()
+	r := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr, Password: cfg.RedisPassword, DB: cfg.RedisDB, MaxRetries: -1, DialTimeout: cfg.DialTimeout, ReadTimeout: 2 * time.Second, WriteTimeout: 2 * time.Second, ContextTimeoutEnabled: true})
+	defer r.Close()
+	conn, e := rpc.Dial(cfg.IssueAddr, cfg.RequestTimeout, logger, metrics, cfg.DialTimeout)
+	if e != nil {
+		return errors.New("invalid Issue address")
+	}
+	defer conn.Close()
+	conn.Connect()
+	bot := &maxapi.Client{BaseURL: cfg.BotBaseURL, Token: cfg.BotToken, MiniAppURL: cfg.MiniAppURL, BotUsername: cfg.BotUsername, Store: state.Store{R: r}, Rate: cfg.NotificationRate}
+	api := &transport.API{Config: cfg, Store: state.Store{R: r}, Identity: identity.Unavailable{}, Issue: pb.NewIssueServiceClient(conn), Bot: bot, Metrics: metrics, Logger: logger}
+	if cfg.CommunityAddr != "" {
+		community, e := rpc.Dial(cfg.CommunityAddr, cfg.RequestTimeout, logger, metrics, cfg.DialTimeout)
+		if e != nil {
+			return errors.New("invalid Community address")
+		}
+		defer community.Close()
+		api.Community = cpb.NewCommunityServiceClient(community)
+	}
+	api.IssueReady = func(ctx context.Context) error {
+		if conn.GetState() != connectivity.Ready {
+			return errors.New("Issue gRPC unavailable")
+		}
+		req, e := http.NewRequestWithContext(ctx, "GET", cfg.IssueReadyURL, nil)
+		if e != nil {
+			return e
+		}
+		res, e := (&http.Client{Timeout: 2 * time.Second}).Do(req)
+		if e != nil {
+			return e
+		}
+		defer res.Body.Close()
+		if res.StatusCode != 200 {
+			return errors.New("Issue dependencies unavailable")
+		}
+		return nil
+	}
+	logger.Warn("Identity protobuf absent: session bootstrap and readiness blocked", zap.String("error_code", "IDENTITY_CONTRACT_UNAVAILABLE"))
+	workerCtx, cancelWorker := context.WithCancel(context.Background())
+	workerDone := make(chan struct{})
+	worker := &notification.Consumer{Redis: r, Stream: cfg.Stream, Group: cfg.Group, Identity: api.Identity, Bot: bot, Metrics: metrics, Logger: logger}
+	go func() { defer close(workerDone); worker.Run(workerCtx) }()
+	defer func() { cancelWorker(); <-workerDone }()
+	server := &http.Server{Addr: cfg.HTTPAddr, Handler: api.Handler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: cfg.ReadTimeout, WriteTimeout: cfg.WriteTimeout, IdleTimeout: cfg.IdleTimeout}
+	errs := make(chan error, 1)
+	go func() { errs <- server.ListenAndServe() }()
+	logger.Info("gateway listening", zap.String("http_addr", cfg.HTTPAddr))
+	select {
+	case e := <-errs:
+		if !errors.Is(e, http.ErrServerClosed) {
+			return e
+		}
+	case <-ctx.Done():
+		shutdown, cancel := context.WithTimeout(context.Background(), cfg.ShutdownTimeout)
+		defer cancel()
+		if e = server.Shutdown(shutdown); e != nil {
+			_ = server.Close()
+			return e
+		}
+	}
+	return nil
 }

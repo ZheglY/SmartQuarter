@@ -1,0 +1,21 @@
+name: smartquarter-gateway-local
+services:
+  max-gateway:
+    build: .
+    env_file: .env.local
+    environment:
+      HTTP_ADDR: ":8080"
+      REDIS_ADDR: redis:6379
+      ISSUE_GRPC_ADDR: issue-service:8082
+      ISSUE_READY_URL: http://issue-service:8083/readyz
+    ports: ["127.0.0.1:18080:8080"]
+    networks: [issue-local]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    stop_grace_period: 25s
+networks:
+  issue-local:
+    external: true
+    name: smartquarter-issue-local_default
