@@ -31,7 +31,7 @@ Go-сервис проблем многоквартирного дома: фот
 Адаптеры: `repository/postgres` (pgxpool), `storage/yandexs3` (AWS SDK v2), `outbox` (Redis Streams).
 `internal/app` собирает зависимости и управляет жизненным циклом; `observability` содержит zap/Prometheus. Сервис не читает таблицы соседей; внешние UUID не имеют cross-service FK.
 
-Единственный источник protobuf: `contracts/proto/smartquarter/issue/v1/issue.proto` **внутри issue-service**. Generated Go лежит в `internal/gen`. Корневые контракты, go.work, CI и Compose не изменены согласно ограничению области работы. В исходном репозитории готового общего issue.proto не было. Gateway должен генерировать свой клиент из этого файла: Go-пакет internal импортировать из другого сервиса нельзя. Перенос канонического proto в общую директорию и подключение gateway требуют отдельной общей задачи; совместимость с ещё не реализованным gateway не проверена.
+Единственный источник protobuf: `../../contracts/proto/smartquarter/issue/v1/issue.proto` в корне репозитория. Wire contract не изменён. Server stubs остаются в `internal/gen`; Gateway генерирует собственные client stubs из того же файла с Go import mapping. Общая генерация: `../max-gateway/scripts/generate.ps1`. HTTP → gRPC интеграция проверяется тестами Gateway с настоящим Issue Service.
 
 ## gRPC
 
@@ -118,7 +118,7 @@ go test ./...
 go vet ./...
 go build ./...
 # Buf CLI 1.72.0; версии Go plugins зафиксированы в buf.gen.yaml.
-buf generate
+buf generate ../../contracts/proto --path ../../contracts/proto/smartquarter/issue/v1/issue.proto
 buf build
 ./scripts/local.ps1 test
 # После local.ps1 up — smoke именно собранного и запущенного контейнера:
