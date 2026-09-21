@@ -2,24 +2,24 @@ package grpc
 
 import (
 	"errors"
-	"gogle.golang.org/grpc/codes"
+
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/domain"
 	identityv1 "github.com/ZheglY/SmartQuarter/services/identity-service/internal/gen/smartquarter/identity/v1"
 )
-)
 
 // toProtouser конвертирует доменого пользователя в Protobuf User
 func toProtoUser(u domain.User) *identityv1.User {
 	return &identityv1.User{
-		Id: u.ID,
-		MaxUserId: u.MaxUserID,
+		Id:          u.ID,
+		MaxUserId:   u.MaxUserID,
 		DisplayName: u.DisplayName,
-		Username: u.Username,
-		CreatedAt: timestamppb.New(u.CreatedAt),
-		UpdatedAt: timestamppb.New(u.UpdatedAt),
+		Username:    u.Username,
+		CreatedAt:   timestamppb.New(u.CreatedAt),
+		UpdatedAt:   timestamppb.New(u.UpdatedAt),
 	}
 }
 
@@ -52,7 +52,7 @@ func toProtoRole(r domain.Role) identityv1.Role {
 	switch r {
 	case domain.RoleResident:
 		return identityv1.Role_ROLE_RESIDENT
-	case domain.RoleChairman: 
+	case domain.RoleChairman:
 		return identityv1.Role_ROLE_CHAIRMAN
 	case domain.RoleAdmin:
 		return identityv1.Role_ROLE_ADMIN
@@ -69,7 +69,7 @@ func toProtoMembershipStatus(s domain.MembershipStatus) identityv1.MembershipSta
 	case domain.MembershipStatusInactive:
 		return identityv1.MembershipStatus_MEMBERSHIP_STATUS_INACTIVE
 	default:
-		return identityv1.MembershipStatus_MEMBERSHIP_STATU_UNSPECIFIED
+		return identityv1.MembershipStatus_MEMBERSHIP_STATUS_UNSPECIFIED
 	}
 }
 

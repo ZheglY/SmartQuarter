@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -22,11 +22,11 @@ func NewPostgres(pool *pgxpool.Pool) *PostgresRepository {
 }
 
 // UpsertMaxUser создает пользователя или обновляет disply_name и username при повторном входе
-func (r *PostgresRepository) UpsertMaxuser(
+func (r *PostgresRepository) UpsertMaxUser(
 	ctx context.Context,
 	maxUserID int64,
-	displayName, username string
-) (*domain.User error) {
+	displayName, username string,
+) (*domain.User, error) {
 	query := `
 		INSERT INTO users (max_user_id, display_name, username, created_at, updated_at)
 		VALUES ($1, $2, $3, NOW(), NOW())
@@ -42,7 +42,7 @@ func (r *PostgresRepository) UpsertMaxuser(
 		&u.ID,
 		&u.MaxUserID,
 		&u.DisplayName,
-		&u.Uesrname,
+		&u.Username,
 		&u.DefaultHouseID,
 		&u.CreatedAt,
 		&u.UpdatedAt,
@@ -63,7 +63,7 @@ func (r *PostgresRepository) GetUserByID(ctx context.Context, userID string) (*d
 	`
 
 	var u domain.User
-	err := r.pool.QueryRow(ctx, query, uesrID).Scan(
+	err := r.pool.QueryRow(ctx, query, userID).Scan(
 		&u.ID,
 		&u.MaxUserID,
 		&u.DisplayName,
@@ -83,7 +83,7 @@ func (r *PostgresRepository) GetUserByID(ctx context.Context, userID string) (*d
 }
 
 // GetHouseByID возвращает информацию о доме
-func (r *PostgresRepository) GetHouseByID(ctx, context.Context, houseID string) (*domain.House, error) {
+func (r *PostgresRepository) GetHouseByID(ctx context.Context, houseID string) (*domain.House, error) {
 	query := `
 	 	SELECT id, name, address, city, created_at, updated_at
 		FROM houses
@@ -92,7 +92,7 @@ func (r *PostgresRepository) GetHouseByID(ctx, context.Context, houseID string) 
 
 	var h domain.House
 	err := r.pool.QueryRow(ctx, query, houseID).Scan(
-		&h.ID, 
+		&h.ID,
 		&h.Name,
 		&h.Address,
 		&h.City,
@@ -145,7 +145,7 @@ func (r *PostgresRepository) GetMembership(ctx context.Context, userID, houseID 
 
 // ListMembershipsByUserID возвращает все записи о домах
 // к которым привязан пользователь
-func (r *PostgresRepository) ListMembershipsByUserID(ctx context.Context, userID string) ([]domain.Mmbership, error) {
+func (r *PostgresRepository) ListMembershipsByUserID(ctx context.Context, userID string) ([]domain.Membership, error) {
 	query := `
 		SELECT id, user_id, house_id, role, status, created_at, updated_at
 		FROM memberships
@@ -209,7 +209,7 @@ func (r *PostgresRepository) ListHousesByIDs(ctx context.Context, houseIDs []str
 	var houses []domain.House
 	for rows.Next() {
 		var h domain.House
-		for err := rows.Scan(
+		if err := rows.Scan(
 			&h.ID,
 			&h.Name,
 			&h.Address,
@@ -229,8 +229,7 @@ func (r *PostgresRepository) ListHousesByIDs(ctx context.Context, houseIDs []str
 	return houses, nil
 }
 
-
 // Ping проверяет доступность соединения с базой данных для /readyz
-func (r *Repository) Ping(ctx context.Context) error {
+func (r *PostgresRepository) Ping(ctx context.Context) error {
 	return r.pool.Ping(ctx)
 }

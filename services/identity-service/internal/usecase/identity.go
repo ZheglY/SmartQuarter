@@ -21,7 +21,7 @@ func New(repo domain.Repository) *IdentityUseCase {
 
 // UpsertMaxUser валидирует входные параметры и обновляет/создает
 // пользователя MAX
-func (uc *Identity.UseCase) UpsertMaxUser(
+func (uc *IdentityUseCase) UpsertMaxUser(
 	ctx context.Context,
 	maxUserID int64,
 	displayName, username string,
@@ -40,7 +40,7 @@ func (uc *Identity.UseCase) UpsertMaxUser(
 }
 
 // GetUserContext собирает профиль, дома, членства и определяет default_house_id
-func (uc *Identity.UseCase) GetUserContext(ctx context.Context, userID string) (*domain.UserContext, error) {
+func (uc *IdentityUseCase) GetUserContext(ctx context.Context, userID string) (*domain.UserContext, error) {
 	if _, err := uuid.Parse(userID); err != nil {
 		return nil, fmt.Errorf("%w: invalid user_id UUID", domain.ErrInvalidInput)
 	}

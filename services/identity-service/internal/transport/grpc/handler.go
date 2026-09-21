@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/domain"
 	identityv1 "github.com/ZheglY/SmartQuarter/services/identity-service/internal/gen/smartquarter/identity/v1"
 )
@@ -19,8 +20,8 @@ type Handler struct {
 	useCase IdentityUseCase
 }
 
-func NewHandler(useCase IdentityUsecase) *Handler {
-	return &Handler {
+func NewHandler(useCase IdentityUseCase) *Handler {
+	return &Handler{
 		useCase: useCase,
 	}
 }
@@ -38,7 +39,7 @@ func (h *Handler) UpsertMaxUser(
 	return toProtoUser(*user), nil
 }
 
-// GetUserContext собирает агрегированный контекст пользователя для 
+// GetUserContext собирает агрегированный контекст пользователя для
 // сессии Gateway
 func (h *Handler) GetUserContext(
 	ctx context.Context,
@@ -50,7 +51,7 @@ func (h *Handler) GetUserContext(
 	}
 
 	protoHouses := make([]*identityv1.House, 0, len(uCtx.Houses))
-	for _, house := range u.Ctx.Houses {
+	for _, house := range uCtx.Houses {
 		protoHouses = append(protoHouses, toProtoHouse(house))
 	}
 
@@ -60,43 +61,43 @@ func (h *Handler) GetUserContext(
 	}
 
 	return &identityv1.UserContext{
-		User: toProtouser(uCtx.User),
-		Houses: protoHouses,
-		Memberships: protoMemberships, 
+		User:           toProtoUser(uCtx.User),
+		Houses:         protoHouses,
+		Memberships:    protoMemberships,
 		DefaultHouseId: uCtx.DefaultHouseID,
 	}, nil
 }
 
-// Getmembership проверяет и возвращает роль и статус участника
+// GetMembership проверяет и возвращает роль и статус участника
 // в конкретном доме
 func (h *Handler) GetMembership(
 	ctx context.Context,
-	req *identityv1.GetMebershipRequest,
+	req *identityv1.GetMembershipRequest,
 ) (*identityv1.Membership, error) {
 	m, err := h.useCase.GetMembership(ctx, req.GetUserId(), req.GetHouseId())
 	if err != nil {
 		return nil, mapError(err)
 	}
 
-	return toProtomembership(*m), nil
+	return toProtoMembership(*m), nil
 }
 
 // ListMemberships возвращает все членства пользователя в домах
 func (h *Handler) ListMemberships(
 	ctx context.Context,
 	req *identityv1.ListMembershipsRequest,
-) (*identityv1.ListmembershipsResponse, error) {
-	membershipsm err := h.useCase.ListMemberships(ctx, req.GetuserId())
+) (*identityv1.ListMembershipsResponse, error) {
+	memberships, err := h.useCase.ListMemberships(ctx, req.GetUserId())
 	if err != nil {
 		return nil, mapError(err)
 	}
 
-	item := make([]*identityv1.Membership, 0, len(memberships))
+	items := make([]*identityv1.Membership, 0, len(memberships))
 	for _, m := range memberships {
-		items = append(items, toProtomemberships(m))
+		items = append(items, toProtoMembership(m))
 	}
 
-	return &identityv1.ListmembershipsResponse{
-		Items: item,
+	return &identityv1.ListMembershipsResponse{
+		Items: items,
 	}, nil
 }

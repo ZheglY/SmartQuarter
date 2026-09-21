@@ -18,7 +18,7 @@ type MembershipStatus string
 const (
 	MembershipStatusUnspecified MembershipStatus = "MEMBERSHIP_STATUS_UNSPECIFIED"
 	MembershipStatusActive      MembershipStatus = "ACTIVE"
-	MembershipStatusInactive    membershipStatus = "INACTIVE"
+	MembershipStatusInactive    MembershipStatus = "INACTIVE"
 )
 
 // User представляет пользователя MAX

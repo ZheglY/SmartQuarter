@@ -13,13 +13,13 @@ type Repository interface {
 	GetHouseByID(ctx context.Context, houseID string) (*House, error)
 
 	// GetMembership возвращает отношение пользователя к конкретному дому
-	GetMembership(ctx, context.Context, userID, houseID string) (*Membership, error)
+	GetMembership(ctx context.Context, userID, houseID string) (*Membership, error)
 
 	// ListMembershipByUserID возвращает все членства пользователя
-	ListMembershipByUserID(ctx context.Context, userID string) ([]Membership, error)
+	ListMembershipsByUserID(ctx context.Context, userID string) ([]Membership, error)
 
 	// ListHouseByIDs возвращает список домов по их UUID
-	ListHouseByIDs(ctx context.Context, houseIDs []string) ([]House, error)
+	ListHousesByIDs(ctx context.Context, houseIDs []string) ([]House, error)
 
 	// Ping проверяет готовновть сервиса
 	Ping(ctx context.Context) error

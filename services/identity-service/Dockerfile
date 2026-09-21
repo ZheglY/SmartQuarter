@@ -1,15 +1,35 @@
-FROM golang:1.26-bookworm AS build
-WORKDIR /src
-ENV GOWORK=off CGO_ENABLED=0
-# Service directory is the entire build context, including its own go.mod/go.sum.
+# Stage 1: Сборка бинарного файла
+FROM golang:1.22-alpine AS builder
+
+WORKDIR /app
+
+# Установка системных сертификатов для безопасных соединений
+RUN apk add --no-cache ca-certificates
+
+# Кэширование зависимостей Go
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Копирование исходного кода
 COPY . .
-RUN go mod download && go build -mod=readonly -trimpath -ldflags="-s -w" -o /out/app ./cmd/app
 
-FROM scratch
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=build /out/app /app
-USER 65532:65532
-ENV HTTP_ADDR=:8080
-EXPOSE 8080
-ENTRYPOINT ["/app"]
+# Статическая компиляция без CGO
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /bin/identity-service ./cmd/app/main.go
 
+# Stage 2: Минимальный финальный образ
+FROM alpine:3.20
+
+WORKDIR /app
+
+# Непривилегированный системный пользователь для безопасности
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /bin/identity-service /app/identity-service
+
+# Проброс портов: 50051 (gRPC), 8081 (Technical HTTP)
+EXPOSE 50051 8081
+
+USER appuser
+
+ENTRYPOINT ["/app/identity-service"]

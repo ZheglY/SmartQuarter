@@ -1,13 +1,55 @@
 package http
 
-import "net/http"
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"time"
 
-// NewHandler exposes only process liveness; dependency readiness is added with adapters.
-func NewHandler() http.Handler {
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+)
+
+// Pinger - проверка доступности зависимостей (PostgreSQL)
+type Pinger interface {
+	Ping(ctx context.Context) error
+}
+
+type statusResponse struct {
+	Status string `json:"status"`
+}
+
+// NewRouter регистрирует технческие эндпоинты сервиса
+func NewRouter(ping Pinger) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
+
+	// 1. Live probe: процесс запущен
+	mux.HandleFunc("GET /livez", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte("{\"status\":\"ok\",\"service\":\"identity-service\"}\n"))
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(statusResponse{Status: "ok"})
 	})
+
+	// 2. Reader probe: проверка соединения с базой данных
+	mux.HandleFunc("GET /readyz", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+
+		if ping != nil {
+			if err := ping.Ping(ctx); err != nil {
+				w.WriteHeader(http.StatusServiceUnavailable)
+				_ = json.NewEncoder(w).Encode(statusResponse{Status: "not_ready"})
+				return
+			}
+		}
+
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(statusResponse{Status: "ok"})
+	})
+
+	// 3. Prometheus metrics
+	mux.Handle("GET /metrics", promhttp.Handler())
+
 	return mux
 }
