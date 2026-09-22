@@ -1,6 +1,12 @@
-FROM golang:1.26.5-bookworm@sha256:53eeac89074db483fdf0ab3be1df32bf6e47562263d2d0d6baa7f26acb4957dd AS build
-WORKDIR /src
-ENV GOWORK=off CGO_ENABLED=0
+# Stage 1: Сборка бинарного файла
+FROM golang:1.23-alpine AS builder
+
+WORKDIR /app
+
+# Установка системных сертификатов для безопасных соединений
+RUN apk add --no-cache ca-certificates
+
+# Кэширование зависимостей Go
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
