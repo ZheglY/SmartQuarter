@@ -1,6 +1,6 @@
 # Интеграция с backend
 
-Дата аудита: 22.09.2026. Ветка `feat/react-front`, база `50fcc75` = проверенный локальный `origin/main`. Изменения ограничены `web/miniapp/**`.
+Обновлено после интеграции Identity 22.09.2026. Описывает текущий связанный MVP.
 
 ## Адрес и сессия
 
@@ -35,23 +35,24 @@ Cookies отправляются с `credentials: include`, headers `Accept`, `C
 
 ## Подтверждённые блокеры и расхождения
 
-### 1. MAX bootstrap: BLOCKED
+### 1. MAX bootstrap: Identity подключён
 
-Endpoint: `POST /api/v1/session/max` с корректной свежей сырой `init_data`.
+Gateway использует общий Identity protobuf и настоящий gRPC-адаптер, а не
+identity.Unavailable. Вход с корректной initData создаёт HttpOnly cookie.
+Новый пользователь без membership получает пустой active_house_id; UI показывает
+профиль и запрос доступа к дому. Оператор назначает роли через provision-команду
+Identity (docs/deployment/server-guide.md, раздел 9). Отозванная membership не
+блокирует вход, но запрещает защищённые операции.
 
-Ожидается по PDF/OpenAPI: 200, `user_context`, `expires_at`, HttpOnly session cookie.
+Контейнерная приёмка: deploy/test/compose.yaml. Здесь настоящий Identity, Issue,
+Community, PostgreSQL, Redis и MinIO; внешний MAX - тестовый HTTP endpoint.
+Проверка на реальных устройствах и публичном домене выполняется отдельно.
 
-Фактически: **503 `{error:{code:"DEPENDENCY_UNAVAILABLE",message:"dependency unavailable",request_id:...}}`**, cookie отсутствует. В `services/max-gateway/cmd/app/main.go` по-прежнему передан `Identity: identity.Unavailable{}`. Identity protobuf/service уже есть в этой базе, но клиент Gateway не подключён. Устаревший комментарий о его отсутствии в Gateway не равен текущему состоянию монорепозитория.
+### 2. Community
 
-Для снятия блокера backend-разработчик должен реализовать согласованный адаптер Identity, подключить его в app, передавать адрес через конфигурацию и проверить bootstrap/context/membership/readiness. Нельзя исправить это ENV-переменной frontend. Go-код в данной задаче не менялся.
-
-Реальный Gateway собран из выбранной базы и запущен с изолированным Redis и синтетическим локальным секретом. Пять корректно подписанных входов подряд получили 503, без cookie. Это **пять воспроизведений блокера**, не пять успешных бизнес-E2E. Проверки liveness, 401 без сессии/с неверной подписью и 403 с чужим Origin прошли. Issue gRPC в этой проверке не запущен: bootstrap останавливается раньше его вызова.
-
-### 2. Community: частично доступен контракт
-
-В PDF описаны polls/calendar/initiatives, в Gateway опубликованы только create/list announcements. Остальные HTTP пути дают 404, даже если соответствующие gRPC существуют в Community Service. Backend должен отдельно согласовать и реализовать их маршруты. Frontend их не вызывает.
-
-GET/POST `/announcements` при пустом `COMMUNITY_GRPC_ADDR` возвращают 503 `COMMUNITY_UNAVAILABLE`. После подключения нужен работающий Community с БД и metadata от Gateway. Код frontend подключён, успешная публикация в настоящую БД не подтверждена из-за блока авторизации.
+Production Compose подключает Community; его готовность входит в /readyz Gateway.
+GET/POST announcements используют проверенную роль и дом из сессии. Опросы,
+календарь и инициативы не входят в опубликованный HTTP/UI MVP.
 
 ### 3. Ошибки PDF детальнее runtime
 
@@ -73,23 +74,11 @@ S3 bucket должен разрешать Origin Mini App, методы PUT/GET/
 
 Ссылки и сырой initData не должны попадать в access logs браузерной аналитики. CSP на ingress следует согласовать с реальным MAX способом встраивания: script-src для собственного bundle и `https://st.max.ru`, connect-src для API/S3, img-src для S3/blob, font-src self; frame-ancestors и webview проверить на устройствах, не ставить X-Frame-Options DENY вслепую.
 
-## Воспроизведение проверки блокера (Windows)
+## Сквозная приёмка
 
-Из корня монорепозитория, Go и Docker установлены; порты 16389 и 18090 свободны:
+Смотрите корневой README и deploy/test/README.md. `npm run test:gateway` запускает полный Docker-стенд с настоящим Identity и удаляет тестовые данные после прогона. Тестовый стенд
+проверяет пять бизнес-проходов, объявления, роли и изоляцию домов.
 
-```powershell
-New-Item -ItemType Directory -Force web/miniapp/test-results | Out-Null
-go build -o web/miniapp/test-results/gateway-probe.exe ./services/max-gateway/cmd/app
-docker run -d --rm --name smartquarter-front-probe-redis -p 127.0.0.1:16389:6379 redis:8.2-alpine
-npm run test:gateway --prefix web/miniapp
-docker stop smartquarter-front-probe-redis
-```
-
-Скрипт запускает именно Go Gateway, не его Node-замену, не меняет серверный код, генерирует одноразовый тестовый token в памяти и завершает созданный дочерний процесс. Сетевые Bot API вызовы направлены на несуществующий локальный адрес, production credentials не используются. После исправления Identity probe намеренно перестанет считать 503 ожидаемым; его нужно заменить успешным сценарием на тестовом стенде.
-
-## Условия реального E2E
-
-Нужны подключённый Identity и тестовые ACTIVE memberships двух жителей/председателя одного дома, здоровые Gateway/Redis/Issue DB/S3, Community для объявления, HTTPS Mini App в настройках MAX bot и подписанная initData трёх реальных тестовых аккаунтов. Затем **пять раз**: Resident A upload → complete → create → list/details; Resident B confirm → счётчик; Chairman queue → generate → body/version → status → обновлённая карточка; объявление. Дополнительно проверить другой дом, истёкшую сессию, S3 CORS/expiry, BackButton, клавиатуру и копирование на MAX Android/iOS.
-
-До выполнения этих шагов реальный бизнес-E2E, настоящая S3-загрузка через UI и тест внутри MAX остаются **BLOCKED / NOT RUN**. Playwright fixtures и HTTP security probe не заменяют эту приёмку.
-
+Для приёмки в MAX нужны домен с HTTPS, токен и webhook вашего бота, облачный
+S3 с CORS, проверенные MAX ID жителей/председателя и назначенные memberships.
+Не подменяйте initData в production и не назначайте роль через frontend headers.

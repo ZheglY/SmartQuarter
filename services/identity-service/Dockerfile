@@ -1,35 +1,15 @@
-# Stage 1: Сборка бинарного файла
-FROM golang:1.22-alpine AS builder
-
-WORKDIR /app
-
-# Установка системных сертификатов для безопасных соединений
-RUN apk add --no-cache ca-certificates
-
-# Кэширование зависимостей Go
+FROM golang:1.26.5-bookworm@sha256:53eeac89074db483fdf0ab3be1df32bf6e47562263d2d0d6baa7f26acb4957dd AS build
+WORKDIR /src
+ENV GOWORK=off CGO_ENABLED=0
 COPY go.mod go.sum ./
 RUN go mod download
-
-# Копирование исходного кода
 COPY . .
+RUN go build -mod=readonly -trimpath -ldflags="-s -w" -o /out/app ./cmd/app
 
-# Статическая компиляция без CGO
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /bin/identity-service ./cmd/app/main.go
-
-# Stage 2: Минимальный финальный образ
-FROM alpine:3.20
-
-WORKDIR /app
-
-# Непривилегированный системный пользователь для безопасности
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /bin/identity-service /app/identity-service
-
-# Проброс портов: 50051 (gRPC), 8081 (Technical HTTP)
+FROM scratch
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=build /out/app /app
+USER 65532:65532
 EXPOSE 50051 8081
-
-USER appuser
-
-ENTRYPOINT ["/app/identity-service"]
+HEALTHCHECK --interval=5s --timeout=4s --start-period=15s CMD ["/app", "healthcheck"]
+ENTRYPOINT ["/app"]

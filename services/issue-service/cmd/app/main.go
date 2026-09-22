@@ -54,7 +54,6 @@ func run() error {
 	return app.Run(ctx, cfg, logger)
 }
 
-
 func healthcheck() error {
 	addr := os.Getenv("HTTP_ADDR")
 	if addr == "" {
@@ -68,9 +67,9 @@ func healthcheck() error {
 	if host == "" || host == "0.0.0.0" || host == "::" {
 		host = "127.0.0.1"
 	}
-	/* 
-	отправляется запрос на получение информации о готовности
-	c таймаутом 4 сек
+	/*
+		отправляется запрос на получение информации о готовности
+		c таймаутом 4 сек
 	*/
 	response, err := (&http.Client{Timeout: 4 * time.Second}).Get("http://" + net.JoinHostPort(host, port) + "/readyz")
 	if err != nil {

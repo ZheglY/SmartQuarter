@@ -43,13 +43,13 @@ func run() error {
 		if e != nil {
 			return errors.New("invalid HTTP_ADDR")
 		}
-		res, e := (&http.Client{Timeout: 3 * time.Second}).Get("http://127.0.0.1:" + port + "/livez")
+		res, e := (&http.Client{Timeout: 3 * time.Second}).Get("http://127.0.0.1:" + port + "/readyz")
 		if e != nil {
 			return errors.New("gateway unavailable")
 		}
 		res.Body.Close()
 		if res.StatusCode != 200 {
-			return errors.New("gateway not live")
+			return errors.New("gateway not ready")
 		}
 		return nil
 	}
@@ -78,14 +78,22 @@ func run() error {
 	defer conn.Close()
 	conn.Connect()
 	bot := &maxapi.Client{BaseURL: cfg.BotBaseURL, Token: cfg.BotToken, MiniAppURL: cfg.MiniAppURL, BotUsername: cfg.BotUsername, Store: state.Store{R: r}, Rate: cfg.NotificationRate}
-	api := &transport.API{Config: cfg, Store: state.Store{R: r}, Identity: identity.Unavailable{}, Issue: pb.NewIssueServiceClient(conn), Bot: bot, Metrics: metrics, Logger: logger}
+	identityConn, e := rpc.Dial(cfg.IdentityAddr, cfg.RequestTimeout, logger, metrics, cfg.DialTimeout)
+	if e != nil {
+		return fmt.Errorf("Identity connection: %w", e)
+	}
+	defer identityConn.Close()
+	identityConn.Connect()
+	api := &transport.API{Config: cfg, Store: state.Store{R: r}, Identity: identity.NewGRPC(identityConn, cfg.RequestTimeout), Issue: pb.NewIssueServiceClient(conn), Bot: bot, Metrics: metrics, Logger: logger}
 	if cfg.CommunityAddr != "" {
 		community, e := rpc.Dial(cfg.CommunityAddr, cfg.RequestTimeout, logger, metrics, cfg.DialTimeout)
 		if e != nil {
 			return errors.New("invalid Community address")
 		}
 		defer community.Close()
+		community.Connect()
 		api.Community = cpb.NewCommunityServiceClient(community)
+		api.CommunityReady = rpc.HTTPReady(community, cfg.CommunityReadyURL)
 	}
 	api.IssueReady = func(ctx context.Context) error {
 		if conn.GetState() != connectivity.Ready {
@@ -105,7 +113,6 @@ func run() error {
 		}
 		return nil
 	}
-	logger.Warn("Identity protobuf absent: session bootstrap and readiness blocked", zap.String("error_code", "IDENTITY_CONTRACT_UNAVAILABLE"))
 	workerCtx, cancelWorker := context.WithCancel(context.Background())
 	workerDone := make(chan struct{})
 	worker := &notification.Consumer{Redis: r, Stream: cfg.Stream, Group: cfg.Group, Identity: api.Identity, Bot: bot, Metrics: metrics, Logger: logger}

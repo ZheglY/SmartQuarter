@@ -15,6 +15,7 @@ type Config struct {
 	RedisDB                                                                                                       int
 	SessionTTL, InitDataTTL, DialTimeout, RequestTimeout, ReadTimeout, WriteTimeout, IdleTimeout, ShutdownTimeout time.Duration
 	CookieName, IdentityAddr, IssueAddr, IssueReadyURL, CommunityAddr                                             string
+	CommunityReadyURL                                                                                             string
 	BotToken, BotBaseURL, MiniAppURL, WebhookSecret, BotUsername                                                  string
 	Stream, Group                                                                                                 string
 	Origins                                                                                                       []string
@@ -38,6 +39,7 @@ func Load() (c Config, err error) {
 	c.IdentityAddr = os.Getenv("IDENTITY_GRPC_ADDR")
 	c.IssueAddr = os.Getenv("ISSUE_GRPC_ADDR")
 	c.CommunityAddr = os.Getenv("COMMUNITY_GRPC_ADDR")
+	c.CommunityReadyURL = os.Getenv("COMMUNITY_READY_URL")
 	c.IssueReadyURL = os.Getenv("ISSUE_READY_URL")
 	c.BotToken = os.Getenv("MAX_BOT_TOKEN")
 	c.BotBaseURL = str("MAX_BOT_API_BASE_URL", "https://platform-api2.max.ru")
@@ -79,7 +81,7 @@ func Load() (c Config, err error) {
 		}
 		c.Origins = append(c.Origins, o)
 	}
-	for k, v := range map[string]string{"ISSUE_GRPC_ADDR": c.IssueAddr, "ISSUE_READY_URL": c.IssueReadyURL, "MAX_BOT_TOKEN": c.BotToken, "MAX_WEBHOOK_SECRET": c.WebhookSecret, "MAX_BOT_USERNAME": c.BotUsername, "MAX_MINIAPP_URL": c.MiniAppURL} {
+	for k, v := range map[string]string{"IDENTITY_GRPC_ADDR": c.IdentityAddr, "ISSUE_GRPC_ADDR": c.IssueAddr, "ISSUE_READY_URL": c.IssueReadyURL, "COMMUNITY_GRPC_ADDR": c.CommunityAddr, "COMMUNITY_READY_URL": c.CommunityReadyURL, "MAX_BOT_TOKEN": c.BotToken, "MAX_WEBHOOK_SECRET": c.WebhookSecret, "MAX_BOT_USERNAME": c.BotUsername, "MAX_MINIAPP_URL": c.MiniAppURL} {
 		if v == "" {
 			return c, fmt.Errorf("%s required", k)
 		}
@@ -90,12 +92,12 @@ func Load() (c Config, err error) {
 	if len(c.Origins) == 0 {
 		return c, fmt.Errorf("TRUSTED_ORIGINS required")
 	}
-	for k, v := range map[string]string{"MAX_BOT_API_BASE_URL": c.BotBaseURL, "MAX_MINIAPP_URL": c.MiniAppURL, "ISSUE_READY_URL": c.IssueReadyURL} {
+	for k, v := range map[string]string{"MAX_BOT_API_BASE_URL": c.BotBaseURL, "MAX_MINIAPP_URL": c.MiniAppURL, "ISSUE_READY_URL": c.IssueReadyURL, "COMMUNITY_READY_URL": c.CommunityReadyURL} {
 		u, e := url.Parse(v)
 		if e != nil || u.Host == "" || u.User != nil || (u.Scheme != "https" && u.Scheme != "http") {
 			return c, fmt.Errorf("invalid %s", k)
 		}
-		if c.SecureCookie && k != "ISSUE_READY_URL" && u.Scheme != "https" {
+		if c.SecureCookie && k != "ISSUE_READY_URL" && k != "COMMUNITY_READY_URL" && u.Scheme != "https" {
 			return c, fmt.Errorf("HTTPS required for %s", k)
 		}
 	}

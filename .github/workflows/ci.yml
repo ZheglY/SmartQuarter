@@ -14,34 +14,131 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
-    name: CI
+  go:
+    name: Go (${{ matrix.service }})
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [community-service, identity-service, issue-service, max-gateway]
     env:
       GOWORK: "off"
+      GOFLAGS: "-mod=readonly"
+    defaults:
+      run:
+        working-directory: services/${{ matrix.service }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
-          go-version: '1.26.x'
-          cache: false
-      - name: Format, vet and test Go modules
+          go-version-file: services/${{ matrix.service }}/go.mod
+          cache-dependency-path: services/${{ matrix.service }}/go.sum
+      - name: Check formatting and module metadata
         shell: bash
         run: |
-          for module in services/*/go.mod; do
-            (
-              cd "$(dirname "$module")"
-              echo "Checking $module"
-              unformatted="$(gofmt -l .)"
-              if [[ -n "$unformatted" ]]; then
-                printf 'Run gofmt on:\n%s\n' "$unformatted"
-                exit 1
-              fi
-              go vet ./...
-              go test ./...
-            )
-          done
+          unformatted="$(gofmt -l .)"
+          if [[ -n "$unformatted" ]]; then
+            printf 'Run gofmt on:\n%s\n' "$unformatted"
+            exit 1
+          fi
+          go mod tidy -diff
+          go mod verify
+      - run: go vet ./...
+      - run: go test ./...
 
+  frontend:
+    name: Mini App
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web/miniapp
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/miniapp/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:e2e
+      - name: Save browser diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-diagnostics
+          path: |
+            web/miniapp/playwright-report/
+            web/miniapp/test-results/
+          retention-days: 7
+
+  images:
+    name: Docker (${{ matrix.context }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        context:
+          - services/community-service
+          - services/identity-service
+          - services/issue-service
+          - services/max-gateway
+          - web/miniapp
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Build deployable image
+        run: docker build "${{ matrix.context }}"
+
+  acceptance:
+    name: Application workflow
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      COMPOSE_PARALLEL_LIMIT: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Build acceptance stack
+        run: docker compose -f deploy/test/compose.yaml build
+      - name: Real Identity, Issue, Community, PostgreSQL, Redis and S3 workflow
+        run: docker compose -f deploy/test/compose.yaml run --rm test
+      - name: Operator provisioning and access revocation
+        run: bash deploy/test/check-provision.sh
+      - name: Diagnostics
+        if: failure()
+        run: docker compose -f deploy/test/compose.yaml logs --tail=150
+      - name: Clean isolated stack
+        if: always()
+        run: docker compose -f deploy/test/compose.yaml down -v
+
+  ci:
+    name: CI
+    if: always()
+    needs: [go, frontend, images, acceptance]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every check to pass
+        env:
+          GO_RESULT: ${{ needs.go.result }}
+          FRONTEND_RESULT: ${{ needs.frontend.result }}
+          IMAGES_RESULT: ${{ needs.images.result }}
+          ACCEPTANCE_RESULT: ${{ needs.acceptance.result }}
+        run: |
+          test "$GO_RESULT" = success
+          test "$FRONTEND_RESULT" = success
+          test "$IMAGES_RESULT" = success
+          test "$ACCEPTANCE_RESULT" = success

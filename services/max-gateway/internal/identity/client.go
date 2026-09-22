@@ -1,5 +1,4 @@
-// Package identity owns the Gateway port pending an agreed Identity protobuf.
-// There is no identity.proto in this repository. Production RPCs are not invented.
+// Package identity adapts the shared Identity gRPC contract to Gateway DTOs.
 package identity
 
 import (

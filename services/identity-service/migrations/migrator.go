@@ -29,5 +29,5 @@ func Up(ctx context.Context, dsn string) error {
 	if err := goose.UpContext(ctx, db, "."); err != nil {
 		return fmt.Errorf("migrator: failed to apply migrations: %w", err)
 	}
-	return goose.UpContext(ctx, db, ".")
+	return nil
 }

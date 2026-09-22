@@ -1,14 +1,14 @@
 # max-gateway
 
-Go HTTP/JSON gateway для Mini App «Умный Квартал». Ветка `feat/max-gateway-service`, база `c1aa8a6973c3e3c8a59494745d907d9ca88416f4`.
+Go HTTP/JSON gateway для Mini App «Умный Квартал».
 
-Реализованы REST → все 10 Issue RPC, Redis-сессии, MAX initData, webhook/Bot API, notification consumer и два маршрута объявлений Community. Основной E2E выполнен 5 раз с настоящим Issue Service, PostgreSQL, Redis и MinIO. В тестах Identity — отдельный test-only gRPC stub, MAX — локальный HTTP endpoint. Это **не** подтверждение реальной интеграции с Identity или платформой MAX.
+Реализованы REST → все 10 Issue RPC, Redis-сессии, MAX initData, webhook/Bot API, notification consumer и два маршрута объявлений Community. Gateway подключается к настоящим Identity, Issue и Community через общие protobuf-контракты. Стенд автоматической приёмки находится в `deploy/test`; внешний MAX API в нём заменён тестовым HTTP-получателем.
 
-## Ограничение запуска: Identity
+## Identity и доступ к дому
 
-В текущей интеграционной базе нет `identity.proto`, а Identity Service содержит HTTP-каркас. `internal/identity.Client` описывает ожидаемый Gateway port (`UpsertMaxUser`, `GetUserContext`, `GetMembership`, `ListMemberships`, `Ready`). Production использует `identity.Unavailable`: валидный MAX login возвращает 503, `/readyz` — 503. ENV `IDENTITY_GRPC_ADDR` зарезервирован и сам по себе не включает интеграцию. Пользователи и роли не создаются локально. Consumer не читает новые события, пока Identity не готов.
+`IDENTITY_GRPC_ADDR` обязателен. `internal/identity.GRPCClient` вызывает `UpsertMaxUser`, `GetUserContext`, `GetMembership`, `ListMemberships` и gRPC Health Check. Источник контракта — `contracts/proto/smartquarter/identity/v1/identity.proto`. Consumer ожидает готовности Identity перед чтением новых событий.
 
-Другому разработчику необходимо согласовать wire contract этих методов, формат UserContext/membership и service authentication. После этого нужен Gateway gRPC adapter и проверка с настоящим Identity. Нельзя просто заменить test stub production-реализацией без согласованного контракта.
+Новый MAX-пользователь получает сессию с пустым списком домов. Оператор назначает дом и роль через `identity-service /app provision`; пример приведён в [серверном гайде](../../docs/deployment/server-guide.md). Membership проверяется при каждом бизнес-запросе, поэтому отзыв доступа действует и на существующую сессию. Без активного membership бизнес-запросы возвращают 403; недоступность Identity возвращает 503.
 
 `tests/testdata/identity.go` имеет build tag `integration`, использует отдельный namespace `gateway.test.Identity` и фиксированные UUID. Его протокол — только тестовый, не предложенный wire contract Identity. Он не входит в production binary и не предоставляет публичный HTTP login bypass.
 
@@ -28,7 +28,7 @@ Mini App --REST/JSON--> HTTP middleware/handlers --gRPC--> Issue Service
 
 `internal/config` — ENV и проверка конфигурации; `identity` — доверенный порт; `state` — Redis sessions/rate/idempotency; `rpc` — metadata/deadlines/metrics; `transport/http` — middleware, REST DTO, отдельные mappers; `maxapi` — HMAC и клиент платформы; `notification` — Streams consumer; `observability` — собственный Prometheus registry и zap.
 
-Бизнес-логика Issue, PostgreSQL-транзакции, миграции, объектное хранилище и outbox остаются в существующем Issue Service. Межсервисных SQL-запросов в production Gateway нет. SQL в E2E используется только для проверки outbox.
+Бизнес-логика Issue, PostgreSQL-транзакции, миграции, объектное хранилище и outbox остаются в существующем Issue Service. Межсервисных SQL-запросов в production Gateway нет. SQL в E2E используется только с тестовыми БД для подготовки пользователей, проверки отзыва доступа и outbox.
 
 ## REST → gRPC
 
@@ -55,7 +55,7 @@ Mini App --REST/JSON--> HTTP middleware/handlers --gRPC--> Issue Service
 | GET /api/v1/announcements | Community.ListAnnouncements | ACTIVE member |
 | POST /webhooks/max | MAX Update | Webhook secret |
 | GET /livez, /healthz | Process liveness | Technical |
-| GET /readyz | Redis + Identity + Issue gRPC + Issue readiness (DB/S3) | Technical |
+| GET /readyz | Redis + Identity/DB + Issue gRPC/DB/S3 + Community gRPC/DB/Redis | Technical |
 | GET /metrics | Prometheus | Technical |
 
 Успешное создание возвращает 201, logout — 204, остальные операции — 200. `status` PATCH называется `new_status`; session bootstrap использует `init_data`. Enum в REST короткий (`DETECTED`), nullable timestamps/statement — `null`; вложенные JSON snapshots — объекты. MAX ID — десятичная строка. `page_size` 1–100, default 20; `page_token` непрозрачный. `status` — повторяемый или разделённый запятыми фильтр.
@@ -64,7 +64,7 @@ Canonical [OpenAPI](../../contracts/openapi/openapi.yaml) описывает р�
 
 ## Общий Issue protobuf
 
-Единственный источник: `contracts/proto/smartquarter/issue/v1/issue.proto` в корне репозитория. Файл перенесён **без изменения содержимого**, включая package, RPC, номера полей, enum values и go_package. Go mapping при генерации даёт Gateway собственный `internal/gen/smartquarter/issue/v1`; Issue продолжает использовать свой `internal/gen`. Нет импорта чужого internal, нового общего Go module или изменений go.work. Community client генерируется из существующего canonical Community proto с mapping только в Gateway.
+Единственный источник: `contracts/proto/smartquarter/issue/v1/issue.proto` в корне репозитория. Файл перенесён **без изменения содержимого**, включая package, RPC, номера полей, enum values и go_package. Go mapping при генерации даёт Gateway собственный `internal/gen/smartquarter/issue/v1`; Issue продолжает использовать свой `internal/gen`. Нет импорта чужого internal, нового общего Go module или изменений go.work. Клиенты Identity и Community генерируются из общих контрактов с собственным Go mapping для Gateway.
 
 Из корня репозитория:
 
@@ -76,15 +76,15 @@ Canonical [OpenAPI](../../contracts/openapi/openapi.yaml) описывает р�
 
 ## Запуск и тесты
 
-Нужны Go 1.26+, Docker Desktop/Linux containers, PowerShell 7. Порты тестовой инфраструктуры: PostgreSQL 15432, Redis 16379, MinIO 19000/19001, Issue 18082/18083. Gateway Compose использует 18080, чтобы не занимать обычный frontend-порт 8080.
-
-Из корня:
+Нужны Go 1.26+ и Docker Engine/Compose v2. Серверный запуск с React, HTTPS и всеми сервисами: [deploy/server](../../deploy/server/README.md). Из корня репозитория:
 
 ```powershell
-./services/max-gateway/scripts/test.ps1
+docker compose -f deploy/test/compose.yaml build
+docker compose -f deploy/test/compose.yaml run --rm test
+docker compose -f deploy/test/compose.yaml down -v
 ```
 
-Скрипт поднимает выделенный `smartquarter-issue-local` через существующий Issue script, создаёт тестовый bucket, применяет миграции, выполняет unit/Redis/notification/E2E тесты. Пароли генерируются существующим Issue script и лежат в игнорируемом `services/issue-service/.env.local`. E2E запускает Gateway HTTP server и test-only Identity gRPC внутри Go test; Issue работает отдельным настоящим контейнером. На этапе проверки отказа E2E кратко приостанавливает **только** `smartquarter-issue-local-postgres-1`, затем обязательно возобновляет его. Стек после тестов остаётся доступным; остановка: `./services/issue-service/scripts/local.ps1 stop`.
+Это отдельный тестовый проект без опубликованных портов. Он использует настоящий Identity/Issue/Community, PostgreSQL, Redis и MinIO, синтетические MAX initData и тестовый Bot API. Проверяются пять проходов Issue workflow, отзыв membership, объявления, роли и изоляция домов. `down -v` удаляет только данные этого тестового проекта.
 
 Проверки модуля:
 
@@ -94,14 +94,11 @@ $env:GOWORK = 'off'
 go test ./...
 go vet ./...
 go build ./...
-docker build -t smartquarter-max-gateway:local .
 ```
 
-Ручной запуск (полный пользовательский вход пока блокирован Identity): скопировать `.env.example` в `.env.local`, заполнить MAX настройки и разрешённый Origin, затем `./scripts/run.ps1`. По умолчанию native HTTP `:8080`; если занят, задать `HTTP_ADDR=:18080`. После запуска Issue test stack можно использовать `docker compose -f compose.local.yml up -d --build`: файл подключает Gateway к сети `smartquarter-issue-local_default`. В local Compose нет fake Identity/Community.
+Для native-запуска скопируйте `.env.example` в `.env.local`, заполните адреса настоящих зависимостей, MAX и Origin, затем выполните `./scripts/run.ps1`. Go сам `.env` не читает. Старый `scripts/test.ps1` оставлен для отдельной проверки Issue со stub Identity; он не заменяет полную приёмку в `deploy/test`. `compose.local.yml` подключается к старому Issue test stack и не поднимает весь продукт.
 
-Общий `deploy/docker-compose.yml` сохранён: его независимая конфигурация Identity/Community не менялась. Для Gateway/Issue использовать описанный локальный контур.
-
-Полный ENV с defaults в `.env.example`. Обязательны `ISSUE_GRPC_ADDR`, `ISSUE_READY_URL`, `MAX_BOT_TOKEN`, `MAX_WEBHOOK_SECRET`, `MAX_BOT_USERNAME`, `MAX_MINIAPP_URL`, непустой `TRUSTED_ORIGINS`. `COMMUNITY_GRPC_ADDR` необязателен, отсутствие даёт 503 на объявлениях. HTTP timeouts, Redis DB/password, session TTL, request/dial timeout, rate limits, stream/group и shutdown timeout задаются ENV. `APP_ENV=local|test` использует SameSite=Lax без Secure; остальные значения — Secure + SameSite=None и HTTPS Origins. Go сам `.env` не читает.
+Обязательны `IDENTITY_GRPC_ADDR`, `ISSUE_GRPC_ADDR`, `ISSUE_READY_URL`, `COMMUNITY_GRPC_ADDR`, `COMMUNITY_READY_URL`, `MAX_BOT_TOKEN`, `MAX_WEBHOOK_SECRET`, `MAX_BOT_USERNAME`, `MAX_MINIAPP_URL`, непустой `TRUSTED_ORIGINS`. Остальные настройки описаны в `.env.example`. `APP_ENV=local|test` использует SameSite=Lax без Secure; production — Secure + SameSite=None и HTTPS Origins.
 
 ## MAX
 
@@ -128,8 +125,8 @@ HTTP errors содержат `{error:{code,message,request_id}}`. Issue v1 пе�
 
 gRPC рассчитан на приватную доверенную сеть MVP; внешний production требует service identity/mTLS. Ingress должен закрывать `/metrics` и внутренние сервисы. Логи не содержат токены, initData, cookies, signed URLs, тела фото/заявлений; labels метрик ограничены маршрутами/кодами, без user/request IDs.
 
-## Community и оставшиеся работы
+## Приёмка и внешние зависимости
 
-Announcement transport проверен на согласованном proto с fake gRPC server. Настоящий Community runtime **NOT VERIFIED**: у текущего сервиса проверки membership/role и отображение domain errors требуют отдельной проверки командой владельцев. Gateway проверяет membership/role перед вызовом. Никакие файлы Identity/Community или их proto не менялись. Необходимо провести совместный runtime E2E после готовности Identity, согласовать service authentication, затем добавить optional Community REST при необходимости.
+Gateway проверяет membership и роль до обращения в Community. Совместный runtime-тест объявлений входит в `deploy/test`. Актуальные результаты локальных проверок и ограничения: [CI audit](../../docs/deployment/ci-audit.md). `IMPLEMENTATION_REPORT.md` описывает первоначальный этап разработки и не является текущим отчётом приёмки.
 
-Подробные результаты проверок и список файлов: [IMPLEMENTATION_REPORT.md](IMPLEMENTATION_REPORT.md).
+Для проверки в реальном MAX нужны зарегистрированный бот, Mini App URL, HTTPS webhook и действующие credentials. Межсервисное взаимодействие в MVP допускается только в закрытой сети Docker; публичная публикация gRPC не предусмотрена.

@@ -3,10 +3,10 @@
 !.env.example
 bin/
 coverage/
+tmp/pdfs/
 *.out
 *.test
 *.exe
 .DS_Store
 .idea/
 .vscode/
-

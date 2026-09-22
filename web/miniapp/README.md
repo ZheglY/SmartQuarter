@@ -2,7 +2,7 @@
 
 React-приложение для жителей и председателей. Дизайн перенесён из предоставленного `max-miniapp-design-main.zip`; рабочие данные загружаются только через REST max-gateway. Демонстрационные ответы находятся исключительно в `tests/` и не включаются в production bundle.
 
-**Статус интеграции:** frontend реализован и проверяется отдельно. На базе `50fcc75` Gateway по-прежнему использует `identity.Unavailable{}`: корректный bootstrap возвращает HTTP 503. Реальное создание Issue через MAX пока заблокировано. Подробности и воспроизводимая проверка: [backend-integration.md](docs/backend-integration.md).
+**Статус интеграции:** Gateway подключён к настоящим Identity, Issue и Community. Сквозной Docker-тест проверяет вход, фото, проблемы, подтверждения, заявления, уведомления и объявления. Для запуска на вашем домене и внутри MAX нужны действующие настройки бота, HTTPS и S3. Подробности: [backend-integration.md](docs/backend-integration.md).
 
 ## Запуск
 
@@ -100,15 +100,17 @@ docker build -t smartquarter-miniapp:local web/miniapp
 docker run --rm -p 127.0.0.1:18091:8080 smartquarter-miniapp:local
 ```
 
-Multi-stage Node → nginx. Nginx отдаёт только статику, `/healthz` и SPA fallback; неизвестные `/assets/` и `/api/` возвращают 404. Согласованный HTTPS ingress обязан направлять `/api/v1/` на настоящий Gateway, остальные пути на frontend. Пример приведён в [deployment-example.md](docs/deployment-example.md); deploy/ и общий Compose не менялись. Нет отдельного Node backend. Для другого API Origin передайте build arg `VITE_API_BASE_URL`, настройте credentialed CORS и проверьте cookie в MAX webview.
+Multi-stage Node → nginx. Nginx отдаёт только статику, `/healthz` и SPA fallback; неизвестные `/assets/` и `/api/` возвращают 404. Согласованный HTTPS ingress обязан направлять `/api/v1/` на настоящий Gateway, остальные пути на frontend. Пример приведён в [deployment-example.md](docs/deployment-example.md); Полный связанный стек с Caddy находится в `deploy/server/compose.yaml`. Нет отдельного Node backend. Для другого API Origin передайте build arg `VITE_API_BASE_URL`, настройте credentialed CORS и проверьте cookie в MAX webview.
 
 ## Ограничения
 
-- Identity не подключён к production Gateway на выбранной базе: бизнес-E2E заблокирован на входе.
+- Identity подключён; доступ к дому назначается оператором через `provision`. Приёмка на реальном MAX и облачном S3 выполняется после настройки credentials.
 - Объявления подключены к имеющимся REST-методам, требуют `COMMUNITY_GRPC_ADDR` и работающего Community Service.
 - Опросы, календарь, инициативы, управление жителями и домом, журнал администратора не имеют публичных Gateway routes. UI не имитирует их выполнение.
 - Заявление — серверный текст, ручная отправка. Копирование поддерживается; `.txt` через Blob доступен в обычном браузере. В нативном MAX скачивание требует HTTPS URL и документированный `downloadFile`; такого Gateway endpoint сейчас нет.
 - Нет realtime push обновления списков, офлайн-режима и постоянного хранения черновиков. Ручное обновление/возврат фокуса перечитывает данные.
-- Реальный MAX Android/iOS, production S3 CORS и бизнес-сценарий с тремя аккаунтами требуют проверки после исправления backend. Браузерные fixtures их не заменяют.
+- Реальный MAX Android/iOS, production S3 CORS и бизнес-сценарий с тремя аккаунтами требуют проверки с вашими credentials и устройствами. Браузерные fixtures их не заменяют.
 
-Результаты, версия базы и список файлов: [verification.md](docs/verification.md).
+Текущие результаты: [CI audit](../../docs/deployment/ci-audit.md). Первоначальная проверка frontend сохранена в [verification.md](docs/verification.md).
+
+`npm run test:gateway` запускает `deploy/test` с настоящими сервисами и очищает его синтетические данные после проверки. Нужен Docker Engine и свободное место для сборки образов; отдельный Windows .exe больше не требуется.

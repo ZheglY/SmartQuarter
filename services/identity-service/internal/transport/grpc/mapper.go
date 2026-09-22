@@ -1,7 +1,9 @@
 package grpc
 
 import (
+	"context"
 	"errors"
+	"log/slog"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -80,6 +82,10 @@ func mapError(err error) error {
 	}
 
 	switch {
+	case errors.Is(err, context.Canceled):
+		return status.Error(codes.Canceled, "request canceled")
+	case errors.Is(err, context.DeadlineExceeded):
+		return status.Error(codes.DeadlineExceeded, "request timed out")
 	case errors.Is(err, domain.ErrInvalidInput):
 		return status.Errorf(codes.InvalidArgument, "%s", err.Error())
 	case errors.Is(err, domain.ErrUserNotFound):
@@ -91,6 +97,7 @@ func mapError(err error) error {
 	case errors.Is(err, domain.ErrMembershipInactive):
 		return status.Error(codes.PermissionDenied, "membership is inactive")
 	default:
-		return status.Errorf(codes.Internal, "internal error: %s", err.Error())
+		slog.Error("identity operation failed", "error", err)
+		return status.Error(codes.Internal, "internal error")
 	}
 }

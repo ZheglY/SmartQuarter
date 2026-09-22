@@ -165,6 +165,10 @@ func (a *API) authenticate(house, manager bool, next http.HandlerFunc) http.Hand
 		}
 		v := actor{Session: s, Token: c.Value}
 		if house {
+			if !identity.ValidID(s.ActiveHouseID) {
+				a.fail(w, r, 403, "PERMISSION_DENIED", "active membership required")
+				return
+			}
 			m, e := a.Identity.GetMembership(r.Context(), s.UserID, s.ActiveHouseID)
 			if e != nil {
 				a.rpcError(w, r, e)
