@@ -18,7 +18,7 @@ type statusResponse struct {
 	Status string `json:"status"`
 }
 
-// NewRouter регистрирует технческие эндпоинты сервиса
+// NewRouter регистрирует технические эндпоинты сервиса
 func NewRouter(ping Pinger) http.Handler {
 	mux := http.NewServeMux()
 
@@ -29,7 +29,7 @@ func NewRouter(ping Pinger) http.Handler {
 		_ = json.NewEncoder(w).Encode(statusResponse{Status: "ok"})
 	})
 
-	// 2. Reader probe: проверка соединения с базой данных
+	// 2. Ready probe: проверка соединения с базой данных
 	mux.HandleFunc("GET /readyz", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
