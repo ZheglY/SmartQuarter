@@ -2,7 +2,11 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
+	"net/url"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -19,8 +23,24 @@ func Load() (*Config, error) {
 
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		// Дефолтная строка подключения под локальный Docker Compose
-		dbURL = "postgres://postgres:postgres@localhost:5432/identity_db?sslmode=disable"
+		return nil, fmt.Errorf("DATABASE_URL required")
+	}
+	u, err := url.Parse(dbURL)
+	if err != nil || (u.Scheme != "postgres" && u.Scheme != "postgresql") || u.Host == "" || (u.Path != "/identity_db" && !strings.HasPrefix(u.Path, "/identity_test")) {
+		return nil, fmt.Errorf("DATABASE_URL must address identity_db or identity_test*")
+	}
+	for _, port := range []string{grpcPort, httpPort} {
+		n, e := strconv.Atoi(strings.TrimPrefix(port, ":"))
+		if e != nil || n < 1 || n > 65535 {
+			return nil, fmt.Errorf("invalid listen port")
+		}
+	}
+	if formatPort(grpcPort) == formatPort(httpPort) {
+		return nil, fmt.Errorf("HTTP and gRPC ports must differ")
+	}
+	var level slog.Level
+	if err = level.UnmarshalText([]byte(logLevel)); err != nil {
+		return nil, fmt.Errorf("invalid LOG_LEVEL")
 	}
 
 	cfg := &Config{

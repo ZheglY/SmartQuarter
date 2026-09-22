@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/domain"
 	"github.com/google/uuid"
@@ -35,13 +36,16 @@ func (uc *IdentityUseCase) UpsertMaxUser(
 		displayName = "Житель"
 	}
 	username = strings.TrimSpace(username)
+	if utf8.RuneCountInString(displayName) > 255 || utf8.RuneCountInString(username) > 255 {
+		return nil, fmt.Errorf("%w: name too long", domain.ErrInvalidInput)
+	}
 
 	return uc.repo.UpsertMaxUser(ctx, maxUserID, displayName, username)
 }
 
 // GetUserContext собирает профиль, дома, членства и определяет default_house_id
 func (uc *IdentityUseCase) GetUserContext(ctx context.Context, userID string) (*domain.UserContext, error) {
-	if _, err := uuid.Parse(userID); err != nil {
+	if !validID(userID) {
 		return nil, fmt.Errorf("%w: invalid user_id UUID", domain.ErrInvalidInput)
 	}
 
@@ -75,19 +79,16 @@ func (uc *IdentityUseCase) GetUserContext(ctx context.Context, userID string) (*
 
 	// 5. Определяем default_house_id
 	defaultHouseID := ""
-	if user.DefaultHouseID != nil && *user.DefaultHouseID != "" {
-		defaultHouseID = *user.DefaultHouseID
-	} else if len(memberships) > 0 {
-		// Если в профиле дефолнтый дом не выставлен, берем первый активный дом
-		for _, m := range memberships {
-			if m.Status == domain.MembershipStatusActive {
-				defaultHouseID = m.HouseID
-				break
-			}
+	for _, m := range memberships {
+		if m.Status != domain.MembershipStatusActive {
+			continue
 		}
-		// Если активных нет. берем первый из списка
 		if defaultHouseID == "" {
-			defaultHouseID = memberships[0].HouseID
+			defaultHouseID = m.HouseID
+		}
+		if user.DefaultHouseID != nil && *user.DefaultHouseID == m.HouseID {
+			defaultHouseID = m.HouseID
+			break
 		}
 	}
 
@@ -102,10 +103,10 @@ func (uc *IdentityUseCase) GetUserContext(ctx context.Context, userID string) (*
 // GetMembership валидирует входные UUID и возвращает членство
 // пользователя в доме
 func (uc *IdentityUseCase) GetMembership(ctx context.Context, userID, houseID string) (*domain.Membership, error) {
-	if _, err := uuid.Parse(userID); err != nil {
+	if !validID(userID) {
 		return nil, fmt.Errorf("%w: invalid user_id UUID", domain.ErrInvalidInput)
 	}
-	if _, err := uuid.Parse(houseID); err != nil {
+	if !validID(houseID) {
 		return nil, fmt.Errorf("%w: invalid house_id UUID", domain.ErrInvalidInput)
 	}
 
@@ -114,9 +115,14 @@ func (uc *IdentityUseCase) GetMembership(ctx context.Context, userID, houseID st
 
 // ListMemberships валидирует UUID пользователя и отдает список его членств
 func (uc *IdentityUseCase) ListMemberships(ctx context.Context, userID string) ([]domain.Membership, error) {
-	if _, err := uuid.Parse(userID); err != nil {
+	if !validID(userID) {
 		return nil, fmt.Errorf("%w: invalid user_id UUID", domain.ErrInvalidInput)
 	}
 
 	return uc.repo.ListMembershipsByUserID(ctx, userID)
+}
+
+func validID(id string) bool {
+	parsed, err := uuid.Parse(id)
+	return err == nil && parsed != uuid.Nil && parsed.String() == id
 }

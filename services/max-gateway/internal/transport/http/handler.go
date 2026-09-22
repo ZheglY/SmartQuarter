@@ -24,15 +24,16 @@ import (
 )
 
 type API struct {
-	Config     config.Config
-	Store      state.Store
-	Identity   identity.Client
-	Issue      pb.IssueServiceClient
-	Community  cpb.CommunityServiceClient
-	Bot        *maxapi.Client
-	Metrics    *observability.Metrics
-	Logger     *zap.Logger
-	IssueReady func(context.Context) error
+	Config         config.Config
+	Store          state.Store
+	Identity       identity.Client
+	Issue          pb.IssueServiceClient
+	Community      cpb.CommunityServiceClient
+	Bot            *maxapi.Client
+	Metrics        *observability.Metrics
+	Logger         *zap.Logger
+	IssueReady     func(context.Context) error
+	CommunityReady func(context.Context) error
 }
 
 func (a *API) Handler() http.Handler {
@@ -73,6 +74,10 @@ func (a *API) ready(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 	if a.Store.R.Ping(ctx).Err() != nil || a.Identity.Ready(ctx) != nil || a.IssueReady == nil || a.IssueReady(ctx) != nil {
 		a.fail(w, r, 503, "DEPENDENCY_UNAVAILABLE", "required dependency unavailable")
+		return
+	}
+	if a.Community != nil && (a.CommunityReady == nil || a.CommunityReady(ctx) != nil) {
+		a.fail(w, r, 503, "DEPENDENCY_UNAVAILABLE", "community unavailable")
 		return
 	}
 	write(w, 200, map[string]string{"status": "ready"})

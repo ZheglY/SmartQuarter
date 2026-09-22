@@ -25,12 +25,8 @@ func NewRouter(ping Pinger) http.Handler {
 	// 1. Live probe: процесс запущен
 	mux.HandleFunc("GET /livez", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-<<<<<<< HEAD
 		w.WriteHeader(http.StatusOK)
 		_ = json.NewEncoder(w).Encode(statusResponse{Status: "ok"})
-=======
-		_, _ = w.Write([]byte("{\"status\":\"ok\",\"usecase\":\"identity-usecase\"}\n"))
->>>>>>> origin/main
 	})
 
 	// 2. Reader probe: проверка соединения с базой данных

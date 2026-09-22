@@ -14,6 +14,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
 	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/config"
 	identityv1 "github.com/ZheglY/SmartQuarter/services/identity-service/internal/gen/smartquarter/identity/v1"
@@ -25,24 +26,28 @@ import (
 )
 
 func Run() error {
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+	var level slog.Level
+	_ = level.UnmarshalText([]byte(cfg.LogLevel))
 	// 1. Инициализация структурированного логгера
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: level,
 	}))
 	slog.SetDefault(logger)
 
 	// 2. Загрузка конфигурации
-	cfg, err := config.Load()
-	if err != nil {
-		return fmt.Errorf("app: load config failed: %w", err)
-	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
 	// 3. Автоматическое применение миграций goose
 	logger.Info("applying database migrations...")
-	if err := migrations.Up(ctx, cfg.DatabaseURL); err != nil {
+	migrationCtx, migrationCancel := context.WithTimeout(ctx, time.Minute)
+	defer migrationCancel()
+	if err := migrations.Up(migrationCtx, cfg.DatabaseURL); err != nil {
 		return fmt.Errorf("app: migrations failed: %w", err)
 	}
 	logger.Info("migrations applied successfully")
@@ -73,18 +78,24 @@ func Run() error {
 	grpcService := grpchandler.NewHandler(uc)
 
 	// 6. Запуск gRPC сервера
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		return handler(ctx, req)
+	}))
 	identityv1.RegisterIdentityServiceServer(grpcServer, grpcService)
+	healthpb.RegisterHealthServer(grpcServer, &grpchandler.Health{DB: repo})
 
 	grpcListener, err := net.Listen("tcp", cfg.GRPCPort)
 	if err != nil {
 		return fmt.Errorf("app: listen grpc port %s failed: %w", cfg.GRPCPort, err)
 	}
 
+	errs := make(chan error, 2)
 	go func() {
 		logger.Info("gRPC server listening", slog.String("port", cfg.GRPCPort))
 		if err := grpcServer.Serve(grpcListener); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
-			logger.Error("gRPC server stopped with error", slog.String("error", err.Error()))
+			errs <- err
 		}
 	}()
 
@@ -100,16 +111,16 @@ func Run() error {
 	go func() {
 		logger.Info("HTTP technical server listening", slog.String("port", cfg.HTTPPort))
 		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logger.Error("HTTP server stopped with error", slog.String("error", err.Error()))
+			errs <- err
 		}
 	}()
 
 	// 8. Ожидание сигналов завершения (Graceful Shutdown)
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
-	sig := <-quit
-
-	logger.Info("shutdown signal received", slog.String("signal", sig.String()))
+	var serveErr error
+	select {
+	case <-ctx.Done():
+	case serveErr = <-errs:
+	}
 
 	// 9. Остановка серверов
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -121,7 +132,13 @@ func Run() error {
 	}
 
 	// Плавно завершаем все активные gRPC RPC-вызовы
-	grpcServer.GracefulStop()
+	done := make(chan struct{})
+	go func() { grpcServer.GracefulStop(); close(done) }()
+	select {
+	case <-done:
+	case <-shutdownCtx.Done():
+		grpcServer.Stop()
+	}
 	logger.Info("service stopped gracefully")
-	return nil
+	return serveErr
 }

@@ -150,7 +150,7 @@ func (r *PostgresRepository) ListMembershipsByUserID(ctx context.Context, userID
 		SELECT id, user_id, house_id, role, status, created_at, updated_at
 		FROM memberships
 		WHERE user_id = $1
-		ORDER BY created_at ASC;
+		ORDER BY created_at ASC, id ASC;
 	`
 
 	rows, err := r.pool.Query(ctx, query, userID)

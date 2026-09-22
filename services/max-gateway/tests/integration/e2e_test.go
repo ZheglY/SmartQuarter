@@ -31,7 +31,9 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/config"
+	cpb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/community/v1"
 	pb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/issue/v1"
+	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/identity"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/maxapi"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/notification"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/observability"
@@ -57,7 +59,7 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 	if os.Getenv("GATEWAY_E2E") != "1" {
 		t.Fatal("set GATEWAY_E2E=1 using scripts/test.ps1")
 	}
-	r := redis.NewClient(&redis.Options{Addr: "localhost:16379", MaxRetries: -1, ContextTimeoutEnabled: true})
+	r := redis.NewClient(&redis.Options{Addr: env("REDIS_TEST_ADDR", "localhost:16379"), MaxRetries: -1, ContextTimeoutEnabled: true})
 	defer r.Close()
 	if e := r.Ping(ctx).Err(); e != nil {
 		t.Fatal(e)
@@ -70,9 +72,14 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 	if e = db.Ping(ctx); e != nil {
 		t.Fatal(e)
 	}
-	ids := testdata.Start(t)
+	var ids identity.Client
+	if os.Getenv("IDENTITY_TEST_ADDR") != "" {
+		ids = testdata.RealIdentity(t)
+	} else {
+		ids = testdata.Start(t)
+	}
 	metrics := observability.New()
-	conn, e := rpc.Dial("localhost:18082", 10*time.Second, zap.NewNop(), metrics)
+	conn, e := rpc.Dial(env("ISSUE_TEST_ADDR", "localhost:18082"), 10*time.Second, zap.NewNop(), metrics)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -99,6 +106,16 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 	cfg := config.Config{Environment: "test", CookieName: "sq_session", SessionTTL: time.Hour, InitDataTTL: 5 * time.Minute, RequestTimeout: 10 * time.Second, Origins: []string{"https://test.example"}, AuthRate: 1000, BusinessRate: 10000, WebhookRate: 1000, BotToken: "gateway-test-token", WebhookSecret: "test-webhook-secret"}
 	bot := &maxapi.Client{BaseURL: maxServer.URL, Token: cfg.BotToken, BotUsername: "test_bot"}
 	api := &transport.API{Config: cfg, Store: state.Store{R: r}, Identity: ids, Issue: issue, Bot: bot, Metrics: metrics, Logger: zap.NewNop(), IssueReady: func(ctx context.Context) error { return nil }}
+	if addr := os.Getenv("COMMUNITY_TEST_ADDR"); addr != "" {
+		community, err := rpc.Dial(addr, 10*time.Second, zap.NewNop(), metrics)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer community.Close()
+		api.Community = cpb.NewCommunityServiceClient(community)
+		api.CommunityReady = rpc.HTTPReady(community, os.Getenv("COMMUNITY_TEST_READY_URL"))
+		community.Connect()
+	}
 	gateway := httptest.NewServer(api.Handler())
 	defer gateway.Close()
 	client := &http.Client{Timeout: 15 * time.Second}
@@ -167,6 +184,23 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 		return nil
 	}
 	author, neighbor, chairman, foreign := login(101), login(102), login(103), login(104)
+	if os.Getenv("IDENTITY_TEST_ADDR") != "" {
+		newcomer := login(105)
+		profile := call(t, newcomer, "GET", "/api/v1/me", nil, "", 200)
+		if profile["active_house_id"] != "" || profile["default_house_id"] != "" || len(profile["houses"].([]any)) != 0 || len(profile["memberships"].([]any)) != 0 {
+			t.Fatal("invalid new-user context", profile)
+		}
+		call(t, newcomer, "GET", "/api/v1/issues", nil, "", 403)
+		testdata.SetMembership(t, 102, "RESIDENT", "INACTIVE")
+		call(t, neighbor, "GET", "/api/v1/issues", nil, "", 403)
+		inactive := login(102)
+		inactiveProfile := call(t, inactive, "GET", "/api/v1/me", nil, "", 200)
+		if inactiveProfile["default_house_id"] != "" {
+			t.Fatal("inactive default house accepted")
+		}
+		testdata.SetMembership(t, 102, "RESIDENT", "ACTIVE")
+		call(t, neighbor, "POST", "/api/v1/session/active-house", map[string]string{"house_id": testdata.House}, "", 200)
+	}
 	call(t, author, "GET", "/api/v1/me", nil, "", 200)
 	call(t, author, "POST", "/api/v1/session/active-house", map[string]string{"house_id": testdata.ForeignHouse}, "", 403)
 	call(t, nil, "GET", "/api/v1/issues", nil, "", 401)
@@ -312,6 +346,17 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 	call(t, author, "GET", "/api/v1/issues", nil, "", 503)
 	badConn.Close()
 	api.Issue = issue
+	if os.Getenv("IDENTITY_TEST_ADDR") != "" {
+		failedIdentity, err := rpc.Dial("127.0.0.1:1", time.Second, zap.NewNop(), metrics)
+		if err != nil {
+			t.Fatal(err)
+		}
+		api.Identity = identity.NewGRPC(failedIdentity, time.Second)
+		call(t, author, "GET", "/api/v1/me", nil, "", 503)
+		call(t, neighbor, "GET", "/api/v1/issues", nil, "", 503)
+		failedIdentity.Close()
+		api.Identity = ids
+	}
 	// Actual MAX Update envelope and deduplication, still using a fake MAX endpoint.
 	body := map[string]any{"update_type": "bot_started", "timestamp": time.Now().UnixMilli(), "user": map[string]any{"user_id": 101, "is_bot": false}}
 	for i := 0; i < 2; i++ {
@@ -331,35 +376,65 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 		t.Fatal("webhook dedup", delivered.Load())
 	}
 
-	// Dedicated stack failure injection; always resume the database even on failure.
-	if err := exec.Command("docker", "pause", "smartquarter-issue-local-postgres-1").Run(); err != nil {
-		t.Fatal("cannot inject PostgreSQL outage", err)
+	if api.Community != nil {
+		call(t, author, "POST", "/api/v1/announcements", map[string]string{"title": "Unauthorized", "body": "Should fail"}, "", 403)
+		ann := call(t, chairman, "POST", "/api/v1/announcements", map[string]string{"title": "Maintenance", "body": "Test announcement"}, uuid.NewString(), 201)
+		list := call(t, neighbor, "GET", "/api/v1/announcements", nil, "", 200)
+		found := false
+		for _, item := range list["items"].([]any) {
+			if item.(map[string]any)["id"] == ann["id"] {
+				found = true
+			}
+		}
+		if !found {
+			t.Fatal("announcement not visible to resident")
+		}
+		other := call(t, foreign, "GET", "/api/v1/announcements", nil, "", 200)
+		for _, item := range other["items"].([]any) {
+			if item.(map[string]any)["id"] == ann["id"] {
+				t.Fatal("announcement crossed house boundary")
+			}
+		}
 	}
-	func() {
-		defer func() {
-			if err := exec.Command("docker", "unpause", "smartquarter-issue-local-postgres-1").Run(); err != nil {
-				t.Error("cannot resume PostgreSQL", err)
+	// Docker pause injection is available only in the legacy host-run test.
+	if os.Getenv("IDENTITY_TEST_ADDR") == "" {
+		// Dedicated stack failure injection; always resume the database even on failure.
+		if err := exec.Command("docker", "pause", "smartquarter-issue-local-postgres-1").Run(); err != nil {
+			t.Fatal("cannot inject PostgreSQL outage", err)
+		}
+		func() {
+			defer func() {
+				if err := exec.Command("docker", "unpause", "smartquarter-issue-local-postgres-1").Run(); err != nil {
+					t.Error("cannot resume PostgreSQL", err)
+				}
+			}()
+			req, _ := http.NewRequest("GET", gateway.URL+"/api/v1/issues", nil)
+			req.AddCookie(neighbor)
+			res, err := client.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer res.Body.Close()
+			if res.StatusCode != 503 && res.StatusCode != 504 {
+				t.Fatal("PostgreSQL outage status", res.StatusCode)
 			}
 		}()
-		req, _ := http.NewRequest("GET", gateway.URL+"/api/v1/issues", nil)
-		req.AddCookie(neighbor)
-		res, err := client.Do(req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer res.Body.Close()
-		if res.StatusCode != 503 && res.StatusCode != 504 {
-			t.Fatal("PostgreSQL outage status", res.StatusCode)
-		}
-	}()
-	call(t, neighbor, "GET", "/api/v1/issues", nil, "", 200)
+		call(t, neighbor, "GET", "/api/v1/issues", nil, "", 200)
+	}
 	// A real closed Redis connection must fail closed, not authenticate a cached actor.
-	unavailableRedis := redis.NewClient(&redis.Options{Addr: "localhost:16379", MaxRetries: -1})
+	unavailableRedis := redis.NewClient(&redis.Options{Addr: env("REDIS_TEST_ADDR", "localhost:16379"), MaxRetries: -1})
 	unavailableRedis.Close()
 	api.Store = state.Store{R: unavailableRedis}
 	call(t, neighbor, "GET", "/api/v1/issues", nil, "", 503)
 	api.Store = state.Store{R: r}
 	call(t, author, "POST", "/api/v1/session/logout", map[string]any{}, "", 204)
 	call(t, author, "GET", "/api/v1/issues", nil, "", 401)
-	t.Log("PASS: five HTTP -> real Issue gRPC -> PostgreSQL/S3 -> outbox/Redis -> fake MAX runs; test-only Identity gRPC")
+	t.Logf("PASS: five Issue workflows and notification delivery; real Identity=%v Community=%v", os.Getenv("IDENTITY_TEST_ADDR") != "", api.Community != nil)
+}
+
+func env(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
 }

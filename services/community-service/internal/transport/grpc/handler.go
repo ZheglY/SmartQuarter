@@ -52,13 +52,13 @@ func extractContext(ctx context.Context, requestedHouseID string) (userID, role 
 
 func mapError(err error) error {
 	if errors.Is(err, domain.ErrAlreadyVoted) {
-		return status.Errorf(codes.AlreadyExists, err.Error())
+		return status.Error(codes.AlreadyExists, err.Error())
 	}
 	if errors.Is(err, domain.ErrPollClosed) || errors.Is(err, domain.ErrInvalidDate) {
-		return status.Errorf(codes.FailedPrecondition, err.Error())
+		return status.Error(codes.FailedPrecondition, err.Error())
 	}
 	if errors.Is(err, domain.ErrNotFound) {
-		return status.Errorf(codes.NotFound, err.Error())
+		return status.Error(codes.NotFound, err.Error())
 	}
 	return status.Errorf(codes.Internal, "internal server error: %v", err)
 }

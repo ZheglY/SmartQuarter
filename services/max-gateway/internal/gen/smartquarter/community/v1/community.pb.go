@@ -1928,7 +1928,7 @@ const file_smartquarter_community_v1_community_proto_rawDesc = "" +
 	"\x12ListCalendarEvents\x124.smartquarter.community.v1.ListCalendarEventsRequest\x1a5.smartquarter.community.v1.ListCalendarEventsResponse\x12m\n" +
 	"\x10CreateInitiative\x122.smartquarter.community.v1.CreateInitiativeRequest\x1a%.smartquarter.community.v1.Initiative\x12x\n" +
 	"\x0fListInitiatives\x121.smartquarter.community.v1.ListInitiativesRequest\x1a2.smartquarter.community.v1.ListInitiativesResponse\x12~\n" +
-	"\x11SupportInitiative\x123.smartquarter.community.v1.SupportInitiativeRequest\x1a4.smartquarter.community.v1.SupportInitiativeResponseBaZ_github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1;communityv1b\x06proto3"
+	"\x11SupportInitiative\x123.smartquarter.community.v1.SupportInitiativeRequest\x1a4.smartquarter.community.v1.SupportInitiativeResponseBaZ_github.com/ZheglY/SmartQuarter/services/community-usecase/internal/gen/community/v1;communityv1b\x06proto3"
 
 var (
 	file_smartquarter_community_v1_community_proto_rawDescOnce sync.Once

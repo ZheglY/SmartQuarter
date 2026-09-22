@@ -1,0 +1,181 @@
+name: smartquarter-server
+
+x-app: &app
+  restart: unless-stopped
+  init: true
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  logging:
+    driver: json-file
+    options: {max-size: '10m', max-file: '3'}
+
+x-db: &db
+  image: postgres:17-bookworm
+  restart: unless-stopped
+  healthcheck:
+    test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+    interval: 5s
+    timeout: 3s
+    retries: 30
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?set APP_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
+    ports: ['80:80', '443:443', '443:443/udp']
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [miniapp, max-gateway]
+    logging:
+      driver: json-file
+      options: {max-size: '10m', max-file: '3'}
+
+  miniapp:
+    build:
+      context: ../../web/miniapp
+      args:
+        VITE_API_BASE_URL: ''
+        VITE_S3_ORIGINS: ${S3_PUBLIC_ENDPOINT:-https://storage.yandexcloud.net}
+    restart: unless-stopped
+    expose: ['8080']
+
+  identity-db:
+    <<: *db
+    environment:
+      POSTGRES_DB: identity_db
+      POSTGRES_USER: identity
+      POSTGRES_PASSWORD: ${IDENTITY_DB_PASSWORD:?set IDENTITY_DB_PASSWORD}
+    volumes: [identity-data:/var/lib/postgresql/data]
+  issue-db:
+    <<: *db
+    environment:
+      POSTGRES_DB: issue_db
+      POSTGRES_USER: issue
+      POSTGRES_PASSWORD: ${ISSUE_DB_PASSWORD:?set ISSUE_DB_PASSWORD}
+    volumes: [issue-data:/var/lib/postgresql/data]
+  community-db:
+    <<: *db
+    environment:
+      POSTGRES_DB: community_db
+      POSTGRES_USER: community
+      POSTGRES_PASSWORD: ${COMMUNITY_DB_PASSWORD:?set COMMUNITY_DB_PASSWORD}
+    volumes: [community-data:/var/lib/postgresql/data]
+
+  redis:
+    image: redis:8.2.10-bookworm@sha256:164c759a0c342ee69d08fc99219382b0fd682181465c0df2e0e6911f4c85d73c
+    restart: unless-stopped
+    command: [redis-server, --appendonly, 'yes']
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  identity-service:
+    <<: *app
+    build: ../../services/identity-service
+    environment:
+      IDENTITY_GRPC_PORT: '50051'
+      IDENTITY_HTTP_PORT: '8081'
+      DATABASE_URL: postgres://identity:${IDENTITY_DB_PASSWORD}@identity-db:5432/identity_db?sslmode=disable
+    depends_on:
+      identity-db: {condition: service_healthy}
+
+  issue-migrate:
+    build: ../../services/issue-service
+    restart: 'no'
+    command: [migrate, up]
+    environment:
+      DATABASE_URL: postgres://issue:${ISSUE_DB_PASSWORD}@issue-db:5432/issue_db?sslmode=disable
+    depends_on:
+      issue-db: {condition: service_healthy}
+
+  community-migrate:
+    image: postgres:17-bookworm
+    restart: 'no'
+    environment:
+      PGPASSWORD: ${COMMUNITY_DB_PASSWORD}
+    entrypoint: [psql]
+    command: ['-h', community-db, '-U', community, '-d', community_db, '-v', ON_ERROR_STOP=1, '-f', /migration.sql]
+    volumes:
+      - ../../services/community-service/migrations/000001_init.up.sql:/migration.sql:ro
+    depends_on:
+      community-db: {condition: service_healthy}
+
+  issue-service:
+    <<: *app
+    build: ../../services/issue-service
+    environment:
+      APP_ENV: production
+      GRPC_ADDR: ':8082'
+      HTTP_ADDR: ':8083'
+      DATABASE_URL: postgres://issue:${ISSUE_DB_PASSWORD}@issue-db:5432/issue_db?sslmode=disable
+      S3_ENDPOINT: ${S3_ENDPOINT:-https://storage.yandexcloud.net}
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-https://storage.yandexcloud.net}
+      S3_REGION: ${S3_REGION:-ru-central1}
+      S3_BUCKET: ${S3_BUCKET:?set S3_BUCKET}
+      S3_USE_PATH_STYLE: 'true'
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:?set AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:?set AWS_SECRET_ACCESS_KEY}
+      REDIS_ADDR: redis:6379
+    depends_on:
+      issue-migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+    stop_grace_period: 40s
+
+  community-service:
+    <<: *app
+    build: ../../services/community-service
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, 'http://127.0.0.1:8084/readyz']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    environment:
+      HTTP_ADDR: ':8084'
+      GRPC_ADDR: ':9090'
+      DATABASE_URL: postgres://community:${COMMUNITY_DB_PASSWORD}@community-db:5432/community_db?sslmode=disable
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      community-migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+
+  max-gateway:
+    <<: *app
+    build: ../../services/max-gateway
+    environment:
+      APP_ENV: production
+      HTTP_ADDR: ':8080'
+      REDIS_ADDR: redis:6379
+      IDENTITY_GRPC_ADDR: identity-service:50051
+      ISSUE_GRPC_ADDR: issue-service:8082
+      ISSUE_READY_URL: http://issue-service:8083/readyz
+      COMMUNITY_GRPC_ADDR: community-service:9090
+      COMMUNITY_READY_URL: http://community-service:8084/readyz
+      MAX_BOT_TOKEN: ${MAX_BOT_TOKEN:?set MAX_BOT_TOKEN}
+      MAX_WEBHOOK_SECRET: ${MAX_WEBHOOK_SECRET:?set MAX_WEBHOOK_SECRET}
+      MAX_BOT_USERNAME: ${MAX_BOT_USERNAME:?set MAX_BOT_USERNAME}
+      MAX_MINIAPP_URL: https://${APP_DOMAIN}
+      TRUSTED_ORIGINS: https://${APP_DOMAIN}
+    depends_on:
+      redis: {condition: service_healthy}
+      identity-service: {condition: service_healthy}
+      issue-service: {condition: service_healthy}
+      community-service: {condition: service_healthy}
+    stop_grace_period: 25s
+
+volumes:
+  identity-data:
+  issue-data:
+  community-data:
+  redis-data:
+  caddy-data:
+  caddy-config:

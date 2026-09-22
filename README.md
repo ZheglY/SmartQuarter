@@ -1,95 +1,72 @@
-# SmartQuarter — Умный Квартал
+# SmartQuarter - Умный Квартал
 
-Каркас MAX Mini App для жителей и председателя дома. Целевой сценарий:
-фото → проблема → подтверждения → заявление по шаблону → ручная отправка председателем.
-MVP включает четыре Go-сервиса, без AI Worker.
+MAX Mini App для жителей и председателя дома. Реализованный MVP:
+вход MAX → фото → проблема → подтверждение другим жителем → заявление →
+ручная отправка председателем, изменение статуса и объявления дома.
 
-| Компонент | Зона ответственности | Локальный HTTP-порт |
+## Развёртывание
+
+Подробные команды: [гайд Ubuntu 24.04](docs/deployment/server-guide.md),
+[PDF](output/pdf/SmartQuarter_Server_Deployment_Guide.pdf).
+Используйте **deploy/server/compose.yaml**: React, Gateway, Identity, Issue,
+Community, три PostgreSQL, Redis и Caddy HTTPS. Фотографии - внешний S3.
+Старый deploy/docker-compose.yml относится к первоначальному каркасу.
+
+```bash
+cd deploy/server
+cp .env.example .env
+# Заполните домен, MAX, S3 и отдельные пароли БД по гайду.
+chmod 600 .env
+docker compose config --quiet
+docker compose build
+docker compose up -d
+```
+
+Identity подключён к Gateway через общий protobuf. Новый MAX-пользователь
+получает сессию без доступа к дому; роли назначает оператор командой
+`docker compose exec identity-service /app provision` (раздел 9 гайда).
+Реальные токены, домен, S3 и регистрация webhook обязательны для испытаний в MAX.
+Вход по поддельной роли или неподписанным данным не предусмотрен.
+
+## Автоматическая приёмка
+
+Из корня, Docker Engine и Compose v2:
+
+```bash
+docker compose -f deploy/test/compose.yaml build
+docker compose -f deploy/test/compose.yaml run --rm test
+# Удаляет только отдельный тестовый проект и его данные:
+docker compose -f deploy/test/compose.yaml down -v
+```
+
+Стенд не публикует порты и не обращается к настоящему MAX. Тестовый Gateway
+использует production router и настоящий Identity/Issue/Community по gRPC,
+PostgreSQL, Redis и MinIO. MAX Bot API заменён тестовым HTTP-получателем.
+Пять проходов проверяют фото, подтверждения, заявления, роли и уведомления;
+дополнительно проверяются объявления, изоляция домов и отзыв доступа.
+Это не заменяет проверку MAX Android/iOS и облачных credentials.
+
+## Компоненты
+
+| Компонент | Назначение | Внутренние порты |
 | --- | --- | --- |
-| max-gateway | MAX, HTTP API, auth/session, gRPC-клиенты, уведомления | 8080 |
-| identity-service | Пользователи, дома, memberships, роли | 8081 |
-| issue-service | Проблемы, файлы, подтверждения, статусы, шаблоны заявлений | 8082 |
-| community-service | Объявления; позже опросы, календарь и инициативы | 8084 |
-| web/miniapp | Будущий React + TypeScript интерфейс в MAX | Пока не запускается |
+| max-gateway | MAX, HTTP API, сессии, gRPC-клиенты, уведомления | 8080 HTTP |
+| identity-service | Пользователи, дома, memberships, роли | 50051 gRPC / 8081 HTTP |
+| issue-service | Фото, проблемы, подтверждения, заявления, outbox | 8082 gRPC / 8083 HTTP |
+| community-service | Объявления дома | 9090 gRPC / 8084 HTTP |
+| web/miniapp | React + TypeScript, MAX Bridge | 8080 HTTP в контейнере |
 
-## Структура
+gRPC и БД не публикуются в интернет. Контракты находятся в contracts/proto и
+contracts/openapi. Опросы, календарь, инициативы и автоматическая отправка
+заявлений во внешние ведомства не входят в текущий UI MVP.
 
-```text
-services/                         отдельный go.mod и Dockerfile у каждого сервиса
-  max-gateway/                    внешний HTTP, MAX, сессии и внутренние клиенты
-  identity-service/               собственные domain/usecase, PostgreSQL и gRPC
-  issue-service/                  то же + storage/s3 и statement/templates
-  community-service/              собственные domain/usecase, PostgreSQL и gRPC
-web/miniapp/                       app, pages, features, shared, public, tests
-contracts/
-  proto/smartquarter/{identity,issue,community}/v1/
-  openapi/                        будущий публичный API Gateway
-  events/                         будущие события уведомлений
-deploy/docker-compose.yml         локальный запуск четырёх Go-каркасов
-tests/e2e/                        место для сквозных проверок
-docs/                            архитектура и место для материалов сдачи
-go.work                          локальный workspace четырёх модулей
-```
+## Проверки и CI
 
-Структура адаптирована по восьми PDF: [решения и источники](docs/architecture.md).
-Назначение внутренних каталогов описано в README каждого сервиса и [Mini App](web/miniapp/README.md).
+Go 1.26.x, Node 24. Каждый services/* - отдельный Go module:
+`GOWORK=off go vet ./...` и `GOWORK=off go test ./...` из папки сервиса.
+Из web/miniapp: npm ci, npm run typecheck, npm run lint, npm test,
+npm run build, npx playwright install chromium webkit, npm run test:e2e.
 
-## Текущее состояние
-
-Реализованы только прежние `GET /healthz`, чтение `HTTP_ADDR`, JSON-логи через slog и graceful shutdown.
-Новые каталоги содержат `.gitkeep`: gRPC, авторизация, бизнес-логика, React, proto/OpenAPI,
-миграции, шаблоны заявлений и внешние интеграции ещё не реализованы.
-PostgreSQL, Redis и MinIO пока не подключены к Compose. Целевые zap, `/livez`, `/readyz`, `/metrics`
-из документов будут добавлены при реализации инфраструктуры. Это каркас, не готовый к сдаче MVP.
-
-## Запуск и проверки
-
-Нужен Go 1.26.x. Запуск одного сервиса из корня:
-
-```sh
-go run ./services/issue-usecase/cmd/app
-# В другом терминале: curl http://localhost:8082/healthz
-```
-
-Параметр `HTTP_ADDR` переопределяет адрес; примеры есть в `services/<name>/.env.example`.
-В PowerShell: `$env:HTTP_ADDR = ":9082"`. Файлы `.env` автоматически не загружаются.
-
-С Docker и Compose v2:
-
-```sh
-docker compose -f deploy/docker-compose.yml up --build -d
-curl http://localhost:8080/healthz
-docker compose -f deploy/docker-compose.yml down
-```
-
-Повторный запуск — та же команда `up`. Наружу опубликован только Gateway на localhost:8080;
-внутри сети HTTP-диагностика сервисов доступна по `<service>:8080`. gRPC пока не слушается.
-
-Проверка модуля в Linux/macOS/Git Bash:
-
-```sh
-cd services/issue-usecase
-export GOWORK=off
-gofmt -l .
-go vet ./...
-go test ./...
-```
-
-В PowerShell вместо `export`: `$env:GOWORK = "off"`; вернуть workspace: `Remove-Item Env:GOWORK`.
-Для всех сервисов с GNU Make и POSIX shell: `make check`; исправить форматирование: `make fmt`.
-Корневой `go test ./...` не обходит отдельные модули.
-
-## Совместная разработка и CI
-
-Каждый сервис — независимый модуль `github.com/ZheglY/SmartQuarter/services/<name>`.
-Обновляйте его зависимости из собственной папки, выполняйте `GOWORK=off go mod tidy`
-и коммитьте `go.mod`/`go.sum`. Пока внешних зависимостей нет, `go.sum` не требуется.
-Сервисы не импортируют domain-код друг друга и не читают чужие БД; контракты согласуются в PR.
-
-Работа — в ветках через PR в `main`; реальные владельцы назначаются в `.github/CODEOWNERS`.
-В GitHub Actions один check `CI`: `gofmt`, `go vet`, `go test` для всех Go-модулей с `GOWORK=off`.
-Запуск на PR, push в `main` и вручную. Сборки контейнеров, публикации и развёртывания в CI нет.
-Frontend/proto-проверки добавляются после появления соответствующего кода и инструментов.
-
-Новый Go-сервис добавьте в `go.work`, Compose и CODEOWNERS; CI и Makefile находят модули автоматически.
-Требования к будущим API и материалам сдачи: [контракты](contracts/README.md), [архитектура](docs/architecture.md).
+CI включает Go, frontend, Docker builds и контейнерный application workflow.
+Зависимости и action SHA зафиксированы. CD/публикация образов не настроены.
+Обновление и откат на сервере описаны в гайде; merge/push выполняются отдельно.

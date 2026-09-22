@@ -1,0 +1,114 @@
+# Isolated acceptance stack. Synthetic credentials, no published ports, no live MAX.
+name: smartquarter-acceptance
+x-db: &db
+  image: postgres:17-bookworm
+  healthcheck:
+    test: [CMD-SHELL, 'pg_isready -U test -d "$${POSTGRES_DB}"']
+    interval: 2s
+    timeout: 3s
+    retries: 30
+services:
+  identity-db:
+    <<: *db
+    environment: {POSTGRES_USER: test, POSTGRES_PASSWORD: acceptance-only, POSTGRES_DB: identity_test}
+  issue-db:
+    <<: *db
+    environment: {POSTGRES_USER: test, POSTGRES_PASSWORD: acceptance-only, POSTGRES_DB: issue_test}
+  community-db:
+    <<: *db
+    environment: {POSTGRES_USER: test, POSTGRES_PASSWORD: acceptance-only, POSTGRES_DB: community_test}
+  redis:
+    image: redis:8.2.10-bookworm@sha256:164c759a0c342ee69d08fc99219382b0fd682181465c0df2e0e6911f4c85d73c
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command: server /data
+    environment: {MINIO_ROOT_USER: acceptance, MINIO_ROOT_PASSWORD: acceptance-secret-only}
+  storage-init:
+    image: quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z
+    depends_on: [minio]
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - |
+        for n in $$(seq 1 60); do
+          if mc alias set local http://minio:9000 acceptance acceptance-secret-only; then
+            mc mb --ignore-existing local/issue-test
+            exit 0
+          fi
+          sleep 1
+        done
+        exit 1
+  identity-service:
+    build: ../../services/identity-service
+    environment:
+      DATABASE_URL: postgres://test:acceptance-only@identity-db:5432/identity_test?sslmode=disable
+    depends_on:
+      identity-db: {condition: service_healthy}
+  issue-migrate:
+    build: ../../services/issue-service
+    command: [migrate, up]
+    environment:
+      DATABASE_URL: postgres://test:acceptance-only@issue-db:5432/issue_test?sslmode=disable
+    depends_on:
+      issue-db: {condition: service_healthy}
+  community-migrate:
+    image: postgres:17-bookworm
+    environment: {PGPASSWORD: acceptance-only}
+    entrypoint: [psql]
+    command: ['-h', community-db, '-U', test, '-d', community_test, '-v', ON_ERROR_STOP=1, '-f', /migration.sql]
+    volumes: ['../../services/community-service/migrations/000001_init.up.sql:/migration.sql:ro']
+    depends_on:
+      community-db: {condition: service_healthy}
+  issue-service:
+    build: ../../services/issue-service
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgres://test:acceptance-only@issue-db:5432/issue_test?sslmode=disable
+      REDIS_ADDR: redis:6379
+      S3_ENDPOINT: http://minio:9000
+      S3_PUBLIC_ENDPOINT: http://minio:9000
+      S3_REGION: ru-central1
+      S3_BUCKET: issue-test
+      S3_USE_PATH_STYLE: 'true'
+      AWS_ACCESS_KEY_ID: acceptance
+      AWS_SECRET_ACCESS_KEY: acceptance-secret-only
+    depends_on:
+      issue-migrate: {condition: service_completed_successfully}
+      storage-init: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+  community-service:
+    build: ../../services/community-service
+    environment:
+      DATABASE_URL: postgres://test:acceptance-only@community-db:5432/community_test?sslmode=disable
+      REDIS_URL: redis://redis:6379/0
+      HTTP_ADDR: ':8084'
+      GRPC_ADDR: ':9090'
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, 'http://127.0.0.1:8084/readyz']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    depends_on:
+      community-migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+  test:
+    build:
+      context: ../../services/max-gateway
+      dockerfile: Dockerfile.integration
+    environment:
+      GATEWAY_E2E: '1'
+      TEST_DATABASE_URL: postgres://test:acceptance-only@issue-db:5432/issue_test?sslmode=disable
+      IDENTITY_TEST_DATABASE_URL: postgres://test:acceptance-only@identity-db:5432/identity_test?sslmode=disable
+      IDENTITY_TEST_ADDR: identity-service:50051
+      ISSUE_TEST_ADDR: issue-service:8082
+      COMMUNITY_TEST_ADDR: community-service:9090
+      COMMUNITY_TEST_READY_URL: http://community-service:8084/readyz
+      REDIS_TEST_ADDR: redis:6379
+    depends_on:
+      identity-service: {condition: service_healthy}
+      issue-service: {condition: service_healthy}
+      community-service: {condition: service_healthy}
