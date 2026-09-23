@@ -233,3 +233,1321 @@ var IdentityService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "smartquarter/identity/v1/identity.proto",
 }
+
+const (
+	HouseService_CreateHouseRegistration_FullMethodName       = "/smartquarter.identity.v1.HouseService/CreateHouseRegistration"
+	HouseService_GetHouseRegistration_FullMethodName          = "/smartquarter.identity.v1.HouseService/GetHouseRegistration"
+	HouseService_ListMyHouseRegistrations_FullMethodName      = "/smartquarter.identity.v1.HouseService/ListMyHouseRegistrations"
+	HouseService_CancelHouseRegistration_FullMethodName       = "/smartquarter.identity.v1.HouseService/CancelHouseRegistration"
+	HouseService_ListPendingHouseRegistrations_FullMethodName = "/smartquarter.identity.v1.HouseService/ListPendingHouseRegistrations"
+	HouseService_ApproveHouseRegistration_FullMethodName      = "/smartquarter.identity.v1.HouseService/ApproveHouseRegistration"
+	HouseService_RejectHouseRegistration_FullMethodName       = "/smartquarter.identity.v1.HouseService/RejectHouseRegistration"
+	HouseService_SearchHouses_FullMethodName                  = "/smartquarter.identity.v1.HouseService/SearchHouses"
+	HouseService_CreateJoinRequest_FullMethodName             = "/smartquarter.identity.v1.HouseService/CreateJoinRequest"
+	HouseService_ListMyJoinRequests_FullMethodName            = "/smartquarter.identity.v1.HouseService/ListMyJoinRequests"
+	HouseService_CancelJoinRequest_FullMethodName             = "/smartquarter.identity.v1.HouseService/CancelJoinRequest"
+	HouseService_ListHouseJoinRequests_FullMethodName         = "/smartquarter.identity.v1.HouseService/ListHouseJoinRequests"
+	HouseService_ApproveJoinRequest_FullMethodName            = "/smartquarter.identity.v1.HouseService/ApproveJoinRequest"
+	HouseService_RejectJoinRequest_FullMethodName             = "/smartquarter.identity.v1.HouseService/RejectJoinRequest"
+	HouseService_CreateHouseInvitation_FullMethodName         = "/smartquarter.identity.v1.HouseService/CreateHouseInvitation"
+	HouseService_ListHouseInvitations_FullMethodName          = "/smartquarter.identity.v1.HouseService/ListHouseInvitations"
+	HouseService_GetHouseInvitation_FullMethodName            = "/smartquarter.identity.v1.HouseService/GetHouseInvitation"
+	HouseService_RevokeHouseInvitation_FullMethodName         = "/smartquarter.identity.v1.HouseService/RevokeHouseInvitation"
+	HouseService_RedeemHouseInvitation_FullMethodName         = "/smartquarter.identity.v1.HouseService/RedeemHouseInvitation"
+	HouseService_PreviewHouseInvitation_FullMethodName        = "/smartquarter.identity.v1.HouseService/PreviewHouseInvitation"
+	HouseService_CreateChairmanTransfer_FullMethodName        = "/smartquarter.identity.v1.HouseService/CreateChairmanTransfer"
+	HouseService_ListChairmanTransfers_FullMethodName         = "/smartquarter.identity.v1.HouseService/ListChairmanTransfers"
+	HouseService_AcceptChairmanTransfer_FullMethodName        = "/smartquarter.identity.v1.HouseService/AcceptChairmanTransfer"
+	HouseService_RejectChairmanTransfer_FullMethodName        = "/smartquarter.identity.v1.HouseService/RejectChairmanTransfer"
+	HouseService_CancelChairmanTransfer_FullMethodName        = "/smartquarter.identity.v1.HouseService/CancelChairmanTransfer"
+	HouseService_ListHouseMembers_FullMethodName              = "/smartquarter.identity.v1.HouseService/ListHouseMembers"
+	HouseService_DeactivateMembership_FullMethodName          = "/smartquarter.identity.v1.HouseService/DeactivateMembership"
+	HouseService_ReactivateMembership_FullMethodName          = "/smartquarter.identity.v1.HouseService/ReactivateMembership"
+	HouseService_RemoveMembership_FullMethodName              = "/smartquarter.identity.v1.HouseService/RemoveMembership"
+	HouseService_GetHouseAccessState_FullMethodName           = "/smartquarter.identity.v1.HouseService/GetHouseAccessState"
+	HouseService_GetNotificationPreferences_FullMethodName    = "/smartquarter.identity.v1.HouseService/GetNotificationPreferences"
+	HouseService_UpdateNotificationPreferences_FullMethodName = "/smartquarter.identity.v1.HouseService/UpdateNotificationPreferences"
+	HouseService_ListNotificationRecipients_FullMethodName    = "/smartquarter.identity.v1.HouseService/ListNotificationRecipients"
+)
+
+// HouseServiceClient is the client API for HouseService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type HouseServiceClient interface {
+	CreateHouseRegistration(ctx context.Context, in *CreateHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error)
+	GetHouseRegistration(ctx context.Context, in *GetHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error)
+	ListMyHouseRegistrations(ctx context.Context, in *ListMyHouseRegistrationsRequest, opts ...grpc.CallOption) (*HouseRegistrationList, error)
+	CancelHouseRegistration(ctx context.Context, in *CancelHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error)
+	ListPendingHouseRegistrations(ctx context.Context, in *ListPendingHouseRegistrationsRequest, opts ...grpc.CallOption) (*HouseRegistrationList, error)
+	ApproveHouseRegistration(ctx context.Context, in *ApproveHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error)
+	RejectHouseRegistration(ctx context.Context, in *RejectHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error)
+	SearchHouses(ctx context.Context, in *SearchHousesRequest, opts ...grpc.CallOption) (*HouseSearchResult, error)
+	CreateJoinRequest(ctx context.Context, in *CreateJoinRequestRequest, opts ...grpc.CallOption) (*JoinRequest, error)
+	ListMyJoinRequests(ctx context.Context, in *ListMyJoinRequestsRequest, opts ...grpc.CallOption) (*JoinRequestList, error)
+	CancelJoinRequest(ctx context.Context, in *CancelJoinRequestRequest, opts ...grpc.CallOption) (*JoinRequest, error)
+	ListHouseJoinRequests(ctx context.Context, in *ListHouseJoinRequestsRequest, opts ...grpc.CallOption) (*JoinRequestList, error)
+	ApproveJoinRequest(ctx context.Context, in *ApproveJoinRequestRequest, opts ...grpc.CallOption) (*JoinRequest, error)
+	RejectJoinRequest(ctx context.Context, in *RejectJoinRequestRequest, opts ...grpc.CallOption) (*JoinRequest, error)
+	CreateHouseInvitation(ctx context.Context, in *CreateHouseInvitationRequest, opts ...grpc.CallOption) (*CreatedInvitation, error)
+	ListHouseInvitations(ctx context.Context, in *ListHouseInvitationsRequest, opts ...grpc.CallOption) (*HouseInvitationList, error)
+	GetHouseInvitation(ctx context.Context, in *GetHouseInvitationRequest, opts ...grpc.CallOption) (*HouseInvitation, error)
+	RevokeHouseInvitation(ctx context.Context, in *RevokeHouseInvitationRequest, opts ...grpc.CallOption) (*HouseInvitation, error)
+	RedeemHouseInvitation(ctx context.Context, in *RedeemHouseInvitationRequest, opts ...grpc.CallOption) (*JoinRequest, error)
+	PreviewHouseInvitation(ctx context.Context, in *PreviewHouseInvitationRequest, opts ...grpc.CallOption) (*HouseSummary, error)
+	CreateChairmanTransfer(ctx context.Context, in *CreateChairmanTransferRequest, opts ...grpc.CallOption) (*ChairmanTransfer, error)
+	ListChairmanTransfers(ctx context.Context, in *ListChairmanTransfersRequest, opts ...grpc.CallOption) (*ChairmanTransferList, error)
+	AcceptChairmanTransfer(ctx context.Context, in *AcceptChairmanTransferRequest, opts ...grpc.CallOption) (*ChairmanTransfer, error)
+	RejectChairmanTransfer(ctx context.Context, in *RejectChairmanTransferRequest, opts ...grpc.CallOption) (*ChairmanTransfer, error)
+	CancelChairmanTransfer(ctx context.Context, in *CancelChairmanTransferRequest, opts ...grpc.CallOption) (*ChairmanTransfer, error)
+	ListHouseMembers(ctx context.Context, in *ListHouseMembersRequest, opts ...grpc.CallOption) (*HouseMemberList, error)
+	DeactivateMembership(ctx context.Context, in *DeactivateMembershipRequest, opts ...grpc.CallOption) (*HouseMember, error)
+	ReactivateMembership(ctx context.Context, in *ReactivateMembershipRequest, opts ...grpc.CallOption) (*HouseMember, error)
+	RemoveMembership(ctx context.Context, in *RemoveMembershipRequest, opts ...grpc.CallOption) (*HouseMember, error)
+	GetHouseAccessState(ctx context.Context, in *GetHouseAccessStateRequest, opts ...grpc.CallOption) (*HouseAccessState, error)
+	GetNotificationPreferences(ctx context.Context, in *GetNotificationPreferencesRequest, opts ...grpc.CallOption) (*NotificationPreferences, error)
+	UpdateNotificationPreferences(ctx context.Context, in *UpdateNotificationPreferencesRequest, opts ...grpc.CallOption) (*NotificationPreferences, error)
+	ListNotificationRecipients(ctx context.Context, in *ListNotificationRecipientsRequest, opts ...grpc.CallOption) (*NotificationRecipientList, error)
+}
+
+type houseServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewHouseServiceClient(cc grpc.ClientConnInterface) HouseServiceClient {
+	return &houseServiceClient{cc}
+}
+
+func (c *houseServiceClient) CreateHouseRegistration(ctx context.Context, in *CreateHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseRegistration)
+	err := c.cc.Invoke(ctx, HouseService_CreateHouseRegistration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) GetHouseRegistration(ctx context.Context, in *GetHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseRegistration)
+	err := c.cc.Invoke(ctx, HouseService_GetHouseRegistration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ListMyHouseRegistrations(ctx context.Context, in *ListMyHouseRegistrationsRequest, opts ...grpc.CallOption) (*HouseRegistrationList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseRegistrationList)
+	err := c.cc.Invoke(ctx, HouseService_ListMyHouseRegistrations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) CancelHouseRegistration(ctx context.Context, in *CancelHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseRegistration)
+	err := c.cc.Invoke(ctx, HouseService_CancelHouseRegistration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ListPendingHouseRegistrations(ctx context.Context, in *ListPendingHouseRegistrationsRequest, opts ...grpc.CallOption) (*HouseRegistrationList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseRegistrationList)
+	err := c.cc.Invoke(ctx, HouseService_ListPendingHouseRegistrations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ApproveHouseRegistration(ctx context.Context, in *ApproveHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseRegistration)
+	err := c.cc.Invoke(ctx, HouseService_ApproveHouseRegistration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) RejectHouseRegistration(ctx context.Context, in *RejectHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseRegistration)
+	err := c.cc.Invoke(ctx, HouseService_RejectHouseRegistration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) SearchHouses(ctx context.Context, in *SearchHousesRequest, opts ...grpc.CallOption) (*HouseSearchResult, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseSearchResult)
+	err := c.cc.Invoke(ctx, HouseService_SearchHouses_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) CreateJoinRequest(ctx context.Context, in *CreateJoinRequestRequest, opts ...grpc.CallOption) (*JoinRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JoinRequest)
+	err := c.cc.Invoke(ctx, HouseService_CreateJoinRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ListMyJoinRequests(ctx context.Context, in *ListMyJoinRequestsRequest, opts ...grpc.CallOption) (*JoinRequestList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JoinRequestList)
+	err := c.cc.Invoke(ctx, HouseService_ListMyJoinRequests_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) CancelJoinRequest(ctx context.Context, in *CancelJoinRequestRequest, opts ...grpc.CallOption) (*JoinRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JoinRequest)
+	err := c.cc.Invoke(ctx, HouseService_CancelJoinRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ListHouseJoinRequests(ctx context.Context, in *ListHouseJoinRequestsRequest, opts ...grpc.CallOption) (*JoinRequestList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JoinRequestList)
+	err := c.cc.Invoke(ctx, HouseService_ListHouseJoinRequests_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ApproveJoinRequest(ctx context.Context, in *ApproveJoinRequestRequest, opts ...grpc.CallOption) (*JoinRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JoinRequest)
+	err := c.cc.Invoke(ctx, HouseService_ApproveJoinRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) RejectJoinRequest(ctx context.Context, in *RejectJoinRequestRequest, opts ...grpc.CallOption) (*JoinRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JoinRequest)
+	err := c.cc.Invoke(ctx, HouseService_RejectJoinRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) CreateHouseInvitation(ctx context.Context, in *CreateHouseInvitationRequest, opts ...grpc.CallOption) (*CreatedInvitation, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatedInvitation)
+	err := c.cc.Invoke(ctx, HouseService_CreateHouseInvitation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ListHouseInvitations(ctx context.Context, in *ListHouseInvitationsRequest, opts ...grpc.CallOption) (*HouseInvitationList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseInvitationList)
+	err := c.cc.Invoke(ctx, HouseService_ListHouseInvitations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) GetHouseInvitation(ctx context.Context, in *GetHouseInvitationRequest, opts ...grpc.CallOption) (*HouseInvitation, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseInvitation)
+	err := c.cc.Invoke(ctx, HouseService_GetHouseInvitation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) RevokeHouseInvitation(ctx context.Context, in *RevokeHouseInvitationRequest, opts ...grpc.CallOption) (*HouseInvitation, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseInvitation)
+	err := c.cc.Invoke(ctx, HouseService_RevokeHouseInvitation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) RedeemHouseInvitation(ctx context.Context, in *RedeemHouseInvitationRequest, opts ...grpc.CallOption) (*JoinRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JoinRequest)
+	err := c.cc.Invoke(ctx, HouseService_RedeemHouseInvitation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) PreviewHouseInvitation(ctx context.Context, in *PreviewHouseInvitationRequest, opts ...grpc.CallOption) (*HouseSummary, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseSummary)
+	err := c.cc.Invoke(ctx, HouseService_PreviewHouseInvitation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) CreateChairmanTransfer(ctx context.Context, in *CreateChairmanTransferRequest, opts ...grpc.CallOption) (*ChairmanTransfer, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChairmanTransfer)
+	err := c.cc.Invoke(ctx, HouseService_CreateChairmanTransfer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ListChairmanTransfers(ctx context.Context, in *ListChairmanTransfersRequest, opts ...grpc.CallOption) (*ChairmanTransferList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChairmanTransferList)
+	err := c.cc.Invoke(ctx, HouseService_ListChairmanTransfers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) AcceptChairmanTransfer(ctx context.Context, in *AcceptChairmanTransferRequest, opts ...grpc.CallOption) (*ChairmanTransfer, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChairmanTransfer)
+	err := c.cc.Invoke(ctx, HouseService_AcceptChairmanTransfer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) RejectChairmanTransfer(ctx context.Context, in *RejectChairmanTransferRequest, opts ...grpc.CallOption) (*ChairmanTransfer, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChairmanTransfer)
+	err := c.cc.Invoke(ctx, HouseService_RejectChairmanTransfer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) CancelChairmanTransfer(ctx context.Context, in *CancelChairmanTransferRequest, opts ...grpc.CallOption) (*ChairmanTransfer, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChairmanTransfer)
+	err := c.cc.Invoke(ctx, HouseService_CancelChairmanTransfer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ListHouseMembers(ctx context.Context, in *ListHouseMembersRequest, opts ...grpc.CallOption) (*HouseMemberList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseMemberList)
+	err := c.cc.Invoke(ctx, HouseService_ListHouseMembers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) DeactivateMembership(ctx context.Context, in *DeactivateMembershipRequest, opts ...grpc.CallOption) (*HouseMember, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseMember)
+	err := c.cc.Invoke(ctx, HouseService_DeactivateMembership_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ReactivateMembership(ctx context.Context, in *ReactivateMembershipRequest, opts ...grpc.CallOption) (*HouseMember, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseMember)
+	err := c.cc.Invoke(ctx, HouseService_ReactivateMembership_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) RemoveMembership(ctx context.Context, in *RemoveMembershipRequest, opts ...grpc.CallOption) (*HouseMember, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseMember)
+	err := c.cc.Invoke(ctx, HouseService_RemoveMembership_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) GetHouseAccessState(ctx context.Context, in *GetHouseAccessStateRequest, opts ...grpc.CallOption) (*HouseAccessState, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HouseAccessState)
+	err := c.cc.Invoke(ctx, HouseService_GetHouseAccessState_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) GetNotificationPreferences(ctx context.Context, in *GetNotificationPreferencesRequest, opts ...grpc.CallOption) (*NotificationPreferences, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NotificationPreferences)
+	err := c.cc.Invoke(ctx, HouseService_GetNotificationPreferences_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) UpdateNotificationPreferences(ctx context.Context, in *UpdateNotificationPreferencesRequest, opts ...grpc.CallOption) (*NotificationPreferences, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NotificationPreferences)
+	err := c.cc.Invoke(ctx, HouseService_UpdateNotificationPreferences_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ListNotificationRecipients(ctx context.Context, in *ListNotificationRecipientsRequest, opts ...grpc.CallOption) (*NotificationRecipientList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NotificationRecipientList)
+	err := c.cc.Invoke(ctx, HouseService_ListNotificationRecipients_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// HouseServiceServer is the server API for HouseService service.
+// All implementations must embed UnimplementedHouseServiceServer
+// for forward compatibility.
+type HouseServiceServer interface {
+	CreateHouseRegistration(context.Context, *CreateHouseRegistrationRequest) (*HouseRegistration, error)
+	GetHouseRegistration(context.Context, *GetHouseRegistrationRequest) (*HouseRegistration, error)
+	ListMyHouseRegistrations(context.Context, *ListMyHouseRegistrationsRequest) (*HouseRegistrationList, error)
+	CancelHouseRegistration(context.Context, *CancelHouseRegistrationRequest) (*HouseRegistration, error)
+	ListPendingHouseRegistrations(context.Context, *ListPendingHouseRegistrationsRequest) (*HouseRegistrationList, error)
+	ApproveHouseRegistration(context.Context, *ApproveHouseRegistrationRequest) (*HouseRegistration, error)
+	RejectHouseRegistration(context.Context, *RejectHouseRegistrationRequest) (*HouseRegistration, error)
+	SearchHouses(context.Context, *SearchHousesRequest) (*HouseSearchResult, error)
+	CreateJoinRequest(context.Context, *CreateJoinRequestRequest) (*JoinRequest, error)
+	ListMyJoinRequests(context.Context, *ListMyJoinRequestsRequest) (*JoinRequestList, error)
+	CancelJoinRequest(context.Context, *CancelJoinRequestRequest) (*JoinRequest, error)
+	ListHouseJoinRequests(context.Context, *ListHouseJoinRequestsRequest) (*JoinRequestList, error)
+	ApproveJoinRequest(context.Context, *ApproveJoinRequestRequest) (*JoinRequest, error)
+	RejectJoinRequest(context.Context, *RejectJoinRequestRequest) (*JoinRequest, error)
+	CreateHouseInvitation(context.Context, *CreateHouseInvitationRequest) (*CreatedInvitation, error)
+	ListHouseInvitations(context.Context, *ListHouseInvitationsRequest) (*HouseInvitationList, error)
+	GetHouseInvitation(context.Context, *GetHouseInvitationRequest) (*HouseInvitation, error)
+	RevokeHouseInvitation(context.Context, *RevokeHouseInvitationRequest) (*HouseInvitation, error)
+	RedeemHouseInvitation(context.Context, *RedeemHouseInvitationRequest) (*JoinRequest, error)
+	PreviewHouseInvitation(context.Context, *PreviewHouseInvitationRequest) (*HouseSummary, error)
+	CreateChairmanTransfer(context.Context, *CreateChairmanTransferRequest) (*ChairmanTransfer, error)
+	ListChairmanTransfers(context.Context, *ListChairmanTransfersRequest) (*ChairmanTransferList, error)
+	AcceptChairmanTransfer(context.Context, *AcceptChairmanTransferRequest) (*ChairmanTransfer, error)
+	RejectChairmanTransfer(context.Context, *RejectChairmanTransferRequest) (*ChairmanTransfer, error)
+	CancelChairmanTransfer(context.Context, *CancelChairmanTransferRequest) (*ChairmanTransfer, error)
+	ListHouseMembers(context.Context, *ListHouseMembersRequest) (*HouseMemberList, error)
+	DeactivateMembership(context.Context, *DeactivateMembershipRequest) (*HouseMember, error)
+	ReactivateMembership(context.Context, *ReactivateMembershipRequest) (*HouseMember, error)
+	RemoveMembership(context.Context, *RemoveMembershipRequest) (*HouseMember, error)
+	GetHouseAccessState(context.Context, *GetHouseAccessStateRequest) (*HouseAccessState, error)
+	GetNotificationPreferences(context.Context, *GetNotificationPreferencesRequest) (*NotificationPreferences, error)
+	UpdateNotificationPreferences(context.Context, *UpdateNotificationPreferencesRequest) (*NotificationPreferences, error)
+	ListNotificationRecipients(context.Context, *ListNotificationRecipientsRequest) (*NotificationRecipientList, error)
+	mustEmbedUnimplementedHouseServiceServer()
+}
+
+// UnimplementedHouseServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedHouseServiceServer struct{}
+
+func (UnimplementedHouseServiceServer) CreateHouseRegistration(context.Context, *CreateHouseRegistrationRequest) (*HouseRegistration, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateHouseRegistration not implemented")
+}
+func (UnimplementedHouseServiceServer) GetHouseRegistration(context.Context, *GetHouseRegistrationRequest) (*HouseRegistration, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetHouseRegistration not implemented")
+}
+func (UnimplementedHouseServiceServer) ListMyHouseRegistrations(context.Context, *ListMyHouseRegistrationsRequest) (*HouseRegistrationList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMyHouseRegistrations not implemented")
+}
+func (UnimplementedHouseServiceServer) CancelHouseRegistration(context.Context, *CancelHouseRegistrationRequest) (*HouseRegistration, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelHouseRegistration not implemented")
+}
+func (UnimplementedHouseServiceServer) ListPendingHouseRegistrations(context.Context, *ListPendingHouseRegistrationsRequest) (*HouseRegistrationList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPendingHouseRegistrations not implemented")
+}
+func (UnimplementedHouseServiceServer) ApproveHouseRegistration(context.Context, *ApproveHouseRegistrationRequest) (*HouseRegistration, error) {
+	return nil, status.Error(codes.Unimplemented, "method ApproveHouseRegistration not implemented")
+}
+func (UnimplementedHouseServiceServer) RejectHouseRegistration(context.Context, *RejectHouseRegistrationRequest) (*HouseRegistration, error) {
+	return nil, status.Error(codes.Unimplemented, "method RejectHouseRegistration not implemented")
+}
+func (UnimplementedHouseServiceServer) SearchHouses(context.Context, *SearchHousesRequest) (*HouseSearchResult, error) {
+	return nil, status.Error(codes.Unimplemented, "method SearchHouses not implemented")
+}
+func (UnimplementedHouseServiceServer) CreateJoinRequest(context.Context, *CreateJoinRequestRequest) (*JoinRequest, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateJoinRequest not implemented")
+}
+func (UnimplementedHouseServiceServer) ListMyJoinRequests(context.Context, *ListMyJoinRequestsRequest) (*JoinRequestList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMyJoinRequests not implemented")
+}
+func (UnimplementedHouseServiceServer) CancelJoinRequest(context.Context, *CancelJoinRequestRequest) (*JoinRequest, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelJoinRequest not implemented")
+}
+func (UnimplementedHouseServiceServer) ListHouseJoinRequests(context.Context, *ListHouseJoinRequestsRequest) (*JoinRequestList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListHouseJoinRequests not implemented")
+}
+func (UnimplementedHouseServiceServer) ApproveJoinRequest(context.Context, *ApproveJoinRequestRequest) (*JoinRequest, error) {
+	return nil, status.Error(codes.Unimplemented, "method ApproveJoinRequest not implemented")
+}
+func (UnimplementedHouseServiceServer) RejectJoinRequest(context.Context, *RejectJoinRequestRequest) (*JoinRequest, error) {
+	return nil, status.Error(codes.Unimplemented, "method RejectJoinRequest not implemented")
+}
+func (UnimplementedHouseServiceServer) CreateHouseInvitation(context.Context, *CreateHouseInvitationRequest) (*CreatedInvitation, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateHouseInvitation not implemented")
+}
+func (UnimplementedHouseServiceServer) ListHouseInvitations(context.Context, *ListHouseInvitationsRequest) (*HouseInvitationList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListHouseInvitations not implemented")
+}
+func (UnimplementedHouseServiceServer) GetHouseInvitation(context.Context, *GetHouseInvitationRequest) (*HouseInvitation, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetHouseInvitation not implemented")
+}
+func (UnimplementedHouseServiceServer) RevokeHouseInvitation(context.Context, *RevokeHouseInvitationRequest) (*HouseInvitation, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevokeHouseInvitation not implemented")
+}
+func (UnimplementedHouseServiceServer) RedeemHouseInvitation(context.Context, *RedeemHouseInvitationRequest) (*JoinRequest, error) {
+	return nil, status.Error(codes.Unimplemented, "method RedeemHouseInvitation not implemented")
+}
+func (UnimplementedHouseServiceServer) PreviewHouseInvitation(context.Context, *PreviewHouseInvitationRequest) (*HouseSummary, error) {
+	return nil, status.Error(codes.Unimplemented, "method PreviewHouseInvitation not implemented")
+}
+func (UnimplementedHouseServiceServer) CreateChairmanTransfer(context.Context, *CreateChairmanTransferRequest) (*ChairmanTransfer, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateChairmanTransfer not implemented")
+}
+func (UnimplementedHouseServiceServer) ListChairmanTransfers(context.Context, *ListChairmanTransfersRequest) (*ChairmanTransferList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListChairmanTransfers not implemented")
+}
+func (UnimplementedHouseServiceServer) AcceptChairmanTransfer(context.Context, *AcceptChairmanTransferRequest) (*ChairmanTransfer, error) {
+	return nil, status.Error(codes.Unimplemented, "method AcceptChairmanTransfer not implemented")
+}
+func (UnimplementedHouseServiceServer) RejectChairmanTransfer(context.Context, *RejectChairmanTransferRequest) (*ChairmanTransfer, error) {
+	return nil, status.Error(codes.Unimplemented, "method RejectChairmanTransfer not implemented")
+}
+func (UnimplementedHouseServiceServer) CancelChairmanTransfer(context.Context, *CancelChairmanTransferRequest) (*ChairmanTransfer, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelChairmanTransfer not implemented")
+}
+func (UnimplementedHouseServiceServer) ListHouseMembers(context.Context, *ListHouseMembersRequest) (*HouseMemberList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListHouseMembers not implemented")
+}
+func (UnimplementedHouseServiceServer) DeactivateMembership(context.Context, *DeactivateMembershipRequest) (*HouseMember, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeactivateMembership not implemented")
+}
+func (UnimplementedHouseServiceServer) ReactivateMembership(context.Context, *ReactivateMembershipRequest) (*HouseMember, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReactivateMembership not implemented")
+}
+func (UnimplementedHouseServiceServer) RemoveMembership(context.Context, *RemoveMembershipRequest) (*HouseMember, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveMembership not implemented")
+}
+func (UnimplementedHouseServiceServer) GetHouseAccessState(context.Context, *GetHouseAccessStateRequest) (*HouseAccessState, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetHouseAccessState not implemented")
+}
+func (UnimplementedHouseServiceServer) GetNotificationPreferences(context.Context, *GetNotificationPreferencesRequest) (*NotificationPreferences, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetNotificationPreferences not implemented")
+}
+func (UnimplementedHouseServiceServer) UpdateNotificationPreferences(context.Context, *UpdateNotificationPreferencesRequest) (*NotificationPreferences, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateNotificationPreferences not implemented")
+}
+func (UnimplementedHouseServiceServer) ListNotificationRecipients(context.Context, *ListNotificationRecipientsRequest) (*NotificationRecipientList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListNotificationRecipients not implemented")
+}
+func (UnimplementedHouseServiceServer) mustEmbedUnimplementedHouseServiceServer() {}
+func (UnimplementedHouseServiceServer) testEmbeddedByValue()                      {}
+
+// UnsafeHouseServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to HouseServiceServer will
+// result in compilation errors.
+type UnsafeHouseServiceServer interface {
+	mustEmbedUnimplementedHouseServiceServer()
+}
+
+func RegisterHouseServiceServer(s grpc.ServiceRegistrar, srv HouseServiceServer) {
+	// If the following call panics, it indicates UnimplementedHouseServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&HouseService_ServiceDesc, srv)
+}
+
+func _HouseService_CreateHouseRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateHouseRegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).CreateHouseRegistration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_CreateHouseRegistration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).CreateHouseRegistration(ctx, req.(*CreateHouseRegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_GetHouseRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHouseRegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).GetHouseRegistration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_GetHouseRegistration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).GetHouseRegistration(ctx, req.(*GetHouseRegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ListMyHouseRegistrations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMyHouseRegistrationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListMyHouseRegistrations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListMyHouseRegistrations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListMyHouseRegistrations(ctx, req.(*ListMyHouseRegistrationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_CancelHouseRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelHouseRegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).CancelHouseRegistration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_CancelHouseRegistration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).CancelHouseRegistration(ctx, req.(*CancelHouseRegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ListPendingHouseRegistrations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPendingHouseRegistrationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListPendingHouseRegistrations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListPendingHouseRegistrations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListPendingHouseRegistrations(ctx, req.(*ListPendingHouseRegistrationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ApproveHouseRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApproveHouseRegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ApproveHouseRegistration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ApproveHouseRegistration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ApproveHouseRegistration(ctx, req.(*ApproveHouseRegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_RejectHouseRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RejectHouseRegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).RejectHouseRegistration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_RejectHouseRegistration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).RejectHouseRegistration(ctx, req.(*RejectHouseRegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_SearchHouses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchHousesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).SearchHouses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_SearchHouses_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).SearchHouses(ctx, req.(*SearchHousesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_CreateJoinRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateJoinRequestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).CreateJoinRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_CreateJoinRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).CreateJoinRequest(ctx, req.(*CreateJoinRequestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ListMyJoinRequests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMyJoinRequestsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListMyJoinRequests(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListMyJoinRequests_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListMyJoinRequests(ctx, req.(*ListMyJoinRequestsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_CancelJoinRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelJoinRequestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).CancelJoinRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_CancelJoinRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).CancelJoinRequest(ctx, req.(*CancelJoinRequestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ListHouseJoinRequests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListHouseJoinRequestsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListHouseJoinRequests(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListHouseJoinRequests_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListHouseJoinRequests(ctx, req.(*ListHouseJoinRequestsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ApproveJoinRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApproveJoinRequestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ApproveJoinRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ApproveJoinRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ApproveJoinRequest(ctx, req.(*ApproveJoinRequestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_RejectJoinRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RejectJoinRequestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).RejectJoinRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_RejectJoinRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).RejectJoinRequest(ctx, req.(*RejectJoinRequestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_CreateHouseInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateHouseInvitationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).CreateHouseInvitation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_CreateHouseInvitation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).CreateHouseInvitation(ctx, req.(*CreateHouseInvitationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ListHouseInvitations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListHouseInvitationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListHouseInvitations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListHouseInvitations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListHouseInvitations(ctx, req.(*ListHouseInvitationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_GetHouseInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHouseInvitationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).GetHouseInvitation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_GetHouseInvitation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).GetHouseInvitation(ctx, req.(*GetHouseInvitationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_RevokeHouseInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokeHouseInvitationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).RevokeHouseInvitation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_RevokeHouseInvitation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).RevokeHouseInvitation(ctx, req.(*RevokeHouseInvitationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_RedeemHouseInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RedeemHouseInvitationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).RedeemHouseInvitation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_RedeemHouseInvitation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).RedeemHouseInvitation(ctx, req.(*RedeemHouseInvitationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_PreviewHouseInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PreviewHouseInvitationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).PreviewHouseInvitation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_PreviewHouseInvitation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).PreviewHouseInvitation(ctx, req.(*PreviewHouseInvitationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_CreateChairmanTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateChairmanTransferRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).CreateChairmanTransfer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_CreateChairmanTransfer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).CreateChairmanTransfer(ctx, req.(*CreateChairmanTransferRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ListChairmanTransfers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListChairmanTransfersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListChairmanTransfers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListChairmanTransfers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListChairmanTransfers(ctx, req.(*ListChairmanTransfersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_AcceptChairmanTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcceptChairmanTransferRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).AcceptChairmanTransfer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_AcceptChairmanTransfer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).AcceptChairmanTransfer(ctx, req.(*AcceptChairmanTransferRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_RejectChairmanTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RejectChairmanTransferRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).RejectChairmanTransfer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_RejectChairmanTransfer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).RejectChairmanTransfer(ctx, req.(*RejectChairmanTransferRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_CancelChairmanTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelChairmanTransferRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).CancelChairmanTransfer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_CancelChairmanTransfer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).CancelChairmanTransfer(ctx, req.(*CancelChairmanTransferRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ListHouseMembers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListHouseMembersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListHouseMembers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListHouseMembers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListHouseMembers(ctx, req.(*ListHouseMembersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_DeactivateMembership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeactivateMembershipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).DeactivateMembership(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_DeactivateMembership_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).DeactivateMembership(ctx, req.(*DeactivateMembershipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ReactivateMembership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReactivateMembershipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ReactivateMembership(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ReactivateMembership_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ReactivateMembership(ctx, req.(*ReactivateMembershipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_RemoveMembership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveMembershipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).RemoveMembership(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_RemoveMembership_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).RemoveMembership(ctx, req.(*RemoveMembershipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_GetHouseAccessState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHouseAccessStateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).GetHouseAccessState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_GetHouseAccessState_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).GetHouseAccessState(ctx, req.(*GetHouseAccessStateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_GetNotificationPreferences_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNotificationPreferencesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).GetNotificationPreferences(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_GetNotificationPreferences_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).GetNotificationPreferences(ctx, req.(*GetNotificationPreferencesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_UpdateNotificationPreferences_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateNotificationPreferencesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).UpdateNotificationPreferences(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_UpdateNotificationPreferences_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).UpdateNotificationPreferences(ctx, req.(*UpdateNotificationPreferencesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ListNotificationRecipients_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListNotificationRecipientsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListNotificationRecipients(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListNotificationRecipients_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListNotificationRecipients(ctx, req.(*ListNotificationRecipientsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// HouseService_ServiceDesc is the grpc.ServiceDesc for HouseService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var HouseService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "smartquarter.identity.v1.HouseService",
+	HandlerType: (*HouseServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateHouseRegistration",
+			Handler:    _HouseService_CreateHouseRegistration_Handler,
+		},
+		{
+			MethodName: "GetHouseRegistration",
+			Handler:    _HouseService_GetHouseRegistration_Handler,
+		},
+		{
+			MethodName: "ListMyHouseRegistrations",
+			Handler:    _HouseService_ListMyHouseRegistrations_Handler,
+		},
+		{
+			MethodName: "CancelHouseRegistration",
+			Handler:    _HouseService_CancelHouseRegistration_Handler,
+		},
+		{
+			MethodName: "ListPendingHouseRegistrations",
+			Handler:    _HouseService_ListPendingHouseRegistrations_Handler,
+		},
+		{
+			MethodName: "ApproveHouseRegistration",
+			Handler:    _HouseService_ApproveHouseRegistration_Handler,
+		},
+		{
+			MethodName: "RejectHouseRegistration",
+			Handler:    _HouseService_RejectHouseRegistration_Handler,
+		},
+		{
+			MethodName: "SearchHouses",
+			Handler:    _HouseService_SearchHouses_Handler,
+		},
+		{
+			MethodName: "CreateJoinRequest",
+			Handler:    _HouseService_CreateJoinRequest_Handler,
+		},
+		{
+			MethodName: "ListMyJoinRequests",
+			Handler:    _HouseService_ListMyJoinRequests_Handler,
+		},
+		{
+			MethodName: "CancelJoinRequest",
+			Handler:    _HouseService_CancelJoinRequest_Handler,
+		},
+		{
+			MethodName: "ListHouseJoinRequests",
+			Handler:    _HouseService_ListHouseJoinRequests_Handler,
+		},
+		{
+			MethodName: "ApproveJoinRequest",
+			Handler:    _HouseService_ApproveJoinRequest_Handler,
+		},
+		{
+			MethodName: "RejectJoinRequest",
+			Handler:    _HouseService_RejectJoinRequest_Handler,
+		},
+		{
+			MethodName: "CreateHouseInvitation",
+			Handler:    _HouseService_CreateHouseInvitation_Handler,
+		},
+		{
+			MethodName: "ListHouseInvitations",
+			Handler:    _HouseService_ListHouseInvitations_Handler,
+		},
+		{
+			MethodName: "GetHouseInvitation",
+			Handler:    _HouseService_GetHouseInvitation_Handler,
+		},
+		{
+			MethodName: "RevokeHouseInvitation",
+			Handler:    _HouseService_RevokeHouseInvitation_Handler,
+		},
+		{
+			MethodName: "RedeemHouseInvitation",
+			Handler:    _HouseService_RedeemHouseInvitation_Handler,
+		},
+		{
+			MethodName: "PreviewHouseInvitation",
+			Handler:    _HouseService_PreviewHouseInvitation_Handler,
+		},
+		{
+			MethodName: "CreateChairmanTransfer",
+			Handler:    _HouseService_CreateChairmanTransfer_Handler,
+		},
+		{
+			MethodName: "ListChairmanTransfers",
+			Handler:    _HouseService_ListChairmanTransfers_Handler,
+		},
+		{
+			MethodName: "AcceptChairmanTransfer",
+			Handler:    _HouseService_AcceptChairmanTransfer_Handler,
+		},
+		{
+			MethodName: "RejectChairmanTransfer",
+			Handler:    _HouseService_RejectChairmanTransfer_Handler,
+		},
+		{
+			MethodName: "CancelChairmanTransfer",
+			Handler:    _HouseService_CancelChairmanTransfer_Handler,
+		},
+		{
+			MethodName: "ListHouseMembers",
+			Handler:    _HouseService_ListHouseMembers_Handler,
+		},
+		{
+			MethodName: "DeactivateMembership",
+			Handler:    _HouseService_DeactivateMembership_Handler,
+		},
+		{
+			MethodName: "ReactivateMembership",
+			Handler:    _HouseService_ReactivateMembership_Handler,
+		},
+		{
+			MethodName: "RemoveMembership",
+			Handler:    _HouseService_RemoveMembership_Handler,
+		},
+		{
+			MethodName: "GetHouseAccessState",
+			Handler:    _HouseService_GetHouseAccessState_Handler,
+		},
+		{
+			MethodName: "GetNotificationPreferences",
+			Handler:    _HouseService_GetNotificationPreferences_Handler,
+		},
+		{
+			MethodName: "UpdateNotificationPreferences",
+			Handler:    _HouseService_UpdateNotificationPreferences_Handler,
+		},
+		{
+			MethodName: "ListNotificationRecipients",
+			Handler:    _HouseService_ListNotificationRecipients_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "smartquarter/identity/v1/identity.proto",
+}

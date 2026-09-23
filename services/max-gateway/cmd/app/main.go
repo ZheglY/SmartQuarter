@@ -17,6 +17,7 @@ import (
 
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/config"
 	cpb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/community/v1"
+	ipb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/identity/v1"
 	pb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/issue/v1"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/identity"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/maxapi"
@@ -85,6 +86,7 @@ func run() error {
 	defer identityConn.Close()
 	identityConn.Connect()
 	api := &transport.API{Config: cfg, Store: state.Store{R: r}, Identity: identity.NewGRPC(identityConn, cfg.RequestTimeout), Issue: pb.NewIssueServiceClient(conn), Bot: bot, Metrics: metrics, Logger: logger}
+	api.House = ipb.NewHouseServiceClient(identityConn)
 	if cfg.CommunityAddr != "" {
 		community, e := rpc.Dial(cfg.CommunityAddr, cfg.RequestTimeout, logger, metrics, cfg.DialTimeout)
 		if e != nil {
@@ -116,6 +118,7 @@ func run() error {
 	workerCtx, cancelWorker := context.WithCancel(context.Background())
 	workerDone := make(chan struct{})
 	worker := &notification.Consumer{Redis: r, Stream: cfg.Stream, Group: cfg.Group, Identity: api.Identity, Bot: bot, Metrics: metrics, Logger: logger}
+	worker.House = api.House
 	go func() { defer close(workerDone); worker.Run(workerCtx) }()
 	defer func() { cancelWorker(); <-workerDone }()
 	server := &http.Server{Addr: cfg.HTTPAddr, Handler: api.Handler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: cfg.ReadTimeout, WriteTimeout: cfg.WriteTimeout, IdleTimeout: cfg.IdleTimeout}

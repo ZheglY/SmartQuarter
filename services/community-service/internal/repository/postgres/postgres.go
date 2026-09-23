@@ -27,7 +27,7 @@ func (r *CommunityRepo) insertOutboxEvent(ctx context.Context, tx pgx.Tx, eventT
 	}
 
 	query := `INSERT INTO outbox_events (event_id, event_type, producer, payload) VALUES ($1, $2, $3, $4)`
-	_, err = tx.Exec(ctx, query, uuid.New().String(), eventType, "community-usecase", payloadBytes)
+	_, err = tx.Exec(ctx, query, uuid.New().String(), eventType, "community-service", payloadBytes)
 	return err
 }
 
@@ -342,7 +342,7 @@ func (r *CommunityRepo) SupportInitiative(ctx context.Context, houseID, initiati
 
 func (r *CommunityRepo) GetUnpublishedOutboxEvents(ctx context.Context, limit int) ([]domain.OutboxEvent, error) {
 	query := `
-		SELECT event_id, event_type, payload
+		SELECT event_id, event_type, payload, occurred_at
 		FROM outbox_events
 		WHERE published_at IS NULL
 		ORDER BY occurred_at ASC
@@ -357,7 +357,7 @@ func (r *CommunityRepo) GetUnpublishedOutboxEvents(ctx context.Context, limit in
 	var events []domain.OutboxEvent
 	for rows.Next() {
 		var e domain.OutboxEvent
-		if err := rows.Scan(&e.EventID, &e.EventType, &e.Payload); err != nil {
+		if err := rows.Scan(&e.EventID, &e.EventType, &e.Payload, &e.OccurredAt); err != nil {
 			return nil, err
 		}
 		events = append(events, e)

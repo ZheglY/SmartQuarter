@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"log/slog"
 	"net/url"
 	"os"
@@ -10,10 +11,12 @@ import (
 )
 
 type Config struct {
-	GRPCPort    string
-	HTTPPort    string
-	DatabaseURL string
-	LogLevel    string
+	RedisAddr, RedisPassword, NotificationStream string
+	GRPCPort                                     string
+	HTTPPort                                     string
+	DatabaseURL                                  string
+	LogLevel                                     string
+	AdminUserIDs                                 map[string]bool
 }
 
 func Load() (*Config, error) {
@@ -44,10 +47,23 @@ func Load() (*Config, error) {
 	}
 
 	cfg := &Config{
-		GRPCPort:    formatPort(grpcPort),
-		HTTPPort:    formatPort(httpPort),
-		DatabaseURL: dbURL,
-		LogLevel:    logLevel,
+		RedisAddr: getEnv("REDIS_ADDR", "localhost:6379"), RedisPassword: os.Getenv("REDIS_PASSWORD"), NotificationStream: getEnv("NOTIFICATION_STREAM", "stream:notifications"),
+		GRPCPort:     formatPort(grpcPort),
+		HTTPPort:     formatPort(httpPort),
+		DatabaseURL:  dbURL,
+		LogLevel:     logLevel,
+		AdminUserIDs: map[string]bool{},
+	}
+	for _, raw := range strings.Split(os.Getenv("ADMIN_USER_IDS"), ",") {
+		id := strings.TrimSpace(raw)
+		if id == "" {
+			continue
+		}
+		parsed, e := uuid.Parse(id)
+		if e != nil || parsed == uuid.Nil || parsed.String() != id {
+			return nil, fmt.Errorf("ADMIN_USER_IDS must contain canonical user UUIDs")
+		}
+		cfg.AdminUserIDs[id] = true
 	}
 	return cfg, nil
 }

@@ -43,6 +43,9 @@ export function ProfilePage({ embedded = false }: { embedded?: boolean }) {
         <p>{role ? 'Участие в активном доме: активно' : 'Нет активного участия в выбранном доме'}</p>
       </section>
       <section className="issue-block">
+        <Link className="management-link" to="/houses">Дома, заявки и управление →</Link>
+        <Link className="management-link" to="/notifications/settings">Настройки уведомлений →</Link>
+        <Link className="management-link" to="/service-contacts">Контакты служб →</Link>
         <h2>Мои дома</h2>
         {user.houses
           .filter((h) =>

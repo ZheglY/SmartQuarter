@@ -46,6 +46,8 @@ services:
     build: ../../services/identity-service
     environment:
       DATABASE_URL: postgres://test:acceptance-only@identity-db:5432/identity_test?sslmode=disable
+      ADMIN_USER_IDS: '99999999-9999-4999-8999-999999999999'
+      REDIS_ADDR: redis:6379
     depends_on:
       identity-db: {condition: service_healthy}
   issue-migrate:
@@ -59,8 +61,8 @@ services:
     image: postgres:17-bookworm
     environment: {PGPASSWORD: acceptance-only}
     entrypoint: [psql]
-    command: ['-h', community-db, '-U', test, '-d', community_test, '-v', ON_ERROR_STOP=1, '-f', /migration.sql]
-    volumes: ['../../services/community-service/migrations/000001_init.up.sql:/migration.sql:ro']
+    command: ['-h', community-db, '-U', test, '-d', community_test, '-v', ON_ERROR_STOP=1, '-f', /migration.sql, '-f', /contacts.sql]
+    volumes: ['../../services/community-service/migrations/000001_init.up.sql:/migration.sql:ro', '../../services/community-service/migrations/000002_service_contacts.up.sql:/contacts.sql:ro']
     depends_on:
       community-db: {condition: service_healthy}
   issue-service:

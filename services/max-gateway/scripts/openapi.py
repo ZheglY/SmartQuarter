@@ -1,5 +1,5 @@
 """Generate the canonical OpenAPI for implemented Gateway routes. Python 3 only."""
-import json
+import json,re
 from pathlib import Path
 S={}
 def ref(name):return {'$ref':'#/components/schemas/'+name}
@@ -35,8 +35,8 @@ paths={}
 def route(method,path,title,response=None,request=None,code=200,role='ACTIVE member',rpc=None,idem=False,public=False,pagination=False,example=None):
  op={'summary':title,'operationId':method+'_'+path.replace('/','_').replace('{','').replace('}',''),'description':('Required role: '+role+'. ' if not public else '')+(('gRPC: '+rpc+'. ') if rpc else ''),'responses':{},'parameters':[{'name':'X-Request-Id','in':'header','required':False,'schema':uuid}]}
  if public:op['security']=[]
- if '{id}' in path:op['parameters'].append({'name':'id','in':'path','required':True,'schema':uuid})
- if method in ('post','patch') and path!='/webhooks/max':op['parameters'].append({'name':'Origin','in':'header','required':True,'schema':string(format='uri'),'description':'Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection).'})
+ for name in re.findall(r'{(\w+)}',path):op['parameters'].append({'name':name,'in':'path','required':True,'schema':uuid})
+ if method in ('post','patch','put','delete') and path!='/webhooks/max':op['parameters'].append({'name':'Origin','in':'header','required':True,'schema':string(format='uri'),'description':'Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection).'})
  if idem:op['parameters'].append({'name':'Idempotency-Key','in':'header','schema':uuid,'description':'Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee.'})
  if pagination:op['parameters'] += [{'name':'page_size','in':'query','schema':{'type':'integer','default':20,'minimum':1,'maximum':100}},{'name':'page_token','in':'query','schema':string(),'description':'Opaque token; empty next_page_token means end.'}]
  if method=='get' and path in ['/api/v1/issues','/api/v1/chairman/issues']:op['parameters'].append({'name':'status','in':'query','schema':array(ref('IssueStatus')),'style':'form','explode':True,'description':'Repeated status parameter; comma-separated values also accepted.'})
@@ -47,7 +47,7 @@ def route(method,path,title,response=None,request=None,code=200,role='ACTIVE mem
  for c,desc in [(400,'Invalid JSON, enum, identifier or pagination'),(401,'Missing/invalid/expired session or initData'),(403,'Forbidden membership, role or Origin'),(404,'Resource not found'),(409,'Conflict, invalid transition or idempotency reservation'),(413,'Body exceeds 256 KiB'),(415,'application/json required'),(429,'Rate limit exceeded'),(500,'Internal error'),(502,'Invalid upstream response'),(503,'Dependency unavailable'),(504,'Deadline exceeded'),(408,'Request canceled')]:op['responses'][str(c)]={'description':desc,'content':{'application/json':{'schema':ref('Error')}}}
  paths.setdefault(path,{})[method]=op
 route('post','/api/v1/session/max','Validate MAX and create Redis session',ref('Session'),obj({'init_data':string()}),public=True,rpc='Identity.UpsertMaxUser -> GetUserContext -> GetMembership',example={'init_data':'<raw MAX initData>'})
-paths['/api/v1/session/max']['post']['description']+='BLOCKED in production until identity.proto is agreed; test-only Identity adapter is excluded from app. Cookie is HttpOnly, Path=/; production Secure + SameSite=None; local Lax.'
+paths['/api/v1/session/max']['post']['description']+='Real Identity integration. Users without membership can access house onboarding. Cookie is HttpOnly, Path=/; production Secure + SameSite=None; local Lax.'
 route('get','/api/v1/me','Get user context',ref('UserContext'),role='Any session',rpc='Identity.GetUserContext')
 route('post','/api/v1/session/active-house','Select active membership',obj(dict(active_house_id=uuid,role=string())),obj({'house_id':uuid}),role='ACTIVE membership of selected house',rpc='Identity.GetMembership')
 route('post','/api/v1/session/logout','Revoke session',request=ref('Empty'),code=204,role='Any session')
@@ -64,12 +64,16 @@ route('get','/api/v1/issues/{id}/statement','Get latest statement',ref('Statemen
 route('get','/api/v1/chairman/issues','List unresolved chairman queue',ref('IssueList'),role='CHAIRMAN or ADMIN',rpc='Issue.ListIssues(chairman_queue=true)',pagination=True)
 route('post','/api/v1/announcements','Publish announcement',ref('Announcement'),ref('CreateAnnouncement'),201,role='CHAIRMAN or ADMIN',rpc='Community.CreateAnnouncement',idem=True)
 route('get','/api/v1/announcements','List announcements',ref('AnnouncementList'),rpc='Community.ListAnnouncements',pagination=True)
-for method in ['post','get']:paths['/api/v1/announcements'][method]['description']+='Transport contract tested with a fake gRPC endpoint; real Community runtime integration NOT VERIFIED. Missing configuration returns 503.'
+for method in ['post','get']:paths['/api/v1/announcements'][method]['description']+='Real Community integration. Missing configuration returns 503.'
 route('post','/webhooks/max','Receive official MAX Update',obj({'ok':{'type':'boolean'}}),ref('MaxUpdate'),public=True,example={'update_type':'bot_started','timestamp':1771409719000,'user':{'user_id':123456789,'is_bot':False}})
 paths['/webhooks/max']['post']['security']=[{'MaxWebhookSecret':[]}]
 for path in ['/livez','/healthz','/readyz']:route('get',path,'Process liveness' if path!='/readyz' else 'Redis, Identity, Issue gRPC and Issue dependencies readiness',obj({'status':string()}),public=True)
 paths['/metrics']={'get':{'summary':'Prometheus metrics; restrict to internal monitoring at ingress','security':[],'responses':{'200':{'description':'Prometheus exposition','content':{'text/plain':{'schema':string()}}}}}}
 spec={'openapi':'3.1.0','info':{'title':'SmartQuarter max-gateway','version':'1.0.0','description':'Implemented Gateway API. Server owns actor user/house/role. No multipart uploads. Identity production integration is blocked pending agreed proto; Community announcements have transport coverage only. gRPC v1 exposes status codes without ErrorInfo, therefore stable generic HTTP error codes are used rather than parsing messages.'},'servers':[{'url':'http://localhost:18080'}],'security':[{'SessionAuth':[]}],'paths':paths,'components':{'securitySchemes':{'SessionAuth':{'type':'apiKey','in':'cookie','name':'sq_session'},'MaxWebhookSecret':{'type':'apiKey','in':'header','name':'X-Max-Bot-Api-Secret'}},'schemas':S}}
+from house_openapi import register
+register(S,route,paths,ref,obj,string,array)
+spec['info']['version']='1.1.0'
+spec['info']['description']='Gateway API with real Identity, Issue and Community services. Session actor and active house are server-owned. House registration requires explicit platform administrator approval. Stable HTTP errors map gRPC status codes.'
 # Hoist common error responses to keep the canonical contract small.
 responses={}
 for path in paths.values():
@@ -98,4 +102,3 @@ def yaml(v,indent=0):
  return pad+scalar(v)+'\n'
 root=Path(__file__).resolve().parents[3]
 (root/'contracts/openapi/openapi.yaml').write_text(yaml(spec),encoding='utf-8')
-

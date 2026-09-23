@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/ZheglY/SmartQuarter/services/community-service/internal/config"
+	"github.com/ZheglY/SmartQuarter/services/community-service/internal/contacts"
 	"github.com/ZheglY/SmartQuarter/services/community-service/internal/events"
 	communityv1 "github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1"
 	"github.com/ZheglY/SmartQuarter/services/community-service/internal/observability/logs"
@@ -76,6 +77,7 @@ func run(logger *zap.Logger) error {
 	go outboxWorker.Start(ctx)
 
 	grpcHandler := grpc_transport.NewCommunityHandler(uc, logger)
+	grpcHandler.Contacts = &contacts.Service{DB: pool}
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_transport.LoggingInterceptor(logger)),
 	)

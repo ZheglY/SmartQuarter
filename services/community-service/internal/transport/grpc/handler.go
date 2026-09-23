@@ -11,14 +11,16 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/ZheglY/SmartQuarter/services/community-service/internal/contacts"
 	"github.com/ZheglY/SmartQuarter/services/community-service/internal/domain"
 	communityv1 "github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1"
 )
 
 type CommunityHandler struct {
 	communityv1.UnimplementedCommunityServiceServer
-	useCase domain.CommunityService
-	logger  *zap.Logger
+	useCase  domain.CommunityService
+	logger   *zap.Logger
+	Contacts *contacts.Service
 }
 
 func NewCommunityHandler(useCase domain.CommunityService, logger *zap.Logger) *CommunityHandler {

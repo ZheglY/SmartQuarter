@@ -53,7 +53,7 @@ func TestGRPCAdapter(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer conn.Close()
-	c := NewGRPC(conn, 100*time.Millisecond)
+	c := NewGRPC(conn, 5*time.Second)
 	ctx := context.Background()
 	u, err := c.UpsertMaxUser(ctx, MaxUser{ID: 1, FirstName: "Test", LastName: "Resident", Username: "user"})
 	if err != nil || u.MaxUserID != "1" || u.DisplayName != "Test Resident" {
@@ -78,7 +78,8 @@ func TestGRPCAdapter(t *testing.T) {
 	if status.Code(c.Ready(ctx)) != codes.Unavailable {
 		t.Fatal("unhealthy identity accepted")
 	}
-	_, err = c.UpsertMaxUser(ctx, MaxUser{ID: 2})
+	timeoutClient := NewGRPC(conn, 100*time.Millisecond)
+	_, err = timeoutClient.UpsertMaxUser(ctx, MaxUser{ID: 2})
 	if status.Code(err) != codes.DeadlineExceeded {
 		t.Fatal(err)
 	}

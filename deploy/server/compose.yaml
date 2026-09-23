@@ -86,6 +86,8 @@ services:
       IDENTITY_GRPC_PORT: '50051'
       IDENTITY_HTTP_PORT: '8081'
       DATABASE_URL: postgres://identity:${IDENTITY_DB_PASSWORD}@identity-db:5432/identity_db?sslmode=disable
+      ADMIN_USER_IDS: ${ADMIN_USER_IDS:-}
+      REDIS_ADDR: redis:6379
     depends_on:
       identity-db: {condition: service_healthy}
 
@@ -104,9 +106,10 @@ services:
     environment:
       PGPASSWORD: ${COMMUNITY_DB_PASSWORD}
     entrypoint: [psql]
-    command: ['-h', community-db, '-U', community, '-d', community_db, '-v', ON_ERROR_STOP=1, '-f', /migration.sql]
+    command: ['-h', community-db, '-U', community, '-d', community_db, '-v', ON_ERROR_STOP=1, '-f', /migration.sql, '-f', /contacts.sql]
     volumes:
       - ../../services/community-service/migrations/000001_init.up.sql:/migration.sql:ro
+      - ../../services/community-service/migrations/000002_service_contacts.up.sql:/contacts.sql:ro
     depends_on:
       community-db: {condition: service_healthy}
 

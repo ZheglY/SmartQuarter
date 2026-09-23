@@ -16,6 +16,7 @@ import (
 
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/config"
 	cpb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/community/v1"
+	ipb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/identity/v1"
 	pb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/issue/v1"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/identity"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/maxapi"
@@ -27,6 +28,7 @@ type API struct {
 	Config         config.Config
 	Store          state.Store
 	Identity       identity.Client
+	House          ipb.HouseServiceClient
 	Issue          pb.IssueServiceClient
 	Community      cpb.CommunityServiceClient
 	Bot            *maxapi.Client
@@ -38,6 +40,7 @@ type API struct {
 
 func (a *API) Handler() http.Handler {
 	mux := http.NewServeMux()
+	a.houseRoutes(mux)
 	mux.HandleFunc("GET /livez", func(w http.ResponseWriter, r *http.Request) { write(w, 200, map[string]string{"status": "ok"}) })
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { write(w, 200, map[string]string{"status": "ok"}) })
 	mux.HandleFunc("GET /readyz", a.ready)
@@ -66,6 +69,10 @@ func (a *API) Handler() http.Handler {
 	business("GET /api/v1/issues/{id}/statement", true, a.getStatement)
 	business("POST /api/v1/announcements", true, a.idempotent(a.createAnnouncement))
 	business("GET /api/v1/announcements", false, a.listAnnouncements)
+	business("GET /api/v1/house/service-contacts", false, a.listContacts)
+	business("POST /api/v1/chairman/service-contacts", true, a.idempotent(a.contactMutation))
+	business("PATCH /api/v1/chairman/service-contacts/{id}", true, a.idempotent(a.contactMutation))
+	business("DELETE /api/v1/chairman/service-contacts/{id}", true, a.idempotent(a.contactMutation))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { a.fail(w, r, 404, "NOT_FOUND", "route not found") })
 	return a.observe(mux)
 }
@@ -119,6 +126,8 @@ func (a *API) rpcError(w http.ResponseWriter, r *http.Request, err error) {
 		c, n, m = 409, "ALREADY_EXISTS", "resource already exists"
 	case codes.FailedPrecondition:
 		c, n, m = 409, "FAILED_PRECONDITION", "precondition failed"
+	case codes.Aborted:
+		c, n, m = 409, "TRANSACTION_RETRY", "transaction conflicted; retry after refreshing"
 	case codes.ResourceExhausted:
 		c, n, m = 429, "RESOURCE_EXHAUSTED", "limit exceeded"
 	case codes.Unavailable, codes.Unimplemented:

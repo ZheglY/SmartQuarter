@@ -1,0 +1,12 @@
+version: v2
+plugins:
+  - local: ["go", "run", "google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12"]
+    out: internal/gen
+    opt:
+      - module=github.com/ZheglY/SmartQuarter/services/community-service/internal/gen
+      - Msmartquarter/community/v1/community.proto=github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1
+  - local: ["go", "run", "google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.1"]
+    out: internal/gen
+    opt:
+      - module=github.com/ZheglY/SmartQuarter/services/community-service/internal/gen
+      - Msmartquarter/community/v1/community.proto=github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1

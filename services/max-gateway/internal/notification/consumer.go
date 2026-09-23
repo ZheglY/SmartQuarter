@@ -12,6 +12,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
+	ipb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/identity/v1"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/identity"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/maxapi"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/observability"
@@ -21,6 +22,7 @@ type Consumer struct {
 	Redis               *redis.Client
 	Stream, Group, Name string
 	Identity            identity.Client
+	House               ipb.HouseServiceClient
 	Bot                 *maxapi.Client
 	Metrics             *observability.Metrics
 	Logger              *zap.Logger
@@ -32,10 +34,11 @@ type Event struct {
 	OccurredAt time.Time `json:"occurred_at"`
 	Producer   string    `json:"producer"`
 	Payload    struct {
-		IssueID   string `json:"issue_id"`
-		HouseID   string `json:"house_id"`
-		CreatedBy string `json:"created_by"`
-		To        string `json:"to"`
+		IssueID         string `json:"issue_id"`
+		HouseID         string `json:"house_id"`
+		CreatedBy       string `json:"created_by"`
+		To              string `json:"to"`
+		RecipientUserID string `json:"recipient_user_id"`
 	} `json:"payload"`
 }
 
@@ -94,7 +97,7 @@ func (c *Consumer) process(ctx context.Context, m redis.XMessage) {
 	defer cancel()
 	raw, _ := m.Values["data"].(string)
 	var e Event
-	if json.Unmarshal([]byte(raw), &e) != nil || !identity.ValidID(e.ID) || e.Version != 1 || e.Producer != "issue-service" || e.OccurredAt.IsZero() || !identity.ValidID(e.Payload.IssueID) || !identity.ValidID(e.Payload.HouseID) || !identity.ValidID(e.Payload.CreatedBy) || m.Values["event_id"] != e.ID || m.Values["event_type"] != e.Type {
+	if json.Unmarshal([]byte(raw), &e) != nil || !identity.ValidID(e.ID) || e.Version != 1 || e.OccurredAt.IsZero() || !validEvent(e) || m.Values["event_id"] != e.ID || m.Values["event_type"] != e.Type {
 		c.deadLetter(ctx, m, "invalid_envelope", raw)
 		return
 	}
@@ -109,8 +112,11 @@ func (c *Consumer) process(ctx context.Context, m redis.XMessage) {
 	case "statement.generated":
 		text = "По вашей проблеме подготовлено заявление."
 	default:
-		c.deadLetter(ctx, m, "unsupported_event", raw)
-		return
+		text = eventText(e.Type)
+		if text == "" {
+			c.deadLetter(ctx, m, "unsupported_event", raw)
+			return
+		}
 	}
 	key := "gateway:notification:" + e.ID
 	done := key + ":done"
@@ -150,6 +156,12 @@ func (c *Consumer) process(ctx context.Context, m redis.XMessage) {
 	c.Logger.Info("notification", zap.String("event_id", e.ID), zap.String("event_type", e.Type), zap.String("delivery_result", result), zap.Int64("retry_count", count))
 }
 func (c *Consumer) deliver(ctx context.Context, e Event, text string) error {
+	if c.House != nil {
+		return c.deliverRecipients(ctx, e, text)
+	}
+	if e.Producer != "issue-service" {
+		return errors.New("house recipient service unavailable")
+	}
 	uc, err := c.Identity.GetUserContext(ctx, e.Payload.CreatedBy)
 	if err != nil {
 		return err

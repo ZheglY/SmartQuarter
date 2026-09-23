@@ -13,11 +13,13 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
 	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/config"
 	identityv1 "github.com/ZheglY/SmartQuarter/services/identity-service/internal/gen/smartquarter/identity/v1"
+	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/house"
 	"github.com/ZheglY/SmartQuarter/services/identity-service/internal/repository/postgres"
 	grpchandler "github.com/ZheglY/SmartQuarter/services/identity-service/internal/transport/grpc"
 	httphandler "github.com/ZheglY/SmartQuarter/services/identity-service/internal/transport/http"
@@ -84,6 +86,14 @@ func Run() error {
 		return handler(ctx, req)
 	}))
 	identityv1.RegisterIdentityServiceServer(grpcServer, grpcService)
+	workflow := &house.Service{DB: pool, Admins: cfg.AdminUserIDs}
+	identityv1.RegisterHouseServiceServer(grpcServer, &grpchandler.HouseHandler{Workflow: workflow})
+	redisClient := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr, Password: cfg.RedisPassword, MaxRetries: -1, DialTimeout: 2 * time.Second, ReadTimeout: 2 * time.Second, WriteTimeout: 2 * time.Second, ContextTimeoutEnabled: true})
+	defer redisClient.Close()
+	workerCtx, stopWorker := context.WithCancel(ctx)
+	workerDone := make(chan struct{})
+	go func() { defer close(workerDone); workflow.RunOutbox(workerCtx, redisClient, cfg.NotificationStream) }()
+	defer func() { stopWorker(); <-workerDone }()
 	healthpb.RegisterHealthServer(grpcServer, &grpchandler.Health{DB: repo})
 
 	grpcListener, err := net.Listen("tcp", cfg.GRPCPort)

@@ -33,6 +33,20 @@ export function launchIssue(raw: string) {
   const id = p?.startsWith('issue_') ? p.slice(6) : '';
   return id && validID(id) ? id : null;
 }
+export function launchHouseRoute(raw: string) {
+  const p = new URLSearchParams(raw).get('start_param') || '';
+  const routes: Record<string, string> = {
+    houses: '/houses',
+    find_house: '/houses/search',
+    register_house: '/houses/register',
+    my_requests: '/join-requests',
+    settings: '/notifications/settings',
+  };
+  if (routes[p]) return routes[p];
+  if (/^invite_[A-Za-z0-9_-]{43}$/.test(p))
+    return '/invitations/redeem?token=' + encodeURIComponent(p.slice(7));
+  return null;
+}
 export function bindBack(fn: () => void, visible: boolean) {
   const b = bridge()?.BackButton;
   if (!b) return () => {};
