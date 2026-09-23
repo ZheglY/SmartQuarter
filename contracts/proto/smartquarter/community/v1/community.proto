@@ -2,11 +2,16 @@ syntax = "proto3";
 
 package smartquarter.community.v1;
 
-option go_package = "github.com/ZheglY/SmartQuarter/services/community-usecase/internal/gen/community/v1;communityv1";
+option go_package = "github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1;communityv1";
 
 import "google/protobuf/timestamp.proto";
 
 service CommunityService {
+  rpc CreateServiceContact(CreateServiceContactRequest) returns (ServiceContact);
+  rpc ListServiceContacts(ListServiceContactsRequest) returns (ListServiceContactsResponse);
+  rpc GetServiceContact(GetServiceContactRequest) returns (ServiceContact);
+  rpc UpdateServiceContact(UpdateServiceContactRequest) returns (ServiceContact);
+  rpc ArchiveServiceContact(ArchiveServiceContactRequest) returns (ServiceContact);
   rpc CreateAnnouncement (CreateAnnouncementRequest) returns (Announcement);
   rpc ListAnnouncements (ListAnnouncementsRequest) returns (ListAnnouncementsResponse);
   rpc CreatePoll (CreatePollRequest) returns (Poll);
@@ -199,4 +204,60 @@ message SupportInitiativeResponse {
   string initiative_id = 1;
   int32 supports_count = 2;
   bool supported_by_me = 3;
+}
+
+// Service contacts (additive contract).
+message ServiceContactInput {
+  string category = 1;
+  string title = 2;
+  string organization_name = 3;
+  string phone = 4;
+  string additional_phone = 5;
+  string email = 6;
+  string website = 7;
+  string description = 8;
+  bool emergency = 9;
+  int32 sort_order = 10;
+}
+message ServiceContact {
+  string id = 1;
+  string house_id = 2;
+  string category = 3;
+  string title = 4;
+  string organization_name = 5;
+  string phone = 6;
+  string additional_phone = 7;
+  string email = 8;
+  string website = 9;
+  string description = 10;
+  bool emergency = 11;
+  int32 sort_order = 12;
+  bool is_active = 13;
+  string created_by = 14;
+  google.protobuf.Timestamp created_at = 15;
+  google.protobuf.Timestamp updated_at = 16;
+}
+message CreateServiceContactRequest {
+  string house_id = 1;
+  ServiceContactInput contact = 2;
+}
+message UpdateServiceContactRequest {
+  string house_id = 1;
+  string id = 2;
+  ServiceContactInput contact = 3;
+}
+message GetServiceContactRequest {
+  string house_id = 1;
+  string id = 2;
+}
+message ArchiveServiceContactRequest {
+  string house_id = 1;
+  string id = 2;
+}
+message ListServiceContactsRequest {
+  string house_id = 1;
+  bool include_archived = 2;
+}
+message ListServiceContactsResponse {
+  repeated ServiceContact items = 1;
 }

@@ -32,7 +32,11 @@ func RealIdentity(t *testing.T) identity.Client {
 	}
 	defer tx.Rollback(ctx)
 	for _, h := range []string{House, ForeignHouse} {
-		_, err = tx.Exec(ctx, `INSERT INTO houses(id,name,address,city) VALUES($1,'Test house','Test address 1','Test') ON CONFLICT(id) DO NOTHING`, h)
+		address := "Test address 1"
+		if h == ForeignHouse {
+			address = "Test address 2"
+		}
+		_, err = tx.Exec(ctx, `INSERT INTO houses(id,name,address,city) VALUES($1,'Test house',$2,'Test') ON CONFLICT(id) DO UPDATE SET address=EXCLUDED.address`, h, address)
 		if err != nil {
 			t.Fatal(err)
 		}

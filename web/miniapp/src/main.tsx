@@ -10,6 +10,7 @@ import '@fontsource/manrope/latin-400.css';
 import '@fontsource/manrope/latin-700.css';
 import './app/styles/reference.css';
 import './app/styles/app.css';
+import './app/styles/workflow.css';
 import { App } from './app/App';
 import { SessionProvider } from './features/session/SessionProvider';
 import { DraftProvider } from './features/issues/drafts';

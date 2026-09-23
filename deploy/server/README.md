@@ -11,6 +11,10 @@ Community and Redis readiness. Provision verified users and house memberships vi
 `docker compose exec identity-service /app provision`; see section 9 of the runbook.
 A user without active memberships can log in but cannot access house data.
 
-`issue-migrate` uses the service's versioned migration runner. `community-migrate` applies the current idempotent initial SQL, not a versioned migration system. Identity runs embedded Goose migrations on start. Read the update and backup sections before deploying future schema changes.
+`issue-migrate` uses the service's versioned migration runner. `community-migrate`
+applies idempotent SQL 000001 and the separate contacts migration 000002. Identity runs
+embedded Goose migrations on start. Before upgrading, check duplicate normalized
+addresses/chairmen and configure ADMIN_USER_IDS using the
+[house workflow runbook](../../docs/house-workflow/README.md).
 
 The older `../docker-compose.yml` is not the server recipe and is not included by this file.

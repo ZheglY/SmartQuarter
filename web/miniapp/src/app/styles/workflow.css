@@ -1,0 +1,58 @@
+.workflow {
+  display: grid;
+  gap: 18px;
+}
+.workflow .news-card {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.workflow-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0;
+}
+.workflow form,
+.workflow fieldset {
+  display: grid;
+  gap: 16px;
+}
+.workflow fieldset {
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.workflow label {
+  display: grid;
+  gap: 7px;
+}
+.workflow input,
+.workflow select,
+.workflow textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 11px 13px;
+  border: 1px solid #d5e2db;
+  border-radius: 12px;
+  background: #fff;
+  color: #173e2e;
+  font: inherit;
+}
+.workflow .workflow-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.workflow-check input {
+  width: 22px;
+  min-height: 22px;
+  accent-color: #297c57;
+}
+.workflow button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

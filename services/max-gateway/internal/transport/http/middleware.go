@@ -81,7 +81,7 @@ func (a *API) observe(next http.Handler) http.Handler {
 			}
 			method := r.Method
 			switch method {
-			case "GET", "POST", "PATCH", "OPTIONS", "HEAD":
+			case "GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD":
 			default:
 				method = "OTHER"
 			}
@@ -116,7 +116,7 @@ func (a *API) origin(next http.HandlerFunc) http.HandlerFunc {
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Add("Vary", "Origin")
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Idempotency-Key, X-Request-Id")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
 			w.Header().Set("Access-Control-Expose-Headers", "X-Request-Id")
 		}
 		next(w, r)

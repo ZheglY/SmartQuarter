@@ -13,6 +13,7 @@ import (
 )
 
 type maxUpdate struct {
+	Payload   string `json:"payload"`
 	Type      string `json:"update_type"`
 	Timestamp int64  `json:"timestamp"`
 	User      struct {
@@ -88,10 +89,27 @@ func (a *API) webhook(w http.ResponseWriter, r *http.Request) {
 			a.fail(w, r, 400, "INVALID_ARGUMENT", "invalid MAX user")
 			return
 		}
-		e = a.Bot.Send(r.Context(), u.User.ID, "Умный Квартал: проблемы дома, заявления и объявления.", true)
+		e = a.Bot.Menu(r.Context(), u.User.ID, "Умный Квартал: найдите свой дом, подайте заявку или зарегистрируйте новый.", u.Payload)
 	case "message_created":
-		if strings.TrimSpace(u.Message.Body.Text) == "/start" && !u.Message.Sender.IsBot {
-			e = a.Bot.Send(r.Context(), u.Message.Sender.ID, "Откройте мини-приложение Умный Квартал.", true)
+		if !u.Message.Sender.IsBot && u.Message.Sender.ID > 0 {
+			parts := strings.Fields(u.Message.Body.Text)
+			command, payload := "", ""
+			if len(parts) > 0 {
+				command = parts[0]
+			}
+			if len(parts) > 1 {
+				payload = parts[1]
+			}
+			text := "Используйте /start, /help или /settings либо выберите раздел приложения."
+			switch command {
+			case "/start":
+				text = "Добро пожаловать в Умный Квартал. Выберите действие."
+			case "/help":
+				text = "Найдите дом и подайте заявку председателю. Если дома ещё нет, зарегистрируйте его. Статусы доступны в разделе «Мои заявки»."
+			case "/settings":
+				text = "Настройки доставки уведомлений доступны в Mini App."
+			}
+			e = a.Bot.Menu(r.Context(), u.Message.Sender.ID, text, payload)
 		}
 	case "message_callback":
 		if u.Callback.ID == "" {

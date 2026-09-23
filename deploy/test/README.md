@@ -14,5 +14,11 @@ protocol is retained solely for legacy isolated notification tests. Unit and bro
 fixture tests run separately. This stack covers the implemented MVP, not deferred
 polls/calendar/initiatives or manual government submission.
 
+`TestHouseWorkflowHTTP` additionally covers registration/platform approval, contacts
+CRUD/archive, search/join approval, bounded invitations, chairman transfer, stale
+authority denial (including cached replies), preferences, house isolation, duplicate
+events and actual Identity outbox publication. The fixed administrator UUID in this
+Compose is test-only. Run against a fresh stack; Issue tests assert exact fixture counts.
+
 On low-memory machines build each service sequentially (identity-service,
 issue-service, issue-migrate, community-service, test).

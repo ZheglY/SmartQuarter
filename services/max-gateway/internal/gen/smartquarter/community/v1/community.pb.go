@@ -1766,6 +1766,599 @@ func (x *SupportInitiativeResponse) GetSupportedByMe() bool {
 	return false
 }
 
+// Service contacts (additive contract).
+type ServiceContactInput struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Category         string                 `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
+	Title            string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	OrganizationName string                 `protobuf:"bytes,3,opt,name=organization_name,json=organizationName,proto3" json:"organization_name,omitempty"`
+	Phone            string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
+	AdditionalPhone  string                 `protobuf:"bytes,5,opt,name=additional_phone,json=additionalPhone,proto3" json:"additional_phone,omitempty"`
+	Email            string                 `protobuf:"bytes,6,opt,name=email,proto3" json:"email,omitempty"`
+	Website          string                 `protobuf:"bytes,7,opt,name=website,proto3" json:"website,omitempty"`
+	Description      string                 `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
+	Emergency        bool                   `protobuf:"varint,9,opt,name=emergency,proto3" json:"emergency,omitempty"`
+	SortOrder        int32                  `protobuf:"varint,10,opt,name=sort_order,json=sortOrder,proto3" json:"sort_order,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ServiceContactInput) Reset() {
+	*x = ServiceContactInput{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServiceContactInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServiceContactInput) ProtoMessage() {}
+
+func (x *ServiceContactInput) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServiceContactInput.ProtoReflect.Descriptor instead.
+func (*ServiceContactInput) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *ServiceContactInput) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+func (x *ServiceContactInput) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *ServiceContactInput) GetOrganizationName() string {
+	if x != nil {
+		return x.OrganizationName
+	}
+	return ""
+}
+
+func (x *ServiceContactInput) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *ServiceContactInput) GetAdditionalPhone() string {
+	if x != nil {
+		return x.AdditionalPhone
+	}
+	return ""
+}
+
+func (x *ServiceContactInput) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *ServiceContactInput) GetWebsite() string {
+	if x != nil {
+		return x.Website
+	}
+	return ""
+}
+
+func (x *ServiceContactInput) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ServiceContactInput) GetEmergency() bool {
+	if x != nil {
+		return x.Emergency
+	}
+	return false
+}
+
+func (x *ServiceContactInput) GetSortOrder() int32 {
+	if x != nil {
+		return x.SortOrder
+	}
+	return 0
+}
+
+type ServiceContact struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	HouseId          string                 `protobuf:"bytes,2,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	Category         string                 `protobuf:"bytes,3,opt,name=category,proto3" json:"category,omitempty"`
+	Title            string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
+	OrganizationName string                 `protobuf:"bytes,5,opt,name=organization_name,json=organizationName,proto3" json:"organization_name,omitempty"`
+	Phone            string                 `protobuf:"bytes,6,opt,name=phone,proto3" json:"phone,omitempty"`
+	AdditionalPhone  string                 `protobuf:"bytes,7,opt,name=additional_phone,json=additionalPhone,proto3" json:"additional_phone,omitempty"`
+	Email            string                 `protobuf:"bytes,8,opt,name=email,proto3" json:"email,omitempty"`
+	Website          string                 `protobuf:"bytes,9,opt,name=website,proto3" json:"website,omitempty"`
+	Description      string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
+	Emergency        bool                   `protobuf:"varint,11,opt,name=emergency,proto3" json:"emergency,omitempty"`
+	SortOrder        int32                  `protobuf:"varint,12,opt,name=sort_order,json=sortOrder,proto3" json:"sort_order,omitempty"`
+	IsActive         bool                   `protobuf:"varint,13,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	CreatedBy        string                 `protobuf:"bytes,14,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
+	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,16,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ServiceContact) Reset() {
+	*x = ServiceContact{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServiceContact) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServiceContact) ProtoMessage() {}
+
+func (x *ServiceContact) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServiceContact.ProtoReflect.Descriptor instead.
+func (*ServiceContact) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *ServiceContact) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetOrganizationName() string {
+	if x != nil {
+		return x.OrganizationName
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetAdditionalPhone() string {
+	if x != nil {
+		return x.AdditionalPhone
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetWebsite() string {
+	if x != nil {
+		return x.Website
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetEmergency() bool {
+	if x != nil {
+		return x.Emergency
+	}
+	return false
+}
+
+func (x *ServiceContact) GetSortOrder() int32 {
+	if x != nil {
+		return x.SortOrder
+	}
+	return 0
+}
+
+func (x *ServiceContact) GetIsActive() bool {
+	if x != nil {
+		return x.IsActive
+	}
+	return false
+}
+
+func (x *ServiceContact) GetCreatedBy() string {
+	if x != nil {
+		return x.CreatedBy
+	}
+	return ""
+}
+
+func (x *ServiceContact) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *ServiceContact) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type CreateServiceContactRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HouseId       string                 `protobuf:"bytes,1,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	Contact       *ServiceContactInput   `protobuf:"bytes,2,opt,name=contact,proto3" json:"contact,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateServiceContactRequest) Reset() {
+	*x = CreateServiceContactRequest{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateServiceContactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateServiceContactRequest) ProtoMessage() {}
+
+func (x *CreateServiceContactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateServiceContactRequest.ProtoReflect.Descriptor instead.
+func (*CreateServiceContactRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *CreateServiceContactRequest) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
+}
+
+func (x *CreateServiceContactRequest) GetContact() *ServiceContactInput {
+	if x != nil {
+		return x.Contact
+	}
+	return nil
+}
+
+type UpdateServiceContactRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HouseId       string                 `protobuf:"bytes,1,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Contact       *ServiceContactInput   `protobuf:"bytes,3,opt,name=contact,proto3" json:"contact,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateServiceContactRequest) Reset() {
+	*x = UpdateServiceContactRequest{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateServiceContactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateServiceContactRequest) ProtoMessage() {}
+
+func (x *UpdateServiceContactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateServiceContactRequest.ProtoReflect.Descriptor instead.
+func (*UpdateServiceContactRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *UpdateServiceContactRequest) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
+}
+
+func (x *UpdateServiceContactRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateServiceContactRequest) GetContact() *ServiceContactInput {
+	if x != nil {
+		return x.Contact
+	}
+	return nil
+}
+
+type GetServiceContactRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HouseId       string                 `protobuf:"bytes,1,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetServiceContactRequest) Reset() {
+	*x = GetServiceContactRequest{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetServiceContactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetServiceContactRequest) ProtoMessage() {}
+
+func (x *GetServiceContactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetServiceContactRequest.ProtoReflect.Descriptor instead.
+func (*GetServiceContactRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *GetServiceContactRequest) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
+}
+
+func (x *GetServiceContactRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type ArchiveServiceContactRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HouseId       string                 `protobuf:"bytes,1,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArchiveServiceContactRequest) Reset() {
+	*x = ArchiveServiceContactRequest{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArchiveServiceContactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArchiveServiceContactRequest) ProtoMessage() {}
+
+func (x *ArchiveServiceContactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArchiveServiceContactRequest.ProtoReflect.Descriptor instead.
+func (*ArchiveServiceContactRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *ArchiveServiceContactRequest) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
+}
+
+func (x *ArchiveServiceContactRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type ListServiceContactsRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	HouseId         string                 `protobuf:"bytes,1,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	IncludeArchived bool                   `protobuf:"varint,2,opt,name=include_archived,json=includeArchived,proto3" json:"include_archived,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ListServiceContactsRequest) Reset() {
+	*x = ListServiceContactsRequest{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListServiceContactsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListServiceContactsRequest) ProtoMessage() {}
+
+func (x *ListServiceContactsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListServiceContactsRequest.ProtoReflect.Descriptor instead.
+func (*ListServiceContactsRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *ListServiceContactsRequest) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
+}
+
+func (x *ListServiceContactsRequest) GetIncludeArchived() bool {
+	if x != nil {
+		return x.IncludeArchived
+	}
+	return false
+}
+
+type ListServiceContactsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*ServiceContact      `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListServiceContactsResponse) Reset() {
+	*x = ListServiceContactsResponse{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListServiceContactsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListServiceContactsResponse) ProtoMessage() {}
+
+func (x *ListServiceContactsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListServiceContactsResponse.ProtoReflect.Descriptor instead.
+func (*ListServiceContactsResponse) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *ListServiceContactsResponse) GetItems() []*ServiceContact {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 var File_smartquarter_community_v1_community_proto protoreflect.FileDescriptor
 
 const file_smartquarter_community_v1_community_proto_rawDesc = "" +
@@ -1903,7 +2496,60 @@ const file_smartquarter_community_v1_community_proto_rawDesc = "" +
 	"\x19SupportInitiativeResponse\x12#\n" +
 	"\rinitiative_id\x18\x01 \x01(\tR\finitiativeId\x12%\n" +
 	"\x0esupports_count\x18\x02 \x01(\x05R\rsupportsCount\x12&\n" +
-	"\x0fsupported_by_me\x18\x03 \x01(\bR\rsupportedByMe*\\\n" +
+	"\x0fsupported_by_me\x18\x03 \x01(\bR\rsupportedByMe\"\xc4\x02\n" +
+	"\x13ServiceContactInput\x12\x1a\n" +
+	"\bcategory\x18\x01 \x01(\tR\bcategory\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12+\n" +
+	"\x11organization_name\x18\x03 \x01(\tR\x10organizationName\x12\x14\n" +
+	"\x05phone\x18\x04 \x01(\tR\x05phone\x12)\n" +
+	"\x10additional_phone\x18\x05 \x01(\tR\x0fadditionalPhone\x12\x14\n" +
+	"\x05email\x18\x06 \x01(\tR\x05email\x12\x18\n" +
+	"\awebsite\x18\a \x01(\tR\awebsite\x12 \n" +
+	"\vdescription\x18\b \x01(\tR\vdescription\x12\x1c\n" +
+	"\temergency\x18\t \x01(\bR\temergency\x12\x1d\n" +
+	"\n" +
+	"sort_order\x18\n" +
+	" \x01(\x05R\tsortOrder\"\x9c\x04\n" +
+	"\x0eServiceContact\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\bhouse_id\x18\x02 \x01(\tR\ahouseId\x12\x1a\n" +
+	"\bcategory\x18\x03 \x01(\tR\bcategory\x12\x14\n" +
+	"\x05title\x18\x04 \x01(\tR\x05title\x12+\n" +
+	"\x11organization_name\x18\x05 \x01(\tR\x10organizationName\x12\x14\n" +
+	"\x05phone\x18\x06 \x01(\tR\x05phone\x12)\n" +
+	"\x10additional_phone\x18\a \x01(\tR\x0fadditionalPhone\x12\x14\n" +
+	"\x05email\x18\b \x01(\tR\x05email\x12\x18\n" +
+	"\awebsite\x18\t \x01(\tR\awebsite\x12 \n" +
+	"\vdescription\x18\n" +
+	" \x01(\tR\vdescription\x12\x1c\n" +
+	"\temergency\x18\v \x01(\bR\temergency\x12\x1d\n" +
+	"\n" +
+	"sort_order\x18\f \x01(\x05R\tsortOrder\x12\x1b\n" +
+	"\tis_active\x18\r \x01(\bR\bisActive\x12\x1d\n" +
+	"\n" +
+	"created_by\x18\x0e \x01(\tR\tcreatedBy\x129\n" +
+	"\n" +
+	"created_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x82\x01\n" +
+	"\x1bCreateServiceContactRequest\x12\x19\n" +
+	"\bhouse_id\x18\x01 \x01(\tR\ahouseId\x12H\n" +
+	"\acontact\x18\x02 \x01(\v2..smartquarter.community.v1.ServiceContactInputR\acontact\"\x92\x01\n" +
+	"\x1bUpdateServiceContactRequest\x12\x19\n" +
+	"\bhouse_id\x18\x01 \x01(\tR\ahouseId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12H\n" +
+	"\acontact\x18\x03 \x01(\v2..smartquarter.community.v1.ServiceContactInputR\acontact\"E\n" +
+	"\x18GetServiceContactRequest\x12\x19\n" +
+	"\bhouse_id\x18\x01 \x01(\tR\ahouseId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"I\n" +
+	"\x1cArchiveServiceContactRequest\x12\x19\n" +
+	"\bhouse_id\x18\x01 \x01(\tR\ahouseId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"b\n" +
+	"\x1aListServiceContactsRequest\x12\x19\n" +
+	"\bhouse_id\x18\x01 \x01(\tR\ahouseId\x12)\n" +
+	"\x10include_archived\x18\x02 \x01(\bR\x0fincludeArchived\"^\n" +
+	"\x1bListServiceContactsResponse\x12?\n" +
+	"\x05items\x18\x01 \x03(\v2).smartquarter.community.v1.ServiceContactR\x05items*\\\n" +
 	"\x12AnnouncementStatus\x12#\n" +
 	"\x1fANNOUNCEMENT_STATUS_UNSPECIFIED\x10\x00\x12!\n" +
 	"\x1dANNOUNCEMENT_STATUS_PUBLISHED\x10\x01*W\n" +
@@ -1915,8 +2561,13 @@ const file_smartquarter_community_v1_community_proto_rawDesc = "" +
 	"\x10InitiativeStatus\x12!\n" +
 	"\x1dINITIATIVE_STATUS_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16INITIATIVE_STATUS_OPEN\x10\x01\x12\x1c\n" +
-	"\x18INITIATIVE_STATUS_CLOSED\x10\x022\xf4\t\n" +
-	"\x10CommunityService\x12s\n" +
+	"\x18INITIATIVE_STATUS_CLOSED\x10\x022\xe3\x0e\n" +
+	"\x10CommunityService\x12y\n" +
+	"\x14CreateServiceContact\x126.smartquarter.community.v1.CreateServiceContactRequest\x1a).smartquarter.community.v1.ServiceContact\x12\x84\x01\n" +
+	"\x13ListServiceContacts\x125.smartquarter.community.v1.ListServiceContactsRequest\x1a6.smartquarter.community.v1.ListServiceContactsResponse\x12s\n" +
+	"\x11GetServiceContact\x123.smartquarter.community.v1.GetServiceContactRequest\x1a).smartquarter.community.v1.ServiceContact\x12y\n" +
+	"\x14UpdateServiceContact\x126.smartquarter.community.v1.UpdateServiceContactRequest\x1a).smartquarter.community.v1.ServiceContact\x12{\n" +
+	"\x15ArchiveServiceContact\x127.smartquarter.community.v1.ArchiveServiceContactRequest\x1a).smartquarter.community.v1.ServiceContact\x12s\n" +
 	"\x12CreateAnnouncement\x124.smartquarter.community.v1.CreateAnnouncementRequest\x1a'.smartquarter.community.v1.Announcement\x12~\n" +
 	"\x11ListAnnouncements\x123.smartquarter.community.v1.ListAnnouncementsRequest\x1a4.smartquarter.community.v1.ListAnnouncementsResponse\x12[\n" +
 	"\n" +
@@ -1928,7 +2579,7 @@ const file_smartquarter_community_v1_community_proto_rawDesc = "" +
 	"\x12ListCalendarEvents\x124.smartquarter.community.v1.ListCalendarEventsRequest\x1a5.smartquarter.community.v1.ListCalendarEventsResponse\x12m\n" +
 	"\x10CreateInitiative\x122.smartquarter.community.v1.CreateInitiativeRequest\x1a%.smartquarter.community.v1.Initiative\x12x\n" +
 	"\x0fListInitiatives\x121.smartquarter.community.v1.ListInitiativesRequest\x1a2.smartquarter.community.v1.ListInitiativesResponse\x12~\n" +
-	"\x11SupportInitiative\x123.smartquarter.community.v1.SupportInitiativeRequest\x1a4.smartquarter.community.v1.SupportInitiativeResponseBaZ_github.com/ZheglY/SmartQuarter/services/community-usecase/internal/gen/community/v1;communityv1b\x06proto3"
+	"\x11SupportInitiative\x123.smartquarter.community.v1.SupportInitiativeRequest\x1a4.smartquarter.community.v1.SupportInitiativeResponseBaZ_github.com/ZheglY/SmartQuarter/services/community-service/internal/gen/community/v1;communityv1b\x06proto3"
 
 var (
 	file_smartquarter_community_v1_community_proto_rawDescOnce sync.Once
@@ -1943,90 +2594,113 @@ func file_smartquarter_community_v1_community_proto_rawDescGZIP() []byte {
 }
 
 var file_smartquarter_community_v1_community_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_smartquarter_community_v1_community_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_smartquarter_community_v1_community_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_smartquarter_community_v1_community_proto_goTypes = []any{
-	(AnnouncementStatus)(0),            // 0: smartquarter.community.v1.AnnouncementStatus
-	(PollStatus)(0),                    // 1: smartquarter.community.v1.PollStatus
-	(InitiativeStatus)(0),              // 2: smartquarter.community.v1.InitiativeStatus
-	(*Announcement)(nil),               // 3: smartquarter.community.v1.Announcement
-	(*CreateAnnouncementRequest)(nil),  // 4: smartquarter.community.v1.CreateAnnouncementRequest
-	(*ListAnnouncementsRequest)(nil),   // 5: smartquarter.community.v1.ListAnnouncementsRequest
-	(*ListAnnouncementsResponse)(nil),  // 6: smartquarter.community.v1.ListAnnouncementsResponse
-	(*PollOption)(nil),                 // 7: smartquarter.community.v1.PollOption
-	(*Poll)(nil),                       // 8: smartquarter.community.v1.Poll
-	(*PollOptionResult)(nil),           // 9: smartquarter.community.v1.PollOptionResult
-	(*PollDetails)(nil),                // 10: smartquarter.community.v1.PollDetails
-	(*CreatePollRequest)(nil),          // 11: smartquarter.community.v1.CreatePollRequest
-	(*GetPollRequest)(nil),             // 12: smartquarter.community.v1.GetPollRequest
-	(*ListPollsRequest)(nil),           // 13: smartquarter.community.v1.ListPollsRequest
-	(*ListPollsResponse)(nil),          // 14: smartquarter.community.v1.ListPollsResponse
-	(*VotePollRequest)(nil),            // 15: smartquarter.community.v1.VotePollRequest
-	(*VotePollResponse)(nil),           // 16: smartquarter.community.v1.VotePollResponse
-	(*CalendarEvent)(nil),              // 17: smartquarter.community.v1.CalendarEvent
-	(*CreateCalendarEventRequest)(nil), // 18: smartquarter.community.v1.CreateCalendarEventRequest
-	(*ListCalendarEventsRequest)(nil),  // 19: smartquarter.community.v1.ListCalendarEventsRequest
-	(*ListCalendarEventsResponse)(nil), // 20: smartquarter.community.v1.ListCalendarEventsResponse
-	(*Initiative)(nil),                 // 21: smartquarter.community.v1.Initiative
-	(*CreateInitiativeRequest)(nil),    // 22: smartquarter.community.v1.CreateInitiativeRequest
-	(*ListInitiativesRequest)(nil),     // 23: smartquarter.community.v1.ListInitiativesRequest
-	(*ListInitiativesResponse)(nil),    // 24: smartquarter.community.v1.ListInitiativesResponse
-	(*SupportInitiativeRequest)(nil),   // 25: smartquarter.community.v1.SupportInitiativeRequest
-	(*SupportInitiativeResponse)(nil),  // 26: smartquarter.community.v1.SupportInitiativeResponse
-	(*timestamppb.Timestamp)(nil),      // 27: google.protobuf.Timestamp
+	(AnnouncementStatus)(0),              // 0: smartquarter.community.v1.AnnouncementStatus
+	(PollStatus)(0),                      // 1: smartquarter.community.v1.PollStatus
+	(InitiativeStatus)(0),                // 2: smartquarter.community.v1.InitiativeStatus
+	(*Announcement)(nil),                 // 3: smartquarter.community.v1.Announcement
+	(*CreateAnnouncementRequest)(nil),    // 4: smartquarter.community.v1.CreateAnnouncementRequest
+	(*ListAnnouncementsRequest)(nil),     // 5: smartquarter.community.v1.ListAnnouncementsRequest
+	(*ListAnnouncementsResponse)(nil),    // 6: smartquarter.community.v1.ListAnnouncementsResponse
+	(*PollOption)(nil),                   // 7: smartquarter.community.v1.PollOption
+	(*Poll)(nil),                         // 8: smartquarter.community.v1.Poll
+	(*PollOptionResult)(nil),             // 9: smartquarter.community.v1.PollOptionResult
+	(*PollDetails)(nil),                  // 10: smartquarter.community.v1.PollDetails
+	(*CreatePollRequest)(nil),            // 11: smartquarter.community.v1.CreatePollRequest
+	(*GetPollRequest)(nil),               // 12: smartquarter.community.v1.GetPollRequest
+	(*ListPollsRequest)(nil),             // 13: smartquarter.community.v1.ListPollsRequest
+	(*ListPollsResponse)(nil),            // 14: smartquarter.community.v1.ListPollsResponse
+	(*VotePollRequest)(nil),              // 15: smartquarter.community.v1.VotePollRequest
+	(*VotePollResponse)(nil),             // 16: smartquarter.community.v1.VotePollResponse
+	(*CalendarEvent)(nil),                // 17: smartquarter.community.v1.CalendarEvent
+	(*CreateCalendarEventRequest)(nil),   // 18: smartquarter.community.v1.CreateCalendarEventRequest
+	(*ListCalendarEventsRequest)(nil),    // 19: smartquarter.community.v1.ListCalendarEventsRequest
+	(*ListCalendarEventsResponse)(nil),   // 20: smartquarter.community.v1.ListCalendarEventsResponse
+	(*Initiative)(nil),                   // 21: smartquarter.community.v1.Initiative
+	(*CreateInitiativeRequest)(nil),      // 22: smartquarter.community.v1.CreateInitiativeRequest
+	(*ListInitiativesRequest)(nil),       // 23: smartquarter.community.v1.ListInitiativesRequest
+	(*ListInitiativesResponse)(nil),      // 24: smartquarter.community.v1.ListInitiativesResponse
+	(*SupportInitiativeRequest)(nil),     // 25: smartquarter.community.v1.SupportInitiativeRequest
+	(*SupportInitiativeResponse)(nil),    // 26: smartquarter.community.v1.SupportInitiativeResponse
+	(*ServiceContactInput)(nil),          // 27: smartquarter.community.v1.ServiceContactInput
+	(*ServiceContact)(nil),               // 28: smartquarter.community.v1.ServiceContact
+	(*CreateServiceContactRequest)(nil),  // 29: smartquarter.community.v1.CreateServiceContactRequest
+	(*UpdateServiceContactRequest)(nil),  // 30: smartquarter.community.v1.UpdateServiceContactRequest
+	(*GetServiceContactRequest)(nil),     // 31: smartquarter.community.v1.GetServiceContactRequest
+	(*ArchiveServiceContactRequest)(nil), // 32: smartquarter.community.v1.ArchiveServiceContactRequest
+	(*ListServiceContactsRequest)(nil),   // 33: smartquarter.community.v1.ListServiceContactsRequest
+	(*ListServiceContactsResponse)(nil),  // 34: smartquarter.community.v1.ListServiceContactsResponse
+	(*timestamppb.Timestamp)(nil),        // 35: google.protobuf.Timestamp
 }
 var file_smartquarter_community_v1_community_proto_depIdxs = []int32{
 	0,  // 0: smartquarter.community.v1.Announcement.status:type_name -> smartquarter.community.v1.AnnouncementStatus
-	27, // 1: smartquarter.community.v1.Announcement.published_at:type_name -> google.protobuf.Timestamp
-	27, // 2: smartquarter.community.v1.Announcement.created_at:type_name -> google.protobuf.Timestamp
+	35, // 1: smartquarter.community.v1.Announcement.published_at:type_name -> google.protobuf.Timestamp
+	35, // 2: smartquarter.community.v1.Announcement.created_at:type_name -> google.protobuf.Timestamp
 	3,  // 3: smartquarter.community.v1.ListAnnouncementsResponse.items:type_name -> smartquarter.community.v1.Announcement
 	1,  // 4: smartquarter.community.v1.Poll.status:type_name -> smartquarter.community.v1.PollStatus
 	7,  // 5: smartquarter.community.v1.Poll.options:type_name -> smartquarter.community.v1.PollOption
-	27, // 6: smartquarter.community.v1.Poll.ends_at:type_name -> google.protobuf.Timestamp
-	27, // 7: smartquarter.community.v1.Poll.created_at:type_name -> google.protobuf.Timestamp
+	35, // 6: smartquarter.community.v1.Poll.ends_at:type_name -> google.protobuf.Timestamp
+	35, // 7: smartquarter.community.v1.Poll.created_at:type_name -> google.protobuf.Timestamp
 	8,  // 8: smartquarter.community.v1.PollDetails.poll:type_name -> smartquarter.community.v1.Poll
 	9,  // 9: smartquarter.community.v1.PollDetails.results:type_name -> smartquarter.community.v1.PollOptionResult
-	27, // 10: smartquarter.community.v1.CreatePollRequest.ends_at:type_name -> google.protobuf.Timestamp
+	35, // 10: smartquarter.community.v1.CreatePollRequest.ends_at:type_name -> google.protobuf.Timestamp
 	1,  // 11: smartquarter.community.v1.ListPollsRequest.status:type_name -> smartquarter.community.v1.PollStatus
 	8,  // 12: smartquarter.community.v1.ListPollsResponse.items:type_name -> smartquarter.community.v1.Poll
-	27, // 13: smartquarter.community.v1.CalendarEvent.starts_at:type_name -> google.protobuf.Timestamp
-	27, // 14: smartquarter.community.v1.CalendarEvent.ends_at:type_name -> google.protobuf.Timestamp
-	27, // 15: smartquarter.community.v1.CalendarEvent.created_at:type_name -> google.protobuf.Timestamp
-	27, // 16: smartquarter.community.v1.CreateCalendarEventRequest.starts_at:type_name -> google.protobuf.Timestamp
-	27, // 17: smartquarter.community.v1.CreateCalendarEventRequest.ends_at:type_name -> google.protobuf.Timestamp
-	27, // 18: smartquarter.community.v1.ListCalendarEventsRequest.from:type_name -> google.protobuf.Timestamp
-	27, // 19: smartquarter.community.v1.ListCalendarEventsRequest.to:type_name -> google.protobuf.Timestamp
+	35, // 13: smartquarter.community.v1.CalendarEvent.starts_at:type_name -> google.protobuf.Timestamp
+	35, // 14: smartquarter.community.v1.CalendarEvent.ends_at:type_name -> google.protobuf.Timestamp
+	35, // 15: smartquarter.community.v1.CalendarEvent.created_at:type_name -> google.protobuf.Timestamp
+	35, // 16: smartquarter.community.v1.CreateCalendarEventRequest.starts_at:type_name -> google.protobuf.Timestamp
+	35, // 17: smartquarter.community.v1.CreateCalendarEventRequest.ends_at:type_name -> google.protobuf.Timestamp
+	35, // 18: smartquarter.community.v1.ListCalendarEventsRequest.from:type_name -> google.protobuf.Timestamp
+	35, // 19: smartquarter.community.v1.ListCalendarEventsRequest.to:type_name -> google.protobuf.Timestamp
 	17, // 20: smartquarter.community.v1.ListCalendarEventsResponse.items:type_name -> smartquarter.community.v1.CalendarEvent
 	2,  // 21: smartquarter.community.v1.Initiative.status:type_name -> smartquarter.community.v1.InitiativeStatus
-	27, // 22: smartquarter.community.v1.Initiative.created_at:type_name -> google.protobuf.Timestamp
-	27, // 23: smartquarter.community.v1.Initiative.updated_at:type_name -> google.protobuf.Timestamp
+	35, // 22: smartquarter.community.v1.Initiative.created_at:type_name -> google.protobuf.Timestamp
+	35, // 23: smartquarter.community.v1.Initiative.updated_at:type_name -> google.protobuf.Timestamp
 	21, // 24: smartquarter.community.v1.ListInitiativesResponse.items:type_name -> smartquarter.community.v1.Initiative
-	4,  // 25: smartquarter.community.v1.CommunityService.CreateAnnouncement:input_type -> smartquarter.community.v1.CreateAnnouncementRequest
-	5,  // 26: smartquarter.community.v1.CommunityService.ListAnnouncements:input_type -> smartquarter.community.v1.ListAnnouncementsRequest
-	11, // 27: smartquarter.community.v1.CommunityService.CreatePoll:input_type -> smartquarter.community.v1.CreatePollRequest
-	12, // 28: smartquarter.community.v1.CommunityService.GetPoll:input_type -> smartquarter.community.v1.GetPollRequest
-	13, // 29: smartquarter.community.v1.CommunityService.ListPolls:input_type -> smartquarter.community.v1.ListPollsRequest
-	15, // 30: smartquarter.community.v1.CommunityService.VotePoll:input_type -> smartquarter.community.v1.VotePollRequest
-	18, // 31: smartquarter.community.v1.CommunityService.CreateCalendarEvent:input_type -> smartquarter.community.v1.CreateCalendarEventRequest
-	19, // 32: smartquarter.community.v1.CommunityService.ListCalendarEvents:input_type -> smartquarter.community.v1.ListCalendarEventsRequest
-	22, // 33: smartquarter.community.v1.CommunityService.CreateInitiative:input_type -> smartquarter.community.v1.CreateInitiativeRequest
-	23, // 34: smartquarter.community.v1.CommunityService.ListInitiatives:input_type -> smartquarter.community.v1.ListInitiativesRequest
-	25, // 35: smartquarter.community.v1.CommunityService.SupportInitiative:input_type -> smartquarter.community.v1.SupportInitiativeRequest
-	3,  // 36: smartquarter.community.v1.CommunityService.CreateAnnouncement:output_type -> smartquarter.community.v1.Announcement
-	6,  // 37: smartquarter.community.v1.CommunityService.ListAnnouncements:output_type -> smartquarter.community.v1.ListAnnouncementsResponse
-	8,  // 38: smartquarter.community.v1.CommunityService.CreatePoll:output_type -> smartquarter.community.v1.Poll
-	10, // 39: smartquarter.community.v1.CommunityService.GetPoll:output_type -> smartquarter.community.v1.PollDetails
-	14, // 40: smartquarter.community.v1.CommunityService.ListPolls:output_type -> smartquarter.community.v1.ListPollsResponse
-	16, // 41: smartquarter.community.v1.CommunityService.VotePoll:output_type -> smartquarter.community.v1.VotePollResponse
-	17, // 42: smartquarter.community.v1.CommunityService.CreateCalendarEvent:output_type -> smartquarter.community.v1.CalendarEvent
-	20, // 43: smartquarter.community.v1.CommunityService.ListCalendarEvents:output_type -> smartquarter.community.v1.ListCalendarEventsResponse
-	21, // 44: smartquarter.community.v1.CommunityService.CreateInitiative:output_type -> smartquarter.community.v1.Initiative
-	24, // 45: smartquarter.community.v1.CommunityService.ListInitiatives:output_type -> smartquarter.community.v1.ListInitiativesResponse
-	26, // 46: smartquarter.community.v1.CommunityService.SupportInitiative:output_type -> smartquarter.community.v1.SupportInitiativeResponse
-	36, // [36:47] is the sub-list for method output_type
-	25, // [25:36] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	35, // 25: smartquarter.community.v1.ServiceContact.created_at:type_name -> google.protobuf.Timestamp
+	35, // 26: smartquarter.community.v1.ServiceContact.updated_at:type_name -> google.protobuf.Timestamp
+	27, // 27: smartquarter.community.v1.CreateServiceContactRequest.contact:type_name -> smartquarter.community.v1.ServiceContactInput
+	27, // 28: smartquarter.community.v1.UpdateServiceContactRequest.contact:type_name -> smartquarter.community.v1.ServiceContactInput
+	28, // 29: smartquarter.community.v1.ListServiceContactsResponse.items:type_name -> smartquarter.community.v1.ServiceContact
+	29, // 30: smartquarter.community.v1.CommunityService.CreateServiceContact:input_type -> smartquarter.community.v1.CreateServiceContactRequest
+	33, // 31: smartquarter.community.v1.CommunityService.ListServiceContacts:input_type -> smartquarter.community.v1.ListServiceContactsRequest
+	31, // 32: smartquarter.community.v1.CommunityService.GetServiceContact:input_type -> smartquarter.community.v1.GetServiceContactRequest
+	30, // 33: smartquarter.community.v1.CommunityService.UpdateServiceContact:input_type -> smartquarter.community.v1.UpdateServiceContactRequest
+	32, // 34: smartquarter.community.v1.CommunityService.ArchiveServiceContact:input_type -> smartquarter.community.v1.ArchiveServiceContactRequest
+	4,  // 35: smartquarter.community.v1.CommunityService.CreateAnnouncement:input_type -> smartquarter.community.v1.CreateAnnouncementRequest
+	5,  // 36: smartquarter.community.v1.CommunityService.ListAnnouncements:input_type -> smartquarter.community.v1.ListAnnouncementsRequest
+	11, // 37: smartquarter.community.v1.CommunityService.CreatePoll:input_type -> smartquarter.community.v1.CreatePollRequest
+	12, // 38: smartquarter.community.v1.CommunityService.GetPoll:input_type -> smartquarter.community.v1.GetPollRequest
+	13, // 39: smartquarter.community.v1.CommunityService.ListPolls:input_type -> smartquarter.community.v1.ListPollsRequest
+	15, // 40: smartquarter.community.v1.CommunityService.VotePoll:input_type -> smartquarter.community.v1.VotePollRequest
+	18, // 41: smartquarter.community.v1.CommunityService.CreateCalendarEvent:input_type -> smartquarter.community.v1.CreateCalendarEventRequest
+	19, // 42: smartquarter.community.v1.CommunityService.ListCalendarEvents:input_type -> smartquarter.community.v1.ListCalendarEventsRequest
+	22, // 43: smartquarter.community.v1.CommunityService.CreateInitiative:input_type -> smartquarter.community.v1.CreateInitiativeRequest
+	23, // 44: smartquarter.community.v1.CommunityService.ListInitiatives:input_type -> smartquarter.community.v1.ListInitiativesRequest
+	25, // 45: smartquarter.community.v1.CommunityService.SupportInitiative:input_type -> smartquarter.community.v1.SupportInitiativeRequest
+	28, // 46: smartquarter.community.v1.CommunityService.CreateServiceContact:output_type -> smartquarter.community.v1.ServiceContact
+	34, // 47: smartquarter.community.v1.CommunityService.ListServiceContacts:output_type -> smartquarter.community.v1.ListServiceContactsResponse
+	28, // 48: smartquarter.community.v1.CommunityService.GetServiceContact:output_type -> smartquarter.community.v1.ServiceContact
+	28, // 49: smartquarter.community.v1.CommunityService.UpdateServiceContact:output_type -> smartquarter.community.v1.ServiceContact
+	28, // 50: smartquarter.community.v1.CommunityService.ArchiveServiceContact:output_type -> smartquarter.community.v1.ServiceContact
+	3,  // 51: smartquarter.community.v1.CommunityService.CreateAnnouncement:output_type -> smartquarter.community.v1.Announcement
+	6,  // 52: smartquarter.community.v1.CommunityService.ListAnnouncements:output_type -> smartquarter.community.v1.ListAnnouncementsResponse
+	8,  // 53: smartquarter.community.v1.CommunityService.CreatePoll:output_type -> smartquarter.community.v1.Poll
+	10, // 54: smartquarter.community.v1.CommunityService.GetPoll:output_type -> smartquarter.community.v1.PollDetails
+	14, // 55: smartquarter.community.v1.CommunityService.ListPolls:output_type -> smartquarter.community.v1.ListPollsResponse
+	16, // 56: smartquarter.community.v1.CommunityService.VotePoll:output_type -> smartquarter.community.v1.VotePollResponse
+	17, // 57: smartquarter.community.v1.CommunityService.CreateCalendarEvent:output_type -> smartquarter.community.v1.CalendarEvent
+	20, // 58: smartquarter.community.v1.CommunityService.ListCalendarEvents:output_type -> smartquarter.community.v1.ListCalendarEventsResponse
+	21, // 59: smartquarter.community.v1.CommunityService.CreateInitiative:output_type -> smartquarter.community.v1.Initiative
+	24, // 60: smartquarter.community.v1.CommunityService.ListInitiatives:output_type -> smartquarter.community.v1.ListInitiativesResponse
+	26, // 61: smartquarter.community.v1.CommunityService.SupportInitiative:output_type -> smartquarter.community.v1.SupportInitiativeResponse
+	46, // [46:62] is the sub-list for method output_type
+	30, // [30:46] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_smartquarter_community_v1_community_proto_init() }
@@ -2040,7 +2714,7 @@ func file_smartquarter_community_v1_community_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_smartquarter_community_v1_community_proto_rawDesc), len(file_smartquarter_community_v1_community_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   24,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

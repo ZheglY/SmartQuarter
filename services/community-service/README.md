@@ -1,19 +1,26 @@
-# community-service
+# Community Service
 
-Объявления (Must Have), опросы (Should Have); календарь и инициативы — последующие расширения. Владеет community_db.
+Владеет community_db: объявления, опросы, календарь, инициативы и контакты служб.
+Gateway вызывает типизированный CommunityService по gRPC; браузер не обращается к
+сервису напрямую. Actor metadata приходит только из доверенной внутренней сети.
 
-Запуск из этой папки: `go run ./cmd/app`. HTTP-порт 8084, переопределяется через `HTTP_ADDR`.
-Сейчас работает только прежний `GET /healthz`. Новые каталоги — заготовки, интеграции не подключены.
+Настройки: DATABASE_URL, REDIS_URL, GRPC_ADDR (:9090), HTTP_ADDR (:8084),
+NOTIFICATION_STREAM (stream:notifications). HTTP: /livez, /readyz, /metrics.
 
-- `cmd/app` — существующая точка запуска; `internal/app` — место для будущего wiring.
-- `internal/config` — окружение; `internal/observability` — будущие логи/метрики.
-- `internal/transport/http` — существующий health handler.
-- `internal/gen` — будущий generated protobuf-код из корневых контрактов.
-- `tests/integration` — место для интеграционных тестов; unit-тесты рядом с кодом.
-- `internal/domain` — сущности/инварианты; `internal/usecase` — прикладные сценарии.
-- `internal/repository/postgres` — будущий адаптер pgx/pgxpool собственной БД.
-- `internal/transport/grpc` — будущие бизнес-вызовы; gRPC-сервер пока не запущен.
-- `internal/clients` — межсервисные клиенты; `internal/events` — outbox/events при необходимости.
-- `migrations` — будущие миграции; `testdata/seed` — синтетические данные собственной БД.
+Серверные миграции: deploy/server/compose.yaml → community-migrate применяет
+000001_init.up.sql и отдельную идемпотентную 000002_service_contacts.up.sql.
+Существующие объявления не меняются. Контакты имеют категории, лимит 10 активных
+записей на категорию и нормализованные международные телефоны. Жители получают
+активные записи без автора и временных меток аудита; менеджеры могут создавать,
+заменять поля и архивировать записи. Контакт, аудит и outbox записываются атомарно.
 
-Контракты — в `contracts/`, общие правила — в корневом README и `docs/architecture.md`.
+Outbox публикуется в общий stream:notifications с producer=community-service и
+полным envelope версии 1. Получателей и настройки проверяет Gateway через Identity.
+Публикация допускает повтор; UUID события стабилен. Старый max_notifications_stream
+больше не используется.
+
+Команды из каталога сервиса: go test ./..., go vet ./..., go build ./cmd/app.
+Buf использует contracts/proto/smartquarter/community/v1/community.proto.
+Полный HTTP/PostgreSQL/Redis тест: deploy/test/compose.yaml.
+
+[Права, события, обновление и приёмка](../../docs/house-workflow/README.md).

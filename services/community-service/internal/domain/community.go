@@ -79,9 +79,10 @@ type Initiative struct {
 }
 
 type OutboxEvent struct {
-	EventID   string
-	EventType string
-	Payload   []byte
+	OccurredAt time.Time
+	EventID    string
+	EventType  string
+	Payload    []byte
 }
 
 type CommunityRepository interface {

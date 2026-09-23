@@ -8,7 +8,11 @@ Go HTTP/JSON gateway для Mini App «Умный Квартал».
 
 `IDENTITY_GRPC_ADDR` обязателен. `internal/identity.GRPCClient` вызывает `UpsertMaxUser`, `GetUserContext`, `GetMembership`, `ListMemberships` и gRPC Health Check. Источник контракта — `contracts/proto/smartquarter/identity/v1/identity.proto`. Consumer ожидает готовности Identity перед чтением новых событий.
 
-Новый MAX-пользователь получает сессию с пустым списком домов. Оператор назначает дом и роль через `identity-service /app provision`; пример приведён в [серверном гайде](../../docs/deployment/server-guide.md). Membership проверяется при каждом бизнес-запросе, поэтому отзыв доступа действует и на существующую сессию. Без активного membership бизнес-запросы возвращают 403; недоступность Identity возвращает 503.
+Новый MAX-пользователь получает сессию с пустым списком домов и может подать заявку.
+Одобрение регистрации требует `ADMIN_USER_IDS`, одобрение вступления — менеджера
+выбранного дома. Привилегии проверяются повторно, в том числе перед replay ответа
+Idempotency-Key. Недоступность Identity возвращает 503.
+[Маршруты](../../contracts/openapi/openapi.yaml) и [runbook](../../docs/house-workflow/README.md).
 
 `tests/testdata/identity.go` имеет build tag `integration`, использует отдельный namespace `gateway.test.Identity` и фиксированные UUID. Его протокол — только тестовый, не предложенный wire contract Identity. Он не входит в production binary и не предоставляет публичный HTTP login bypass.
 

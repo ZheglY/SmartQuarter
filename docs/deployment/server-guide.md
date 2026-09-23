@@ -1,4 +1,8 @@
 # Умный Квартал
+
+Дополнение для `feat/house-identity-service`: [регистрация домов, ADMIN_USER_IDS,
+миграции и новый workflow](../house-workflow/README.md). Обычное подключение дома
+теперь происходит через заявку и одобрение; `/app provision` — инструмент оператора.
 ## Развёртывание на удалённом сервере
 Ubuntu 24.04 LTS | Docker Compose | HTTPS | MAX
 

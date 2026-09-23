@@ -1,0 +1,807 @@
+{
+  "operations": [
+    {
+      "name": "CreateHouseRegistration",
+      "fields": [
+        [
+          "string",
+          "name"
+        ],
+        [
+          "string",
+          "address"
+        ],
+        [
+          "string",
+          "city"
+        ]
+      ],
+      "response": "HouseRegistration",
+      "method": "POST",
+      "path": "/house-registrations",
+      "access": "session",
+      "code": 202
+    },
+    {
+      "name": "GetHouseRegistration",
+      "fields": [
+        [
+          "string",
+          "id"
+        ]
+      ],
+      "response": "HouseRegistration",
+      "method": "GET",
+      "path": "/house-registrations/{id}",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "ListMyHouseRegistrations",
+      "fields": [],
+      "response": "HouseRegistrationList",
+      "method": "GET",
+      "path": "/house-registrations",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "CancelHouseRegistration",
+      "fields": [
+        [
+          "string",
+          "id"
+        ]
+      ],
+      "response": "HouseRegistration",
+      "method": "POST",
+      "path": "/house-registrations/{id}/cancel",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "ListPendingHouseRegistrations",
+      "fields": [],
+      "response": "HouseRegistrationList",
+      "method": "GET",
+      "path": "/admin/house-registrations",
+      "access": "admin",
+      "code": 200
+    },
+    {
+      "name": "ApproveHouseRegistration",
+      "fields": [
+        [
+          "string",
+          "id"
+        ],
+        [
+          "string",
+          "reason"
+        ]
+      ],
+      "response": "HouseRegistration",
+      "method": "POST",
+      "path": "/admin/house-registrations/{id}/approve",
+      "access": "admin",
+      "code": 200
+    },
+    {
+      "name": "RejectHouseRegistration",
+      "fields": [
+        [
+          "string",
+          "id"
+        ],
+        [
+          "string",
+          "reason"
+        ]
+      ],
+      "response": "HouseRegistration",
+      "method": "POST",
+      "path": "/admin/house-registrations/{id}/reject",
+      "access": "admin",
+      "code": 200
+    },
+    {
+      "name": "SearchHouses",
+      "fields": [
+        [
+          "string",
+          "query"
+        ]
+      ],
+      "response": "HouseSearchResult",
+      "method": "GET",
+      "path": "/houses/search",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "CreateJoinRequest",
+      "fields": [
+        [
+          "string",
+          "house_id"
+        ]
+      ],
+      "response": "JoinRequest",
+      "method": "POST",
+      "path": "/houses/{house_id}/join-requests",
+      "access": "session",
+      "code": 202
+    },
+    {
+      "name": "ListMyJoinRequests",
+      "fields": [],
+      "response": "JoinRequestList",
+      "method": "GET",
+      "path": "/join-requests",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "CancelJoinRequest",
+      "fields": [
+        [
+          "string",
+          "id"
+        ]
+      ],
+      "response": "JoinRequest",
+      "method": "POST",
+      "path": "/join-requests/{id}/cancel",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "ListHouseJoinRequests",
+      "fields": [],
+      "response": "JoinRequestList",
+      "method": "GET",
+      "path": "/chairman/join-requests",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "ApproveJoinRequest",
+      "fields": [
+        [
+          "string",
+          "id"
+        ],
+        [
+          "string",
+          "reason"
+        ]
+      ],
+      "response": "JoinRequest",
+      "method": "POST",
+      "path": "/chairman/join-requests/{id}/approve",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "RejectJoinRequest",
+      "fields": [
+        [
+          "string",
+          "id"
+        ],
+        [
+          "string",
+          "reason"
+        ]
+      ],
+      "response": "JoinRequest",
+      "method": "POST",
+      "path": "/chairman/join-requests/{id}/reject",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "CreateHouseInvitation",
+      "fields": [
+        [
+          "int32",
+          "expires_in_hours"
+        ],
+        [
+          "int32",
+          "max_uses"
+        ]
+      ],
+      "response": "CreatedInvitation",
+      "method": "POST",
+      "path": "/chairman/invitations",
+      "access": "manager",
+      "code": 201
+    },
+    {
+      "name": "ListHouseInvitations",
+      "fields": [],
+      "response": "HouseInvitationList",
+      "method": "GET",
+      "path": "/chairman/invitations",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "GetHouseInvitation",
+      "fields": [
+        [
+          "string",
+          "id"
+        ]
+      ],
+      "response": "HouseInvitation",
+      "method": "GET",
+      "path": "/invitations/{id}",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "RevokeHouseInvitation",
+      "fields": [
+        [
+          "string",
+          "id"
+        ]
+      ],
+      "response": "HouseInvitation",
+      "method": "POST",
+      "path": "/chairman/invitations/{id}/revoke",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "RedeemHouseInvitation",
+      "fields": [
+        [
+          "string",
+          "token"
+        ]
+      ],
+      "response": "JoinRequest",
+      "method": "POST",
+      "path": "/invitations/redeem",
+      "access": "session",
+      "code": 202
+    },
+    {
+      "name": "PreviewHouseInvitation",
+      "fields": [
+        [
+          "string",
+          "token"
+        ]
+      ],
+      "response": "HouseSummary",
+      "method": "POST",
+      "path": "/invitations/preview",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "CreateChairmanTransfer",
+      "fields": [
+        [
+          "string",
+          "target_user_id"
+        ]
+      ],
+      "response": "ChairmanTransfer",
+      "method": "POST",
+      "path": "/chairman/transfers",
+      "access": "manager",
+      "code": 202
+    },
+    {
+      "name": "ListChairmanTransfers",
+      "fields": [],
+      "response": "ChairmanTransferList",
+      "method": "GET",
+      "path": "/chairman/transfers",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "AcceptChairmanTransfer",
+      "fields": [
+        [
+          "string",
+          "id"
+        ]
+      ],
+      "response": "ChairmanTransfer",
+      "method": "POST",
+      "path": "/chairman/transfers/{id}/accept",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "RejectChairmanTransfer",
+      "fields": [
+        [
+          "string",
+          "id"
+        ]
+      ],
+      "response": "ChairmanTransfer",
+      "method": "POST",
+      "path": "/chairman/transfers/{id}/reject",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "CancelChairmanTransfer",
+      "fields": [
+        [
+          "string",
+          "id"
+        ]
+      ],
+      "response": "ChairmanTransfer",
+      "method": "POST",
+      "path": "/chairman/transfers/{id}/cancel",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "ListHouseMembers",
+      "fields": [],
+      "response": "HouseMemberList",
+      "method": "GET",
+      "path": "/chairman/members",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "DeactivateMembership",
+      "fields": [
+        [
+          "string",
+          "id"
+        ],
+        [
+          "bool",
+          "platform_admin_override"
+        ]
+      ],
+      "response": "HouseMember",
+      "method": "POST",
+      "path": "/chairman/members/{id}/deactivate",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "ReactivateMembership",
+      "fields": [
+        [
+          "string",
+          "id"
+        ],
+        [
+          "bool",
+          "platform_admin_override"
+        ]
+      ],
+      "response": "HouseMember",
+      "method": "POST",
+      "path": "/chairman/members/{id}/reactivate",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "RemoveMembership",
+      "fields": [
+        [
+          "string",
+          "id"
+        ],
+        [
+          "bool",
+          "platform_admin_override"
+        ]
+      ],
+      "response": "HouseMember",
+      "method": "DELETE",
+      "path": "/chairman/members/{id}",
+      "access": "manager",
+      "code": 200
+    },
+    {
+      "name": "GetHouseAccessState",
+      "fields": [],
+      "response": "HouseAccessState",
+      "method": "GET",
+      "path": "/house-access",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "GetNotificationPreferences",
+      "fields": [],
+      "response": "NotificationPreferences",
+      "method": "GET",
+      "path": "/notifications/settings",
+      "access": "session",
+      "code": 200
+    },
+    {
+      "name": "UpdateNotificationPreferences",
+      "fields": [
+        [
+          "bool",
+          "notifications_enabled"
+        ],
+        [
+          "bool",
+          "issue_notifications_enabled"
+        ],
+        [
+          "bool",
+          "announcement_notifications_enabled"
+        ],
+        [
+          "bool",
+          "membership_notifications_enabled"
+        ],
+        [
+          "bool",
+          "bot_notifications_enabled"
+        ]
+      ],
+      "response": "NotificationPreferences",
+      "method": "PUT",
+      "path": "/notifications/settings",
+      "access": "session",
+      "code": 200
+    }
+  ],
+  "entities": {
+    "HouseRegistration": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "applicant_user_id"
+      ],
+      [
+        "string",
+        "requested_name"
+      ],
+      [
+        "string",
+        "original_address"
+      ],
+      [
+        "string",
+        "city"
+      ],
+      [
+        "HouseRegistrationStatus",
+        "status"
+      ],
+      [
+        "string",
+        "resulting_house_id"
+      ],
+      [
+        "string",
+        "rejection_reason"
+      ],
+      [
+        "google.protobuf.Timestamp",
+        "created_at"
+      ],
+      [
+        "google.protobuf.Timestamp",
+        "reviewed_at"
+      ],
+      [
+        "string",
+        "applicant_display_name"
+      ]
+    ],
+    "JoinRequest": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "user_id"
+      ],
+      [
+        "string",
+        "house_id"
+      ],
+      [
+        "JoinRequestSource",
+        "source"
+      ],
+      [
+        "JoinRequestStatus",
+        "status"
+      ],
+      [
+        "string",
+        "rejection_reason"
+      ],
+      [
+        "google.protobuf.Timestamp",
+        "created_at"
+      ],
+      [
+        "google.protobuf.Timestamp",
+        "reviewed_at"
+      ],
+      [
+        "string",
+        "display_name"
+      ]
+    ],
+    "HouseInvitation": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "house_id"
+      ],
+      [
+        "string",
+        "created_by"
+      ],
+      [
+        "google.protobuf.Timestamp",
+        "expires_at"
+      ],
+      [
+        "int32",
+        "max_uses"
+      ],
+      [
+        "int32",
+        "used_count"
+      ],
+      [
+        "InvitationStatus",
+        "status"
+      ],
+      [
+        "google.protobuf.Timestamp",
+        "created_at"
+      ]
+    ],
+    "CreatedInvitation": [
+      [
+        "HouseInvitation",
+        "invitation"
+      ],
+      [
+        "string",
+        "token"
+      ],
+      [
+        "string",
+        "deep_link"
+      ]
+    ],
+    "ChairmanTransfer": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "house_id"
+      ],
+      [
+        "string",
+        "current_chairman_user_id"
+      ],
+      [
+        "string",
+        "target_user_id"
+      ],
+      [
+        "ChairmanTransferStatus",
+        "status"
+      ],
+      [
+        "google.protobuf.Timestamp",
+        "expires_at"
+      ],
+      [
+        "google.protobuf.Timestamp",
+        "created_at"
+      ]
+    ],
+    "HouseSummary": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "name"
+      ],
+      [
+        "string",
+        "address"
+      ],
+      [
+        "string",
+        "city"
+      ],
+      [
+        "bool",
+        "has_chairman"
+      ],
+      [
+        "bool",
+        "join_available"
+      ]
+    ],
+    "HouseMember": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "user_id"
+      ],
+      [
+        "string",
+        "house_id"
+      ],
+      [
+        "string",
+        "display_name"
+      ],
+      [
+        "string",
+        "role"
+      ],
+      [
+        "string",
+        "status"
+      ]
+    ],
+    "HouseAccessState": [
+      [
+        "bool",
+        "platform_admin"
+      ],
+      [
+        "int32",
+        "pending_registrations"
+      ],
+      [
+        "int32",
+        "pending_join_requests"
+      ],
+      [
+        "int32",
+        "incoming_join_requests"
+      ],
+      [
+        "bool",
+        "can_manage_active_house"
+      ]
+    ],
+    "NotificationPreferences": [
+      [
+        "bool",
+        "notifications_enabled"
+      ],
+      [
+        "bool",
+        "issue_notifications_enabled"
+      ],
+      [
+        "bool",
+        "announcement_notifications_enabled"
+      ],
+      [
+        "bool",
+        "membership_notifications_enabled"
+      ],
+      [
+        "bool",
+        "bot_notifications_enabled"
+      ]
+    ],
+    "NotificationRecipient": [
+      [
+        "string",
+        "user_id"
+      ],
+      [
+        "string",
+        "max_user_id"
+      ]
+    ],
+    "HouseRegistrationList": [
+      [
+        "repeated HouseRegistration",
+        "items"
+      ]
+    ],
+    "JoinRequestList": [
+      [
+        "repeated JoinRequest",
+        "items"
+      ]
+    ],
+    "HouseInvitationList": [
+      [
+        "repeated HouseInvitation",
+        "items"
+      ]
+    ],
+    "ChairmanTransferList": [
+      [
+        "repeated ChairmanTransfer",
+        "items"
+      ]
+    ],
+    "HouseMemberList": [
+      [
+        "repeated HouseMember",
+        "items"
+      ]
+    ],
+    "NotificationRecipientList": [
+      [
+        "repeated NotificationRecipient",
+        "items"
+      ]
+    ],
+    "HouseSearchResult": [
+      [
+        "repeated HouseSummary",
+        "items"
+      ]
+    ]
+  },
+  "enums": {
+    "HouseRegistrationStatus": [
+      "PENDING",
+      "APPROVED",
+      "REJECTED",
+      "CANCELLED"
+    ],
+    "JoinRequestStatus": [
+      "PENDING",
+      "APPROVED",
+      "REJECTED",
+      "CANCELLED"
+    ],
+    "InvitationStatus": [
+      "ACTIVE",
+      "EXPIRED",
+      "REVOKED",
+      "EXHAUSTED"
+    ],
+    "ChairmanTransferStatus": [
+      "PENDING",
+      "ACCEPTED",
+      "REJECTED",
+      "CANCELLED",
+      "EXPIRED"
+    ],
+    "JoinRequestSource": [
+      "SEARCH",
+      "INVITE",
+      "ADMIN"
+    ]
+  }
+}

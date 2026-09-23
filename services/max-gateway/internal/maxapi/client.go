@@ -24,6 +24,29 @@ type Client struct {
 
 var ErrDelivery = errors.New("MAX delivery failed")
 
+// Menu uses MAX startapp deep links documented at dev.max.ru/help/deeplinks.
+func (c *Client) Menu(ctx context.Context, userID int64, text, payload string) error {
+	if userID <= 0 || c.Token == "" {
+		return ErrDelivery
+	}
+	buttons := [][]any{}
+	for _, item := range [][2]string{{"Открыть Mini App", "houses"}, {"Найти дом", "find_house"}, {"Зарегистрировать дом", "register_house"}, {"Мои заявки", "my_requests"}, {"Настройки уведомлений", "settings"}} {
+		buttons = append(buttons, []any{map[string]string{"type": "link", "text": item[0], "url": "https://max.ru/" + url.PathEscape(c.BotUsername) + "?startapp=" + item[1]}})
+	}
+	if strings.HasPrefix(payload, "invite_") && len(payload) == 50 {
+		valid := true
+		for _, r := range payload {
+			if !(r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '_' || r == '-') {
+				valid = false
+			}
+		}
+		if valid {
+			buttons = append([][]any{{map[string]string{"type": "link", "text": "Открыть приглашение", "url": "https://max.ru/" + url.PathEscape(c.BotUsername) + "?startapp=" + payload}}}, buttons...)
+		}
+	}
+	return c.post(ctx, "/messages?user_id="+strconv.FormatInt(userID, 10), map[string]any{"text": text, "attachments": []any{map[string]any{"type": "inline_keyboard", "payload": map[string]any{"buttons": buttons}}}}, strconv.FormatInt(userID, 10))
+}
+
 func (c *Client) Send(ctx context.Context, userID int64, text string, button bool) error {
 	if userID <= 0 || c.Token == "" {
 		return ErrDelivery

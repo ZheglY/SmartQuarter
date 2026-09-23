@@ -3,7 +3,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../shared/api';
 import { setUnauthorizedHandler } from '../../shared/api/client';
-import { rawInitData, launchIssue, initializeViewport } from '../../shared/max/bridge';
+import {
+  rawInitData,
+  launchIssue,
+  launchHouseRoute,
+  initializeViewport,
+} from '../../shared/max/bridge';
 import { useDrafts } from '../issues/drafts';
 import type { UserContext } from '../../shared/api/models';
 type Session = {
@@ -70,6 +75,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       launched.current = true;
       const id = launchIssue(raw || '');
       if (id) navigate('/issues/' + id, { replace: true });
+      else {
+        const route = launchHouseRoute(raw || '');
+        if (route) navigate(route, { replace: true });
+      }
     }
   }, [session.data, raw, navigate]);
   async function switchHouse(id: string) {

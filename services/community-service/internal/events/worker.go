@@ -2,6 +2,8 @@ package events
 
 import (
 	"context"
+	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -55,12 +57,20 @@ func (w *OutboxWorker) processBatch(ctx context.Context) {
 	var publishedIDs []string
 
 	for _, e := range events {
+		stream := os.Getenv("NOTIFICATION_STREAM")
+		if stream == "" {
+			stream = "stream:notifications"
+		}
+		raw, encodeErr := json.Marshal(map[string]any{"event_id": e.EventID, "event_type": e.EventType, "event_version": 1, "producer": "community-service", "occurred_at": e.OccurredAt, "payload": json.RawMessage(e.Payload)})
+		if encodeErr != nil {
+			continue
+		}
 		err := w.redis.XAdd(ctx, &redis.XAddArgs{
-			Stream: "max_notifications_stream",
+			Stream: stream,
 			Values: map[string]interface{}{
 				"event_id":   e.EventID,
 				"event_type": e.EventType,
-				"payload":    string(e.Payload),
+				"data":       string(raw),
 			},
 		}).Err()
 

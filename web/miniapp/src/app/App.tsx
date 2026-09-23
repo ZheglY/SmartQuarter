@@ -11,8 +11,27 @@ import { IssueDetailsPage } from '../pages/IssueDetailsPage';
 import { CreateIssuePage } from '../pages/CreateIssuePage';
 import { NewsPage, CreateAnnouncementPage } from '../pages/NewsPage';
 import { ProfilePage, CommunityPage } from '../pages/ProfilePage';
+import {
+  HousesPage,
+  RegisterHousePage,
+  RegistrationPage,
+  SearchHousesPage,
+  JoinHousePage,
+  MyRequestsPage,
+  RedeemInvitationPage,
+} from '../pages/HousePages';
+import {
+  ReviewRegistrationsPage,
+  ReviewJoinRequestsPage,
+  InvitationsPage,
+  MembersPage,
+  TransferPage,
+} from '../pages/ChairmanPages';
+import { NotificationSettingsPage } from '../pages/NotificationSettingsPage';
+import { ServiceContactsPage } from '../pages/ServiceContactsPage';
 function Gate() {
   const s = useSession();
+  const { pathname } = useLocation();
   if (s.loading || s.switching)
     return (
       <>
@@ -45,14 +64,31 @@ function Gate() {
         </main>
       </>
     );
-  if (!membership(s.context))
+  if (
+    !membership(s.context) &&
+    !(
+      /^\/houses(?:\/|$)/.test(pathname) ||
+      [
+        '/',
+        '/profile',
+        '/join-requests',
+        '/invitations/redeem',
+        '/notifications/settings',
+        '/admin/house-registrations',
+        '/chairman/transfer',
+      ].includes(pathname)
+    )
+  )
     return (
       <>
         <PageHeader title="Нет доступа к дому" />
         <main className="page-content">
           <EmptyState title="Нужен доступ к дому">
-            Обратитесь к председателю или выберите дом с активным участием в профиле.
+            Найдите дом и подайте заявку на вступление или зарегистрируйте новый.
           </EmptyState>
+          <Link className="primary-btn" to="/houses">
+            Найти или зарегистрировать дом
+          </Link>
           <ProfilePage embedded />
         </main>
       </>
@@ -114,12 +150,27 @@ function Layout() {
   );
 }
 export function App() {
+  const { context } = useSession();
   return (
     <div className="app">
       <Routes>
         <Route element={<Gate />}>
           <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/"
+              element={context && membership(context) ? <HomePage /> : <HousesPage />}
+            />
+            <Route path="/houses" element={<HousesPage />} />
+            <Route path="/houses/register" element={<RegisterHousePage />} />
+            <Route path="/houses/register/:id" element={<RegistrationPage />} />
+            <Route path="/houses/search" element={<SearchHousesPage />} />
+            <Route path="/houses/:houseId/join" element={<JoinHousePage />} />
+            <Route path="/join-requests" element={<MyRequestsPage />} />
+            <Route path="/invitations/redeem" element={<RedeemInvitationPage />} />
+            <Route path="/notifications/settings" element={<NotificationSettingsPage />} />
+            <Route path="/admin/house-registrations" element={<ReviewRegistrationsPage />} />
+            <Route path="/chairman/transfer" element={<TransferPage />} />
+            <Route path="/service-contacts" element={<ServiceContactsPage />} />
             <Route path="/issues" element={<IssuesPage />} />
             <Route path="/issues/new" element={<CreateIssuePage />} />
             <Route path="/issues/:issueId" element={<IssueDetailsPage />} />
@@ -127,6 +178,10 @@ export function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/community" element={<CommunityPage />} />
             <Route element={<Manager />}>
+              <Route path="/chairman/join-requests" element={<ReviewJoinRequestsPage />} />
+              <Route path="/chairman/invitations" element={<InvitationsPage />} />
+              <Route path="/chairman/members" element={<MembersPage />} />
+              <Route path="/chairman/service-contacts" element={<ServiceContactsPage manage />} />
               <Route path="/chairman" element={<IssuesPage chairman />} />
               <Route path="/chairman/issues/:issueId" element={<IssueDetailsPage chairman />} />
               <Route path="/chairman/announcements/new" element={<CreateAnnouncementPage />} />

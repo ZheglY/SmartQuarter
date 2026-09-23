@@ -297,8 +297,19 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 				t.Fatal("notifications not delivered", delivered.Load())
 			}
 			var pending int
-			if e = db.QueryRow(ctx, "SELECT count(*) FROM outbox_events WHERE aggregate_id=$1 AND published_at IS NULL", issueID).Scan(&pending); e != nil || pending != 0 {
-				t.Fatal("outbox not published")
+			// Delivery can finish before the publisher commits published_at.
+			deadline = time.Now().Add(12 * time.Second)
+			for {
+				if e = db.QueryRow(ctx, "SELECT count(*) FROM outbox_events WHERE aggregate_id=$1 AND published_at IS NULL", issueID).Scan(&pending); e != nil {
+					t.Fatal(e)
+				}
+				if pending == 0 {
+					break
+				}
+				if time.Now().After(deadline) {
+					t.Fatalf("outbox not published: %d pending", pending)
+				}
+				time.Sleep(50 * time.Millisecond)
 			}
 			entries, e := r.XRange(ctx, "stream:notifications", "-", "+").Result()
 			if e != nil {
