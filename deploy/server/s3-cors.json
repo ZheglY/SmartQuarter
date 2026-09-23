@@ -1,6 +1,6 @@
 [
   {
-    "AllowedOrigins": ["https://app.example.com"],
+    "AllowedOrigins": ["https://maxhack.ru"],
     "AllowedMethods": ["GET", "HEAD", "PUT"],
     "AllowedHeaders": ["*"],
     "ExposeHeaders": ["ETag"],

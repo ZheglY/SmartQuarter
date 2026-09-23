@@ -1,7 +1,8 @@
 # Stage 1: Сборка бинарного файла
-FROM golang:1.23-alpine AS builder
+FROM golang:1.26-alpine AS build
 
 WORKDIR /app
+ENV GOWORK=off CGO_ENABLED=0
 
 # Установка системных сертификатов для безопасных соединений
 RUN apk add --no-cache ca-certificates
