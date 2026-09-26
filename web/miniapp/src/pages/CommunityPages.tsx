@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { NotificationFocus } from '../shared/ui/NotificationFocus';
 import { useHouseQuery, useHouseAction, QueryState } from '../features/session/houseWorkflow';
 import { useUser } from '../features/session/SessionProvider';
 import {
@@ -266,11 +267,15 @@ function localDate(s: string) {
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
 export function CalendarPage() {
+  const [params] = useSearchParams();
   const manager = canManage(useUser()),
     action = useHouseAction(),
-    [month, setMonth] = useState(
-      () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-    ),
+    [month, setMonth] = useState(() => {
+      const value = params.get('date') || '';
+      const parsed = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(value + 'T12:00:00') : new Date();
+      const date = Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+      return new Date(date.getFullYear(), date.getMonth(), 1);
+    }),
     [editing, setEditing] = useState<CalendarEvent | null | undefined>(),
     [deleting, setDeleting] = useState<CalendarEvent>();
   const from = month.toISOString(),
@@ -278,6 +283,10 @@ export function CalendarPage() {
   const q = useHouseQuery('calendar:' + from, (s) => api.calendar(from, to, s));
   return (
     <Frame title="Календарь дома">
+      <NotificationFocus
+        ids={q.data?.items.map((i) => i.id) || []}
+        loaded={q.isSuccess && !q.isFetching}
+      />
       <div className="calendar-toolbar">
         <button
           className="secondary-btn"
@@ -322,7 +331,7 @@ export function CalendarPage() {
       )}
       <QueryState query={q} />
       {q.data?.items.map((e) => (
-        <article className="news-card" key={e.id}>
+        <article className="news-card" key={e.id} id={'entry-' + e.id} tabIndex={-1}>
           <h2>{e.title}</h2>
           <p>
             {formatDate(e.starts_at)} — {formatDate(e.ends_at)}
@@ -459,6 +468,11 @@ export function InitiativesPage() {
   const q = useHouseQuery('initiatives:' + token, (s) => api.initiatives(token, s));
   return (
     <Frame title="Инициативы жильцов">
+      <NotificationFocus
+        ids={q.data?.items.map((i) => i.id) || []}
+        loaded={q.isSuccess && !q.isFetching}
+        next={q.data?.next_page_token ? () => setToken(q.data!.next_page_token) : undefined}
+      />
       <p>
         Предлагайте улучшения и поддерживайте идеи соседей. Поддержать каждую инициативу можно один
         раз.
@@ -504,7 +518,7 @@ export function InitiativesPage() {
       )}
       <QueryState query={q} />
       {q.data?.items.map((i) => (
-        <article className="news-card" key={i.id}>
+        <article className="news-card" key={i.id} id={'entry-' + i.id} tabIndex={-1}>
           <h2>{i.title}</h2>
           <p className="preserve-lines">{i.description}</p>
           <p>Поддержали: {i.supports_count}</p>

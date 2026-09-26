@@ -5,7 +5,7 @@ import { api } from '../../shared/api';
 import { setUnauthorizedHandler } from '../../shared/api/client';
 import {
   rawInitData,
-  launchIssue,
+  launchTarget,
   launchHouseRoute,
   initializeViewport,
 } from '../../shared/max/bridge';
@@ -60,6 +60,21 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     queryFn: async ({ signal }) => {
       if (bootstrap.current) {
         const v = await api.bootstrap(raw!, signal);
+        const target = launchTarget(raw!);
+        if (target?.houseId && target.houseId !== v.user_context.active_house_id) {
+          if (
+            !v.user_context.memberships.some(
+              (m) =>
+                m.house_id === target.houseId &&
+                m.user_id === v.user_context.user.id &&
+                m.status === 'ACTIVE',
+            )
+          )
+            throw new Error('У вас больше нет доступа к дому из уведомления.');
+          await api.switchHouse(target.houseId);
+          bootstrap.current = false;
+          return api.me(signal);
+        }
         bootstrap.current = false;
         return v.user_context;
       }
@@ -73,8 +88,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (session.data && !launched.current) {
       launched.current = true;
-      const id = launchIssue(raw || '');
-      if (id) navigate('/issues/' + id, { replace: true });
+      const target = launchTarget(raw || '');
+      if (target) navigate(target.path, { replace: true });
       else {
         const route = launchHouseRoute(raw || '');
         if (route) navigate(route, { replace: true });

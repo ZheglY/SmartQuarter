@@ -41,7 +41,10 @@ export function ServiceContactsPage({ manage = false }: { manage?: boolean }) {
     ['description', 'Описание', 2000],
   ];
   return (
-    <WorkflowFrame title={manage ? 'Управление контактами' : 'Контакты служб'}>
+    <WorkflowFrame
+      title={manage ? 'Управление контактами' : 'Контакты служб'}
+      back={manage ? '/houses' : '/profile'}
+    >
       {manage && !draft && (
         <button
           className="primary-btn"

@@ -50,10 +50,18 @@ export function useHouseAction() {
     },
   };
 }
-export function WorkflowFrame({ title, children }: { title: string; children: ReactNode }) {
+export function WorkflowFrame({
+  title,
+  children,
+  back = '/houses',
+}: {
+  title: string;
+  children: ReactNode;
+  back?: string;
+}) {
   return (
     <>
-      <PageHeader title={title} back="/houses" />
+      <PageHeader title={title} back={back} />
       <main className="page-content workflow">{children}</main>
     </>
   );

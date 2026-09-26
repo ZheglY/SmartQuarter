@@ -20,7 +20,7 @@ export function NotificationSettingsPage() {
     action = useHouseAction(),
     value = draft || q.data;
   return (
-    <WorkflowFrame title="Уведомления">
+    <WorkflowFrame title="Уведомления" back="/profile">
       <QueryState query={q} />
       {value && (
         <form

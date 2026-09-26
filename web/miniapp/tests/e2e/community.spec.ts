@@ -4,14 +4,14 @@ const pollID = 'b1111111-1111-4111-8111-111111111111',
   optID = 'b2222222-2222-4222-8222-222222222222',
   eventID = 'b3333333-3333-4333-8333-333333333333',
   initiativeID = 'b4444444-4444-4444-8444-444444444444';
-async function setup(page: Page, role: 'RESIDENT' | 'CHAIRMAN' | 'ADMIN' | 'NONE') {
+async function setup(page: Page, role: 'RESIDENT' | 'CHAIRMAN' | 'ADMIN' | 'NONE', launch = '') {
   await page.route('https://st.max.ru/**', (r) => r.abort());
-  await page.addInitScript(() => {
+  await page.addInitScript((launch) => {
     window.WebApp = {
-      initData: 'test-only',
+      initData: 'test-only&start_param=' + launch,
       BackButton: { show() {}, hide() {}, onClick() {}, offClick() {} },
     };
-  });
+  }, launch);
   const uc = {
     ...context,
     houses: role === 'NONE' || role === 'ADMIN' ? [] : context.houses,
@@ -49,6 +49,12 @@ async function setup(page: Page, role: 'RESIDENT' | 'CHAIRMAN' | 'ADMIN' | 'NONE
     if (path === '/session/max')
       return reply({ user_context: uc, expires_at: '2099-01-01T00:00:00Z' });
     if (path === '/me') return reply(uc);
+    if (path === '/session/active-house') {
+      uc.active_house_id = req.postDataJSON().house_id;
+      return reply({ active_house_id: uc.active_house_id, role: 'RESIDENT' });
+    }
+    if (path === '/house/service-contacts') return reply({ items: [] });
+    if (path === '/house-registrations' || path === '/join-requests') return reply({ items: [] });
     if (path === '/house-access')
       return reply({
         platform_admin: role === 'ADMIN',
@@ -247,4 +253,119 @@ test('citizen cannot register house or access admin and never loses navigation',
   await page.goto('/houses/register');
   await expect(page.getByText('Нужны полномочия председателя')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Отправить на рассмотрение' })).toHaveCount(0);
+});
+
+test('resident sees only resident house actions and contacts return to profile', async ({
+  page,
+}, info) => {
+  await setup(page, 'RESIDENT');
+  await page.goto('/houses');
+  await expect(page.getByRole('link', { name: 'Найти дом', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Зарегистрировать дом' })).toHaveCount(0);
+  await expect(page.getByRole('navigation', { name: 'Управление домом' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /Предложения роли председателя/ })).toHaveCount(0);
+  await expect(page.locator('main').getByRole('link', { name: /Профиль|Уведомления/ })).toHaveCount(
+    0,
+  );
+  await page.screenshot({ path: info.outputPath('resident-houses.png'), fullPage: true });
+  await page.getByRole('link', { name: 'Мои заявки', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Вступление в дом' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Регистрация домов' })).toHaveCount(0);
+  await page
+    .getByRole('navigation', { name: 'Основная навигация' })
+    .getByRole('link', { name: 'Профиль' })
+    .click();
+  await page.getByRole('link', { name: 'Контакты служб →' }).click();
+  await expect(page.getByRole('heading', { name: 'Контакты служб' })).toBeVisible();
+  await page.getByRole('link', { name: 'Назад', exact: true }).click();
+  await expect(page).toHaveURL(/\/profile$/);
+  await expect(page.getByRole('heading', { name: 'Мой профиль' })).toBeVisible();
+});
+
+test('chairman sees management panel and approved registration action', async ({ page }, info) => {
+  await setup(page, 'CHAIRMAN');
+  await page.goto('/houses');
+  await expect(page.getByRole('navigation', { name: 'Управление домом' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Зарегистрировать дом' })).toBeVisible();
+  await page.screenshot({ path: info.outputPath('chairman-houses.png'), fullPage: true });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('resident opens all community sections without manager controls', async ({ page }, info) => {
+  await setup(page, 'RESIDENT');
+  await page.goto('/community');
+  await expect(page.getByText('Пока недоступно')).toHaveCount(0);
+  await page.screenshot({ path: info.outputPath('community.png'), fullPage: true });
+  await page.getByRole('link', { name: /^Опросы/ }).click();
+  await expect(page.getByRole('heading', { name: 'Опросы', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Создать опрос/ })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Назад', exact: true }).click();
+  await page.getByRole('link', { name: /^Календарь/ }).click();
+  await expect(page.getByRole('heading', { name: 'Календарь дома' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Добавить событие' })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Назад', exact: true }).click();
+  await page.getByRole('link', { name: /^Инициативы/ }).click();
+  await expect(page.getByRole('heading', { name: 'Инициативы жильцов' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Предложить инициативу' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('bot poll link switches to the notified house and opens its poll', async ({ page }) => {
+  await setup(page, 'RESIDENT', 'poll_' + pollID + '_' + ids.house2);
+  const switched = page.waitForRequest(
+    (r) => r.url().endsWith('/session/active-house') && r.method() === 'POST',
+  );
+  await page.goto('/');
+  expect((await switched).postDataJSON().house_id).toBe(ids.house2);
+  await expect(page).toHaveURL(new RegExp('/community/polls/' + pollID + '$'));
+  await expect(page.getByRole('heading', { name: 'Когда провести собрание?' })).toBeVisible();
+});
+
+test('bot initiative link finds a record beyond the first page', async ({ page }) => {
+  await setup(page, 'RESIDENT', 'initiative_' + initiativeID + '_' + ids.house);
+  await page.route('**/api/v1/initiatives?**', (r) =>
+    r.fulfill({
+      json: new URL(r.request().url()).searchParams.get('page_token')
+        ? {
+            items: [
+              {
+                id: initiativeID,
+                title: 'Книжная полка',
+                description: 'Книги для соседей',
+                status: 'INITIATIVE_STATUS_OPEN',
+                supports_count: 0,
+                supported_by_me: false,
+              },
+            ],
+            next_page_token: '',
+          }
+        : { items: [], next_page_token: 'next' },
+    }),
+  );
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Книжная полка' })).toBeVisible();
+  await expect(page.locator('#entry-' + initiativeID)).toBeFocused();
+});
+
+test('bot calendar link selects event month and focuses the event', async ({ page }) => {
+  const timestamp = Math.floor(new Date('2027-03-15T12:00:00Z').getTime() / 1000);
+  await setup(page, 'RESIDENT', 'calendar_' + eventID + '_' + ids.house + '_' + timestamp);
+  await page.route('**/api/v1/calendar?**', (r) =>
+    r.fulfill({
+      json: {
+        items: [
+          {
+            id: eventID,
+            title: 'Встреча соседей',
+            description: 'Обсуждение двора',
+            starts_at: '2027-03-15T12:00:00Z',
+            ends_at: '2027-03-15T13:00:00Z',
+          },
+        ],
+      },
+    }),
+  );
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'март 2027 г.' })).toBeVisible();
+  await expect(page.locator('#entry-' + eventID)).toBeFocused();
 });

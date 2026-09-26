@@ -35,6 +35,11 @@ type Event struct {
 	Producer   string    `json:"producer"`
 	Payload    struct {
 		IssueID         string `json:"issue_id"`
+		PollID          string `json:"poll_id"`
+		InitiativeID    string `json:"initiative_id"`
+		AnnouncementID  string `json:"announcement_id"`
+		CalendarEventID string `json:"event_id"`
+		StartsAt        string `json:"starts_at"`
 		HouseID         string `json:"house_id"`
 		CreatedBy       string `json:"created_by"`
 		To              string `json:"to"`
@@ -104,13 +109,13 @@ func (c *Consumer) process(ctx context.Context, m redis.XMessage) {
 	text := ""
 	switch e.Type {
 	case "issue.created":
-		text = "Проблема зарегистрирована."
+		text = "📍 Спасибо за сигнал! Ваша заявка принята."
 	case "issue.confirmed":
-		text = "Житель подтвердил вашу проблему."
+		text = "🤝 Сосед подтвердил вашу заявку. Вместе проще добиться решения!"
 	case "issue.status_changed":
-		text = "Статус вашей проблемы обновлён."
+		text = "🔄 По вашей заявке есть новости. Проверьте новый статус."
 	case "statement.generated":
-		text = "По вашей проблеме подготовлено заявление."
+		text = "📝 По вашей заявке подготовлено обращение. Подробности — в карточке."
 	default:
 		text = eventText(e.Type)
 		if text == "" {
@@ -177,7 +182,8 @@ func (c *Consumer) deliver(ctx context.Context, e Event, text string) error {
 	if err != nil || maxID <= 0 {
 		return errors.New("recipient mapping unavailable")
 	}
-	return c.Bot.Send(ctx, maxID, text, true)
+	label, payload := eventAction(e)
+	return c.Bot.SendAction(ctx, maxID, text, label, payload)
 }
 func (c *Consumer) deadLetter(ctx context.Context, m redis.XMessage, reason, raw string) {
 	c.Metrics.NotificationFailures.Inc()

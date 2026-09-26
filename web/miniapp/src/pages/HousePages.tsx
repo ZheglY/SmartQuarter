@@ -9,7 +9,7 @@ import {
   useHouseQuery,
 } from '../features/session/houseWorkflow';
 import { houseApi } from '../shared/api/house';
-import { canManage } from '../shared/utils/presentation';
+import { canManage, roleLabels } from '../shared/utils/presentation';
 import { EmptyState, ErrorState } from '../shared/ui/components';
 
 export function HousesPage() {
@@ -17,32 +17,30 @@ export function HousesPage() {
     session = useSession(),
     action = useHouseAction();
   const access = useHouseQuery('access', (s) => houseApi.GetHouseAccessState(s));
+  const manager = canManage(user);
+  const houses = user.houses.filter((h) =>
+    user.memberships.some(
+      (m) => m.house_id === h.id && m.user_id === user.user.id && m.status === 'ACTIVE',
+    ),
+  );
   return (
-    <WorkflowFrame title="Мои дома">
+    <WorkflowFrame title="Мои дома" back="/profile">
       <p className="intro">
-        Найдите свой дом и подайте заявку на вступление. Председатели могут регистрировать новые
-        дома.
+        {manager
+          ? 'Управляйте своим домом и заявками жильцов.'
+          : houses.length
+            ? 'Ваши дома и заявки на вступление — в одном месте.'
+            : 'Найдите свой дом или введите приглашение от председателя.'}
       </p>
-      <div className="workflow-links">
+      <div className="house-actions">
         <Link className="primary-btn" to="/houses/search">
           Найти дом
         </Link>
-        {access.data?.can_register_house && (
-          <Link className="secondary-btn" to="/houses/register">
-            Зарегистрировать дом
-          </Link>
-        )}
         <Link className="secondary-btn" to="/join-requests">
           Мои заявки
         </Link>
         <Link className="secondary-btn" to="/invitations/redeem">
           Ввести приглашение
-        </Link>
-        <Link className="secondary-btn" to="/notifications/settings">
-          Уведомления
-        </Link>
-        <Link className="secondary-btn" to="/profile">
-          Профиль
         </Link>
       </div>
       <QueryState query={access} />
@@ -51,35 +49,63 @@ export function HousesPage() {
           Администрирование платформы →
         </Link>
       )}
-      {user.houses
-        .filter((h) => user.memberships.some((m) => m.house_id === h.id && m.status === 'ACTIVE'))
-        .map((h) => (
-          <article className="news-card" key={h.id}>
-            <h2>{h.name}</h2>
-            <p>
-              {h.city}, {h.address}
-            </p>
-            <button
-              className="primary-btn"
-              disabled={action.isPending || h.id === user.active_house_id}
-              onClick={() => action.run('switch-' + h.id, () => session.switchHouse(h.id))}
-            >
-              {h.id === user.active_house_id ? 'Текущий дом' : 'Выбрать дом'}
-            </button>
-          </article>
-        ))}
-      {canManage(user) && (
-        <nav className="workflow-links" aria-label="Управление домом">
-          <Link to="/chairman/join-requests">
-            Заявки жильцов ({access.data?.incoming_join_requests ?? 0})
-          </Link>
-          <Link to="/chairman/invitations">Приглашения</Link>
-          <Link to="/chairman/members">Жильцы</Link>
-          <Link to="/chairman/transfer">Передать роль председателя</Link>
-          <Link to="/chairman/service-contacts">Контакты служб</Link>
-        </nav>
+      {houses.map((h) => (
+        <article
+          className={
+            'news-card house-summary' +
+            (h.id === user.active_house_id ? ' house-summary-active' : '')
+          }
+          key={h.id}
+        >
+          <span className="category-badge">
+            {
+              roleLabels[
+                user.memberships.find(
+                  (m) => m.house_id === h.id && m.user_id === user.user.id && m.status === 'ACTIVE',
+                )!.role
+              ]
+            }
+          </span>
+          <h2>{h.name}</h2>
+          <p>
+            {h.city}, {h.address}
+          </p>
+          <button
+            className="primary-btn"
+            disabled={action.isPending || h.id === user.active_house_id}
+            onClick={() => action.run('switch-' + h.id, () => session.switchHouse(h.id))}
+          >
+            {h.id === user.active_house_id ? 'Текущий дом' : 'Выбрать дом'}
+          </button>
+        </article>
+      ))}
+      {manager && (
+        <section className="chairman-panel" aria-label="Кабинет председателя">
+          <span className="role-eyebrow">Председатель</span>
+          <h2>Управление домом</h2>
+          <nav className="workflow-links" aria-label="Управление домом">
+            <Link to="/chairman/join-requests">
+              Заявки жильцов ({access.data?.incoming_join_requests ?? 0})
+            </Link>
+            <Link to="/chairman/invitations">Приглашения</Link>
+            <Link to="/chairman/members">Жильцы</Link>
+            <Link to="/chairman/transfer">Передать роль председателя</Link>
+            <Link to="/chairman/service-contacts">Контакты служб</Link>
+          </nav>
+        </section>
       )}
-      <Link to="/chairman/transfer">Предложения роли председателя</Link>
+      {access.data?.can_register_house && (
+        <section className="house-registration-section" aria-label="Полномочия председателя">
+          <Link className="secondary-btn" to="/houses/register">
+            Зарегистрировать дом
+          </Link>
+          {!manager && (
+            <Link className="management-link" to="/chairman/transfer">
+              Предложения роли председателя →
+            </Link>
+          )}
+        </section>
+      )}
       {action.error && <ErrorState error={action.error} />}
     </WorkflowFrame>
   );
@@ -288,6 +314,7 @@ export function JoinHousePage() {
   );
 }
 export function MyRequestsPage() {
+  const access = useHouseQuery('access', (s) => houseApi.GetHouseAccessState(s));
   const registrations = useHouseQuery('registrations', (s) => houseApi.ListMyHouseRegistrations(s)),
     joins = useHouseQuery('joins', (s) => houseApi.ListMyJoinRequests(s)),
     session = useSession(),
@@ -303,18 +330,22 @@ export function MyRequestsPage() {
       >
         Обновить статусы
       </button>
-      <h2>Регистрация домов</h2>
-      <QueryState query={registrations} />
-      {registrations.data?.items.length === 0 && <EmptyState title="Заявок на дом пока нет" />}
-      {registrations.data?.items.map((r) => (
-        <Link className="news-card" key={r.id} to={'/houses/register/' + r.id}>
-          <h3>{r.requested_name}</h3>
-          <p>
-            {r.city}, {r.original_address}
-          </p>
-          <WorkflowStatus status={r.status} />
-        </Link>
-      ))}
+      {(access.data?.can_register_house || !!registrations.data?.items.length) && (
+        <>
+          <h2>Регистрация домов</h2>
+          <QueryState query={registrations} />
+          {registrations.data?.items.length === 0 && <EmptyState title="Заявок на дом пока нет" />}
+          {registrations.data?.items.map((r) => (
+            <Link className="news-card" key={r.id} to={'/houses/register/' + r.id}>
+              <h3>{r.requested_name}</h3>
+              <p>
+                {r.city}, {r.original_address}
+              </p>
+              <WorkflowStatus status={r.status} />
+            </Link>
+          ))}
+        </>
+      )}
       <h2>Вступление в дом</h2>
       <QueryState query={joins} />
       {joins.data?.items.length === 0 && <EmptyState title="Заявок на вступление пока нет" />}
