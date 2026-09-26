@@ -22,6 +22,48 @@ import (
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/tests/testdata"
 )
 
+func TestQuietEventsAcknowledgedWithoutDelivery(t *testing.T) {
+	if os.Getenv("GATEWAY_E2E") != "1" {
+		t.Fatal("dedicated Redis required")
+	}
+	ctx := context.Background()
+	r := redis.NewClient(&redis.Options{Addr: "localhost:16379", MaxRetries: -1})
+	defer r.Close()
+	stream := "gateway-test:" + uuid.NewString()
+	defer r.Del(ctx, stream, stream+":dead")
+	if err := r.XGroupCreateMkStream(ctx, stream, "test", "0").Err(); err != nil {
+		t.Fatal(err)
+	}
+	// No Identity or Bot is supplied: a suppressed event must never reach delivery.
+	c := &Consumer{Redis: r, Stream: stream, Group: "test", Metrics: observability.New(), Logger: zap.NewNop()}
+	for _, kind := range []string{"poll.voted", "service_contact.update", "issue.confirmed", "issue.created", "house.registration.created"} {
+		e := Event{ID: uuid.NewString(), Type: kind, Version: 1, OccurredAt: time.Now(), Producer: "community-service"}
+		e.Payload.HouseID = uuid.NewString()
+		e.Payload.IssueID = uuid.NewString()
+		e.Payload.CreatedBy = uuid.NewString()
+		e.Payload.RecipientUserID = uuid.NewString()
+		if kind == "issue.confirmed" || kind == "issue.created" {
+			e.Producer = "issue-service"
+		}
+		if kind == "house.registration.created" {
+			e.Producer = "identity-service"
+		}
+		b, _ := json.Marshal(e)
+		if err := r.XAdd(ctx, &redis.XAddArgs{Stream: stream, Values: map[string]any{"event_id": e.ID, "event_type": kind, "data": string(b)}}).Err(); err != nil {
+			t.Fatal(err)
+		}
+		entries, err := r.XReadGroup(ctx, &redis.XReadGroupArgs{Group: "test", Consumer: "test", Streams: []string{stream, ">"}, Count: 1}).Result()
+		if err != nil {
+			t.Fatal(err)
+		}
+		c.process(ctx, entries[0].Messages[0])
+	}
+	pending, err := r.XPending(ctx, stream, "test").Result()
+	if err != nil || pending.Count != 0 || r.XLen(ctx, stream+":dead").Val() != 0 {
+		t.Fatalf("quiet events pending/dead: %v %v", pending, err)
+	}
+}
+
 func TestPendingRecoveryDedupAndDeadLetter(t *testing.T) {
 	if os.Getenv("GATEWAY_E2E") != "1" {
 		t.Fatal("dedicated Redis required")

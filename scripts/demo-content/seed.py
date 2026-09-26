@@ -47,7 +47,7 @@ def main():
     args = parser.parse_args()
     house = str(uuid.UUID(args.house))
     namespace = uuid.UUID(house)
-    uid = lambda name: str(uuid.uuid5(namespace, 'demo-content-v1/' + name))
+    uid = lambda name: str(uuid.uuid5(namespace, 'demo-content-v2/' + name))
     for service in ['identity-service', 'issue-service', 'community-service', 'max-gateway']:
         cid = command(COMPOSE + ['ps', '-a', '-q', service]).strip()
         if not cid or command(['docker', 'inspect', '-f', '{{.State.Running}}', cid]).strip() != 'false':
@@ -76,12 +76,12 @@ def main():
         issue_sql.append('DELETE FROM ' + table + ' WHERE issue_id IN (' + scope + ');')
     issue_sql += ['DELETE FROM attachments WHERE house_id=' + q(house) + ';', 'DELETE FROM outbox_events WHERE payload->>\'house_id\'=' + q(house) + ';', 'DELETE FROM issues WHERE house_id=' + q(house) + ';']
     cases = [
-        ('roaches', 'CLEANLINESS', 'Незваный сосед уже распаковал чемодан', 'Вечером у мусоропровода появились тараканы. Просим проверить подвал и провести обработку общих зон. Пока гость не попросил прописку!', 'Подъезд №1, первый этаж', 'DETECTED', 'uninvited-neighbor.png', 0),
-        ('water', 'UTILITIES', 'В холле открылась утиная регата', 'Под радиатором у входа собирается вода. Нужны осмотр соединения, устранение течи и просушка пола. Резиновая утка довольна, жители — не очень.', 'Входная группа, подъезд №1', 'WAITING_RESULT', 'lobby-regatta.png', 1),
-        ('bench', 'INFRASTRUCTURE', 'Скамейка снова держит слово', 'Расшатавшуюся доску у детской площадки закрепили, крепёж заменили. Теперь можно спокойно обсудить новости двора. Спасибо всем, кто сообщил!', 'Двор, скамейка у площадки', 'RESOLVED', 'bench-inspection.png', 1),
-        ('lamp', 'SAFETY', 'Лестница играет в прятки', 'Между вторым и третьим этажами не включается свет. Просим заменить лампу и проверить датчик движения.', 'Подъезд №1, лестничный пролёт', 'READY_FOR_APPEAL', None, 1),
+        ('bench', 'INFRASTRUCTURE', 'Повреждена доска скамейки во дворе', 'На сиденье скамейки обнаружена трещина и ослаблен крепёж. Просим осмотреть конструкцию, заменить повреждённую доску и проверить устойчивость опор.', 'Двор, скамейка у пешеходной дорожки', 'DETECTED', 'damaged-bench.png', 0),
+        ('water', 'UTILITIES', 'Протечка соединения радиатора в подъезде', 'В месте соединения радиатора с трубой образуются капли, на полу скапливается вода. Обращение передано обслуживающей организации, ожидается устранение течи.', 'Подъезд №1, входная группа', 'WAITING_RESULT', 'radiator-leak.png', 1),
+        ('lamp', 'SAFETY', 'Не работает освещение лестничной площадки', 'На площадке между вторым и третьим этажами не включается светильник. В вечернее время ступени плохо различимы. Требуется проверить светильник и датчик движения.', 'Подъезд №1, лестничный пролёт', 'READY_FOR_APPEAL', 'stair-light.png', 1),
+        ('waste', 'CLEANLINESS', 'Убраны отходы возле контейнерной площадки', 'После обращения выполнены вывоз крупногабаритных отходов и уборка прилегающей территории. Проход к контейнерам свободен. Заявка закрыта после проверки результата.', 'Контейнерная площадка во дворе', 'RESOLVED', None, 1),
     ]
-    marker = '\n\nДемонстрационный пример: ситуация и иллюстрация вымышлены.'
+    marker = '\n\nДемонстрационный пример. Описание и изображение не фиксируют реальное происшествие в этом доме.'
     for name, category, title, body, location, status, filename, count in cases:
         issue_id = uid('issue/' + name)
         issue_sql.append(insert('issues', id=issue_id, house_id=house, created_by=author, house_address_snapshot=address, category=category, description=title+'\n\n'+body+marker, location_text=location, status=status, confirmations_count=count, created_at=now, updated_at=now, resolved_at=now if status == 'RESOLVED' else None))
@@ -102,26 +102,26 @@ def main():
         community_sql.append('DELETE FROM ' + table + ' WHERE house_id=' + q(house) + ';')
     community_sql.append('DELETE FROM outbox_events WHERE payload->>\'house_id\'=' + q(house) + ';')
     announcements = [
-        ('cleanup', 'Субботник без героизма: час для любимого двора', 'Встречаемся у входа в субботу в 11:00. Перчатки и мешки будут на месте. Можно прийти на 20 минут — каждый вклад важен. После уборки обменяемся идеями для клумб.'),
-        ('water', 'Проверяем радиаторы до холодов', 'Посмотрите, нет ли капель у соединений радиаторов. Если заметили течь в общих зонах — создайте заявку с фотографией. Не пытайтесь самостоятельно перекрывать общедомовые коммуникации.'),
-        ('welcome', 'Добро пожаловать в наш цифровой двор', 'Здесь можно сообщить о неисправности, поддержать идею соседей, проголосовать и посмотреть календарь. Полезные контакты находятся в профиле. Давайте сделаем заботу о доме привычным делом.'),
+        ('heating', 'Подготовка общедомовых систем к отопительному сезону', 'При осмотре общих помещений проверяются радиаторы, запорная арматура и состояние трубопроводов. Если вы заметили следы протечки, направьте заявку с указанием подъезда, этажа и фотографией.'),
+        ('meeting', 'Сбор предложений к повестке собрания жителей', 'Предлагается обсудить освещение двора, доступность входных групп и размещение велосипедов. Направляйте предложения через раздел инициатив. Подтверждённые дата и повестка публикуются отдельно.'),
+        ('waste', 'Порядок обращения с крупногабаритными отходами', 'Не оставляйте мебель и строительные материалы у входов и на лестничных площадках. Место и порядок вывоза необходимо уточнять у обслуживающей организации. Контакты доступны в профиле.'),
     ]
     for name, title, body in announcements:
         community_sql.append(insert('announcements', id=uid('announcement/'+name), house_id=house, author_user_id=chairman, title=title, body=body+'\n\nДемонстрационное объявление. Даты и работы не являются реальным уведомлением.', status='PUBLISHED', published_at=now, created_at=now))
     from datetime import datetime, timedelta
     base = datetime.fromisoformat(now)
-    polls = [('flowers','Что посадим у входа?', ['Лаванду и злаки','Неприхотливые многолетники','Пока оставим газон'],'OPEN',7), ('meeting','Когда удобнее собраться соседям?', ['В будни после 19:00','В субботу утром','Онлайн вечером'],'OPEN',10), ('benches','Какой цвет выберем для скамеек?', ['Тёплый орех','Графит','Зелёный'],'CLOSED',-1)]
+    polls = [('priority','Какое улучшение двора следует рассмотреть в первую очередь?', ['Дополнительное освещение','Ремонт пешеходных дорожек','Велосипедная парковка'],'OPEN',7), ('meeting','Какое время удобно для обсуждения вопросов дома?', ['Будний день после 19:00','Суббота с 11:00 до 13:00','Воскресенье после 16:00'],'OPEN',10), ('lighting','Поддерживаете установку датчиков движения в общих помещениях?', ['Поддерживаю после расчёта стоимости','Нужны дополнительные сведения','Не поддерживаю'],'CLOSED',-1)]
     for name, question, options, status, days in polls:
         poll_id = uid('poll/'+name)
         community_sql.append(insert('polls', id=poll_id, house_id=house, author_user_id=chairman, question=question+' · демо', status=status, ends_at=(base+timedelta(days=days)).isoformat(), created_at=now))
         for index, option in enumerate(options):
             community_sql.append(insert('poll_options', id=uid('option/'+name+'/'+str(index)), poll_id=poll_id, text=option, position=index))
         community_sql.append(insert('poll_votes', poll_id=poll_id, option_id=uid('option/'+name+'/0'), user_id=neighbor))
-    for name, title, body, status in [('books','Книжная полка для соседей','Предлагаем поставить в холле небольшой стеллаж: принёс книгу — взял другую. Начнём с одной полки и аккуратных правил обмена.','OPEN'),('bikes','Велосипедам — своё место','Предлагаем обсудить велопарковку во дворе, чтобы проходы оставались свободными. Сначала соберём пожелания и варианты размещения.','OPEN'),('plants','Зелёный уголок у входа','Соседи договорились о неприхотливых растениях и графике ухода. Сбор предложений завершён, идея переходит к обсуждению исполнения.','CLOSED')]:
+    for name, title, body, status in [('access','Проверка доступности входной группы','Предлагается обследовать пороги, поручни и возможность прохода с колясками. По результатам составить перечень работ и предварительную смету.','OPEN'),('bikes','Организация велосипедной парковки','Предлагается согласовать место велопарковки, не перекрывающее проходы и подъезд спецтехники. До принятия решения необходимо оценить спрос и стоимость.','OPEN'),('lighting','Обследование наружного освещения','Сбор предложений завершён. Для демонстрации показан этап подготовки перечня неисправных светильников и обращения в обслуживающую организацию.','CLOSED')]:
         initiative_id = uid('initiative/'+name)
         community_sql.append(insert('initiatives', id=initiative_id, house_id=house, author_user_id=author, title=title, description=body+'\n\nДемонстрационная инициатива; поддержка показана для примера.', status=status, supports_count=1, created_at=now, updated_at=now))
         community_sql.append(insert('initiative_supports', initiative_id=initiative_id, user_id=neighbor))
-    for index, (title, body, day) in enumerate([('Час заботы о дворе','Лёгкая уборка и идеи для клумб. Сбор у первого подъезда.',1),('Встреча соседей','Обсудим освещение, велопарковку и книжный обмен.',3),('Проверка освещения','Демонстрационный обход общих зон: лестницы, вход и двор.',6)]):
+    for index, (title, body, day) in enumerate([('Осмотр общедомовых систем отопления','Пример планового осмотра радиаторов и трубопроводов в общих помещениях.',1),('Обсуждение предложений по благоустройству','Пример встречи по вопросам освещения, доступности входов и велопарковки.',3),('Проверка освещения общих помещений','Пример обхода лестничных площадок, входных групп и дворовых светильников.',6)]):
         start = (base + timedelta(days=day)).replace(hour=15, minute=0, second=0, microsecond=0)
         community_sql.append(insert('calendar_events', id=uid('calendar/'+str(index)), house_id=house, created_by=chairman, title=title, description=body+'\n\nДемонстрационное событие. Реальная встреча не назначена.', starts_at=start.isoformat(), ends_at=(start+timedelta(hours=1)).isoformat(), created_at=now))
     for index, (category, title) in enumerate([('MANAGEMENT_COMPANY','Управляющая организация'),('EMERGENCY_DISPATCH','Диспетчерская дома'),('ELEVATOR','Обслуживание лифтов'),('WASTE','Вывоз отходов')]):

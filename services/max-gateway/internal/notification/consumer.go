@@ -106,6 +106,12 @@ func (c *Consumer) process(ctx context.Context, m redis.XMessage) {
 		c.deadLetter(ctx, m, "invalid_envelope", raw)
 		return
 	}
+	if quietEvent(e.Type) {
+		// Routine events remain available to other consumers, but are not chat notifications.
+		// A failed ACK stays pending and is reclaimed normally, without contacting MAX.
+		c.Redis.XAck(ctx, c.Stream, c.Group, m.ID)
+		return
+	}
 	text := ""
 	switch e.Type {
 	case "issue.created":

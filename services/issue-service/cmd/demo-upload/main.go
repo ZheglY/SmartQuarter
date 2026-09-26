@@ -49,7 +49,7 @@ func run() error {
 	cfg.ResponseChecksumValidation = aws.ResponseChecksumValidationWhenRequired
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) { o.BaseEndpoint = aws.String(os.Getenv("S3_ENDPOINT")); o.UsePathStyle = true })
 	rows := []map[string]any{}
-	for _, name := range []string{"uninvited-neighbor.png", "lobby-regatta.png", "bench-inspection.png"} {
+	for _, name := range []string{"radiator-leak.png", "stair-light.png", "damaged-bench.png"} {
 		data, err := os.ReadFile(filepath.Join(*dir, name))
 		if err != nil {
 			return err
