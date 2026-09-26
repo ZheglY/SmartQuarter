@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Newspaper, Vote, CalendarDays, Lightbulb, ChevronRight } from 'lucide-react';
 import { houseApi } from '../shared/api/house';
 import { useHouseQuery } from '../features/session/houseWorkflow';
 import { Link } from 'react-router-dom';
@@ -57,7 +58,7 @@ export function ProfilePage({ embedded = false }: { embedded?: boolean }) {
       </section>
       <section className="issue-block">
         <Link className="management-link" to="/houses">
-          Дома, заявки и управление →
+          {canManage(user) ? 'Дома, заявки и управление →' : 'Мои дома и заявки →'}
         </Link>
         <Link className="management-link" to="/notifications/settings">
           Настройки уведомлений →
@@ -123,24 +124,59 @@ export function ProfilePage({ embedded = false }: { embedded?: boolean }) {
   );
 }
 export function CommunityPage() {
+  const manager = canManage(useUser());
+  const sections = [
+    {
+      title: 'Объявления дома',
+      path: '/news',
+      icon: Newspaper,
+      description: manager
+        ? 'Публикуйте важные новости для жильцов'
+        : 'Новости от вашего председателя',
+    },
+    {
+      title: 'Опросы',
+      path: '/community/polls',
+      icon: Vote,
+      description: manager
+        ? 'Создавайте опросы и смотрите результаты'
+        : 'Голосуйте и смотрите результаты',
+    },
+    {
+      title: 'Календарь',
+      path: '/community/calendar',
+      icon: CalendarDays,
+      description: manager
+        ? 'Планируйте собрания и работы по дому'
+        : 'Собрания, работы и события дома',
+    },
+    {
+      title: 'Инициативы',
+      path: '/community/initiatives',
+      icon: Lightbulb,
+      description: 'Предлагайте идеи и поддерживайте соседей',
+    },
+  ];
   return (
     <>
       <PageHeader title="Сообщество" />
       <main className="page-content">
-        <h2>Вместе — лучше</h2>
-        <p className="intro">Следите за жизнью дома и участвуйте в решении общих проблем.</p>
-        <Link className="news-card" to="/news">
-          <h3>Объявления дома →</h3>
-          <p>Новости от вашего председателя</p>
-        </Link>
-        {[
-          ['Опросы', 'polls', 'Голосуйте и смотрите результаты'],
-          ['Календарь', 'calendar', 'Собрания, работы и события дома'],
-          ['Инициативы', 'initiatives', 'Предлагайте идеи и поддерживайте соседей'],
-        ].map(([title, path, description]) => (
-          <Link className="news-card" key={title} to={'/community/' + path}>
-            <h3>{title}</h3>
-            <p>{description} →</p>
+        <h2>{manager ? 'Жизнь дома под вашим управлением' : 'Вместе — лучше'}</h2>
+        <p className="intro">
+          {manager
+            ? 'Делитесь новостями, собирайте мнения и планируйте события.'
+            : 'Следите за жизнью дома и участвуйте в решении общих проблем.'}
+        </p>
+        {sections.map(({ title, path, description, icon: Icon }) => (
+          <Link className="community-link" key={path} to={path}>
+            <span className="community-icon">
+              <Icon size={24} aria-hidden />
+            </span>
+            <div>
+              <h3>{title}</h3>
+              <p>{description}</p>
+            </div>
+            <ChevronRight size={18} aria-hidden />
           </Link>
         ))}
       </main>

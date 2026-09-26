@@ -41,11 +41,50 @@ export function launchHouseRoute(raw: string) {
     register_house: '/houses/register',
     my_requests: '/join-requests',
     settings: '/notifications/settings',
+    contacts: '/service-contacts',
+    join_review: '/chairman/join-requests',
+    transfer: '/chairman/transfer',
+    poll: '/community/polls',
+    initiative: '/community/initiatives',
+    calendar: '/community/calendar',
+    announcement: '/news',
   };
   if (routes[p]) return routes[p];
   if (/^invite_[A-Za-z0-9_-]{43}$/.test(p))
     return '/invitations/redeem?token=' + encodeURIComponent(p.slice(7));
   return null;
+}
+
+export function launchTarget(raw: string): { path: string; houseId?: string } | null {
+  const p = new URLSearchParams(raw).get('start_param') || '';
+  const [kind, id, houseId, day, ...extra] = p.split('_');
+  if (
+    !['issue', 'poll', 'initiative', 'announcement', 'calendar'].includes(kind) ||
+    !validID(id || '') ||
+    (houseId && !validID(houseId)) ||
+    extra.length
+  )
+    return null;
+  if (day && (kind !== 'calendar' || !/^\d{10}$/.test(day))) return null;
+  let path =
+    kind === 'issue'
+      ? '/issues/' + id
+      : kind === 'poll'
+        ? '/community/polls/' + id
+        : kind === 'announcement'
+          ? '/news?focus=' + id
+          : '/community/' + (kind === 'initiative' ? 'initiatives' : 'calendar') + '?focus=' + id;
+  if (day) {
+    const date = new Date(Number(day) * 1000);
+    path +=
+      '&date=' +
+      date.getFullYear() +
+      '-' +
+      String(date.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(date.getDate()).padStart(2, '0');
+  }
+  return { path, houseId };
 }
 export function bindBack(fn: () => void, visible: boolean) {
   const b = bridge()?.BackButton;

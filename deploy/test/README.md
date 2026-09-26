@@ -21,4 +21,10 @@ events and actual Identity outbox publication. The fixed administrator UUID in t
 Compose is test-only. Run against a fresh stack; Issue tests assert exact fixture counts.
 
 On low-memory machines build each service sequentially (identity-service,
-issue-service, issue-migrate, community-service, test).
+issue-service, issue-migrate, community-service, minio, storage-init, test).
+
+The S3 test server and client are built from the official MinIO sources because
+the historical Quay images no longer pull anonymously. `storage/Dockerfile` pins
+the source commits for MinIO `RELEASE.2025-09-07T16-13-09Z` and mc
+`RELEASE.2025-08-13T08-35-41Z`; the binaries and upstream licenses are copied into
+the runtime images. The production stack continues to use the configured external S3.

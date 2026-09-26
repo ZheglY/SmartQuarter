@@ -216,6 +216,8 @@ test('notification preferences persist and remain accessible without membership'
 }) => {
   await setup(page, 'NONE');
   await page.goto('/notifications/settings');
+  await expect(page.getByRole('checkbox', { name: 'Сообщения от бота в MAX' })).toBeVisible();
+  await expect(page.getByText('Доставка через MAX-бота')).toHaveCount(0);
   await page.getByRole('checkbox', { name: 'Объявления и события дома' }).uncheck();
   await page.getByRole('button', { name: 'Сохранить настройки' }).click();
   await expect(page.getByRole('status')).toHaveText('Настройки сохранены.');

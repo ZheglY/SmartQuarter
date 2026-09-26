@@ -30,12 +30,12 @@ func eventText(kind string) string {
 		"house.registration.cancelled": "Заявка на регистрацию дома отменена.",
 		"house.created":                "Дом зарегистрирован.", "house.chairman.assigned": "Вам назначена роль председателя.",
 		"house.join.created":  "Получена заявка на вступление в дом. Откройте раздел управления заявками.",
-		"house.join.approved": "Ваша заявка на вступление одобрена. Выберите дом в приложении.", "house.join.rejected": "Ваша заявка на вступление отклонена.",
+		"house.join.approved": "🏡 Добро пожаловать домой! Ваша заявка на вступление одобрена.", "house.join.rejected": "Ваша заявка на вступление отклонена.",
 		"house.membership.created": "Участие в доме создано.", "house.membership.activated": "Ваш доступ к дому активирован.", "house.membership.deactivated": "Ваш доступ к дому приостановлен.", "house.membership.removed": "Ваше участие в доме удалено.",
 		"house.invite.created": "Приглашение в дом создано.", "house.invite.redeemed": "Приглашение принято. Дождитесь одобрения заявки.", "house.invite.revoked": "Приглашение отозвано.",
 		"house.chairman.transfer_requested": "Вам предложена роль председателя. Подтвердите или отклоните передачу в приложении.", "house.chairman.transfer_completed": "Роль председателя передана. Вы остались жителем дома.", "house.chairman.transfer_accepted": "Передача роли председателя подтверждена.", "house.chairman.transfer_rejected": "Предложение роли председателя отклонено.", "house.chairman.transfer_cancelled": "Предложение роли председателя отменено.",
-		"announcement.created": "В вашем доме опубликовано объявление.", "poll.created": "В вашем доме началось голосование.", "poll.voted": "Результаты голосования в вашем доме обновились.", "calendar.event_created": "В календаре вашего дома новое событие.", "initiative.created": "В вашем доме появилась новая инициатива.",
-		"service_contact.create": "В справочник служб дома добавлен контакт.", "service_contact.update": "Контакты служб дома обновлены.", "service_contact.archive": "Справочник служб дома обновлён.",
+		"announcement.created": "📣 Новость для соседей! В доме опубликовано объявление.", "poll.created": "🗳 Время решать вместе! В доме открыт новый опрос.", "poll.voted": "🗳 В опросе появился новый голос. Посмотрите результаты.", "calendar.event_created": "📅 Есть планы на дом! В календарь добавлено событие.", "initiative.created": "💡 У соседей новая идея! Посмотрите инициативу и поддержите её.",
+		"service_contact.create": "☎️ В справочнике дома появился новый полезный контакт.", "service_contact.update": "Контакты служб дома обновлены.", "service_contact.archive": "Справочник служб дома обновлён.",
 	}[kind]
 }
 func (c *Consumer) deliverRecipients(ctx context.Context, e Event, text string) error {
@@ -82,7 +82,8 @@ func (c *Consumer) deliverRecipients(ctx context.Context, e Event, text string) 
 			if err != nil || id <= 0 {
 				return errors.New("invalid MAX recipient")
 			}
-			if err = c.Bot.Send(ctx, id, text, true); err != nil {
+			label, payload := eventAction(e)
+			if err = c.Bot.SendAction(ctx, id, text, label, payload); err != nil {
 				return err
 			}
 			if err = c.Redis.Set(ctx, done, "1", 7*24*time.Hour).Err(); err != nil {

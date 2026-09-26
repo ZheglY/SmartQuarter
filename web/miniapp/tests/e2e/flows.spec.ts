@@ -135,7 +135,7 @@ test('resident creates issue through direct upload, complete and POST; ambiguous
   await expect(page).toHaveURL('/issues/' + ids.issue);
   expect(keys).toHaveLength(2);
   expect(keys[0]).toBe(keys[1]);
-  await expect(page.getByRole('button', { name: 'Вы автор проблемы' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Вы сообщили об этом' })).toBeDisabled();
   await expect(page.getByAltText('photo.png')).toBeVisible();
 });
 test('another resident confirms once and cannot open chairman UI', async ({ page }) => {

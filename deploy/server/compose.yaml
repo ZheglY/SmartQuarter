@@ -110,6 +110,7 @@ services:
     volumes:
       - ../../services/community-service/migrations/000001_init.up.sql:/migration.sql:ro
       - ../../services/community-service/migrations/000002_service_contacts.up.sql:/contacts.sql:ro
+      - ../../services/community-service/migrations/000003_community_integrity.up.sql:/community-integrity.sql:ro
     depends_on:
       community-db: {condition: service_healthy}
 

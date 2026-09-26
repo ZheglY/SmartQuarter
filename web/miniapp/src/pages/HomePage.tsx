@@ -43,9 +43,17 @@ export function HomePage() {
           </div>
         </Link>
         {canManage(user) && (
-          <Link className="management-link" to="/chairman">
-            Кабинет председателя <ChevronRight size={18} />
-          </Link>
+          <section className="chairman-panel" aria-label="Кабинет председателя">
+            <span className="role-eyebrow">Председатель</span>
+            <h2>Ваш дом под управлением</h2>
+            <p>Обращения, жители и события дома.</p>
+            <Link className="management-link" to="/chairman">
+              Кабинет председателя <ChevronRight size={18} />
+            </Link>
+            <Link className="management-link" to="/houses">
+              Жильцы и заявки <ChevronRight size={18} />
+            </Link>
+          </section>
         )}
         <div className="section-heading">
           <h2>Проблемы дома</h2>

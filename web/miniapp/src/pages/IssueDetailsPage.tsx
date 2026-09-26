@@ -54,6 +54,7 @@ export function IssueDetailsPage({ chairman = false }: { chairman?: boolean }) {
     },
   });
   const issue = q.data?.issue;
+  const [title, ...description] = (issue?.description || '').split(/\n\s*\n/);
   return (
     <>
       <PageHeader title="Проблема дома" back={chairman ? '/chairman' : '/issues'} />
@@ -70,7 +71,8 @@ export function IssueDetailsPage({ chairman = false }: { chairman?: boolean }) {
               <CategoryBadge category={issue.category} />
               <StatusBadge status={issue.status} />
             </div>
-            <h2 className="detail-title">{issue.description}</h2>
+            <h2 className="detail-title">{title}</h2>
+            {description.length > 0 && <p className="preserve-lines">{description.join('\n\n')}</p>}
             <p className="muted">
               {issue.house_address_snapshot}
               {issue.location_text && ' · ' + issue.location_text}
@@ -99,7 +101,7 @@ export function IssueDetailsPage({ chairman = false }: { chairman?: boolean }) {
                   : q.data.confirmed_by_me
                     ? 'Вы подтвердили проблему'
                     : issue.created_by === user.user.id
-                      ? 'Вы автор проблемы'
+                      ? 'Вы сообщили об этом'
                       : issue.status === 'RESOLVED'
                         ? 'Проблема решена'
                         : 'Подтвердить проблему'}

@@ -89,7 +89,7 @@ func (a *API) webhook(w http.ResponseWriter, r *http.Request) {
 			a.fail(w, r, 400, "INVALID_ARGUMENT", "invalid MAX user")
 			return
 		}
-		e = a.Bot.Menu(r.Context(), u.User.ID, "Умный Квартал: найдите свой дом, подайте заявку или зарегистрируйте новый.", u.Payload)
+		e = a.Bot.Menu(r.Context(), u.User.ID, "🏡 Добро пожаловать в Умный Квартал! Новости, заявки и идеи соседей — всё о вашем доме в одном месте.", u.Payload)
 	case "message_created":
 		if !u.Message.Sender.IsBot && u.Message.Sender.ID > 0 {
 			parts := strings.Fields(u.Message.Body.Text)
@@ -100,14 +100,14 @@ func (a *API) webhook(w http.ResponseWriter, r *http.Request) {
 			if len(parts) > 1 {
 				payload = parts[1]
 			}
-			text := "Используйте /start, /help или /settings либо выберите раздел приложения."
+			text := "🏡 Я помогу открыть ваш дом. Выберите кнопку ниже. Подсказки — /help."
 			switch command {
 			case "/start":
-				text = "Добро пожаловать в Умный Квартал. Выберите действие."
+				text = "🏡 Дом начинается с соседей. Откройте свой дом или найдите его по адресу."
 			case "/help":
-				text = "Найдите дом и подайте заявку председателю. Если дома ещё нет, зарегистрируйте его. Статусы доступны в разделе «Мои заявки»."
+				text = "👋 Найдите дом и подайте заявку председателю. После одобрения вы сможете сообщать о проблемах, голосовать и предлагать идеи."
 			case "/settings":
-				text = "Настройки доставки уведомлений доступны в Mini App."
+				text = "🔔 Решайте сами, какие новости получать. Настройки — по кнопке «Уведомления»."
 			}
 			e = a.Bot.Menu(r.Context(), u.Message.Sender.ID, text, payload)
 		}

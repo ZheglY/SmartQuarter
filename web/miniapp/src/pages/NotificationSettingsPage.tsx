@@ -9,10 +9,10 @@ import {
 import { ErrorState } from '../shared/ui/components';
 const labels: Record<keyof NotificationPreferences, string> = {
   notifications_enabled: 'Все уведомления',
-  issue_notifications_enabled: 'Мои проблемы и заявления',
+  issue_notifications_enabled: 'Статусы моих заявок и заявления',
   announcement_notifications_enabled: 'Объявления и события дома',
   membership_notifications_enabled: 'Заявки и доступ к дому',
-  bot_notifications_enabled: 'Доставка через MAX-бота',
+  bot_notifications_enabled: 'Сообщения от бота в MAX',
 };
 export function NotificationSettingsPage() {
   const q = useHouseQuery('preferences', (s) => houseApi.GetNotificationPreferences(s)),
@@ -20,7 +20,11 @@ export function NotificationSettingsPage() {
     action = useHouseAction(),
     value = draft || q.data;
   return (
-    <WorkflowFrame title="Уведомления">
+    <WorkflowFrame title="Уведомления" back="/profile">
+      <p className="intro">
+        Выберите, о чём бот будет писать вам в MAX. Новые голоса в опросах и подтверждения заявок не
+        отправляются отдельными сообщениями.
+      </p>
       <QueryState query={q} />
       {value && (
         <form

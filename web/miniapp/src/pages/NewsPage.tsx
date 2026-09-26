@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { NotificationFocus } from '../shared/ui/NotificationFocus';
 import { Link, useNavigate } from 'react-router-dom';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../features/session/SessionProvider';
@@ -20,6 +21,17 @@ export function NewsPage() {
     <>
       <PageHeader title="Новости дома" />
       <main className="page-content">
+        <NotificationFocus
+          ids={q.data?.pages.flatMap((p) => p.items.map((i) => i.id)) || []}
+          loaded={q.isSuccess && !q.isFetching}
+          next={
+            q.hasNextPage
+              ? () => {
+                  void q.fetchNextPage();
+                }
+              : undefined
+          }
+        />
         {canManage(user) && (
           <Link className="primary-btn full" to="/chairman/announcements/new">
             Создать объявление
@@ -39,7 +51,7 @@ export function NewsPage() {
             {q.data?.pages
               .flatMap((p) => p.items)
               .map((n) => (
-                <article className="news-card" key={n.id}>
+                <article className="news-card" key={n.id} id={'entry-' + n.id} tabIndex={-1}>
                   <small>{formatDate(n.published_at)}</small>
                   <h2>{n.title}</h2>
                   <p className="pre-wrap">{n.body}</p>

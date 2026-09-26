@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { NavLink, Routes, Route, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, TriangleAlert, Bell, Users, User } from 'lucide-react';
+import { Home, TriangleAlert, Newspaper, Users, User } from 'lucide-react';
 import { useSession } from '../features/session/SessionProvider';
 import { canManage, membership } from '../shared/utils/presentation';
 import { bindBack } from '../shared/max/bridge';
@@ -93,10 +93,10 @@ function Gate() {
         <PageHeader title="Нет доступа к дому" />
         <main className="page-content">
           <EmptyState title="Нужен доступ к дому">
-            Найдите дом и подайте заявку на вступление или зарегистрируйте новый.
+            Найдите свой дом и отправьте заявку на вступление председателю.
           </EmptyState>
           <Link className="primary-btn" to="/houses">
-            Найти или зарегистрировать дом
+            Найти свой дом
           </Link>
           <ProfilePage embedded />
         </main>
@@ -142,7 +142,7 @@ function Layout() {
             ? [
                 [Home, '/', 'Главная'],
                 [TriangleAlert, '/issues', 'Проблемы'],
-                [Bell, '/news', 'Новости'],
+                [Newspaper, '/news', 'Новости'],
                 [Users, '/community', 'Сообщество'],
                 [User, '/profile', 'Профиль'],
               ]

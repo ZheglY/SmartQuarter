@@ -30,7 +30,7 @@ func (c *Client) Menu(ctx context.Context, userID int64, text, payload string) e
 		return ErrDelivery
 	}
 	buttons := [][]any{}
-	for _, item := range [][2]string{{"Открыть Mini App", "houses"}, {"Найти дом", "find_house"}, {"Зарегистрировать дом", "register_house"}, {"Мои заявки", "my_requests"}, {"Настройки уведомлений", "settings"}} {
+	for _, item := range [][2]string{{"🏡 Мой дом", "houses"}, {"🔎 Найти дом", "find_house"}, {"📋 Мои заявки", "my_requests"}, {"🔔 Уведомления", "settings"}} {
 		buttons = append(buttons, []any{map[string]string{"type": "link", "text": item[0], "url": "https://max.ru/" + url.PathEscape(c.BotUsername) + "?startapp=" + item[1]}})
 	}
 	if strings.HasPrefix(payload, "invite_") && len(payload) == 50 {
@@ -48,12 +48,20 @@ func (c *Client) Menu(ctx context.Context, userID int64, text, payload string) e
 }
 
 func (c *Client) Send(ctx context.Context, userID int64, text string, button bool) error {
+	label := ""
+	if button {
+		label = "Открыть Умный Квартал"
+	}
+	return c.SendAction(ctx, userID, text, label, "")
+}
+
+func (c *Client) SendAction(ctx context.Context, userID int64, text, label, payload string) error {
 	if userID <= 0 || c.Token == "" {
 		return ErrDelivery
 	}
 	body := map[string]any{"text": text}
-	if button {
-		body["attachments"] = []any{map[string]any{"type": "inline_keyboard", "payload": map[string]any{"buttons": [][]any{{map[string]string{"type": "open_app", "text": "Открыть Умный Квартал", "web_app": c.BotUsername}}}}}}
+	if label != "" {
+		body["attachments"] = []any{map[string]any{"type": "inline_keyboard", "payload": map[string]any{"buttons": [][]any{{map[string]string{"type": "open_app", "text": label, "web_app": c.BotUsername, "payload": payload}}}}}}
 	}
 	return c.post(ctx, "/messages?user_id="+strconv.FormatInt(userID, 10), body, strconv.FormatInt(userID, 10))
 }
