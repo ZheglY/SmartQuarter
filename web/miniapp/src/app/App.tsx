@@ -29,6 +29,14 @@ import {
 } from '../pages/ChairmanPages';
 import { NotificationSettingsPage } from '../pages/NotificationSettingsPage';
 import { ServiceContactsPage } from '../pages/ServiceContactsPage';
+import { AdminPage } from '../pages/AdminPage';
+import {
+  PollsPage,
+  PollPage,
+  CreatePollPage,
+  CalendarPage,
+  InitiativesPage,
+} from '../pages/CommunityPages';
 function Gate() {
   const s = useSession();
   const { pathname } = useLocation();
@@ -75,6 +83,7 @@ function Gate() {
         '/invitations/redeem',
         '/notifications/settings',
         '/admin/house-registrations',
+        '/admin',
         '/chairman/transfer',
       ].includes(pathname)
     )
@@ -110,42 +119,54 @@ function Manager() {
   );
 }
 function Layout() {
+  const session = useSession();
+  const hasHouse = session.context && membership(session.context);
   const location = useLocation(),
     navigate = useNavigate();
   useEffect(() => {
     window.scrollTo(0, 0);
     return bindBack(() => {
-      if (location.key !== 'default') navigate(-1);
+      if (typeof window.history.state?.idx === 'number' && window.history.state.idx > 0)
+        navigate(-1);
       else navigate('/');
     }, location.pathname !== '/');
   }, [location.pathname, location.key, navigate]);
   return (
     <>
-      <div key={useSession().context?.active_house_id}>
+      <div key={session.context?.active_house_id}>
         <Outlet />
       </div>
-      <nav className="bottom-nav" aria-label="Основная навигация">
-        {[
-          [Home, '/', 'Главная'],
-          [TriangleAlert, '/issues', 'Проблемы'],
-          [Bell, '/news', 'Новости'],
-          [Users, '/community', 'Сообщество'],
-          [User, '/profile', 'Профиль'],
-        ].map(([Icon, path, label]) => {
-          const Component = Icon as typeof Home;
-          return (
-            <NavLink
-              key={String(path)}
-              to={String(path)}
-              end={path === '/'}
-              className={({ isActive }) => (isActive ? 'active' : '')}
-            >
-              <Component aria-hidden />
-              <span>{String(label)}</span>
-            </NavLink>
-          );
-        })}
-      </nav>
+      {session.context && (
+        <nav className="bottom-nav" aria-label="Основная навигация">
+          {(hasHouse
+            ? [
+                [Home, '/', 'Главная'],
+                [TriangleAlert, '/issues', 'Проблемы'],
+                [Bell, '/news', 'Новости'],
+                [Users, '/community', 'Сообщество'],
+                [User, '/profile', 'Профиль'],
+              ]
+            : [
+                [Home, '/houses', 'Дома'],
+                [Users, '/join-requests', 'Заявки'],
+                [User, '/profile', 'Профиль'],
+              ]
+          ).map(([Icon, path, label]) => {
+            const Component = Icon as typeof Home;
+            return (
+              <NavLink
+                key={String(path)}
+                to={String(path)}
+                end={path === '/'}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                <Component aria-hidden />
+                <span>{String(label)}</span>
+              </NavLink>
+            );
+          })}
+        </nav>
+      )}
     </>
   );
 }
@@ -154,8 +175,8 @@ export function App() {
   return (
     <div className="app">
       <Routes>
-        <Route element={<Gate />}>
-          <Route element={<Layout />}>
+        <Route element={<Layout />}>
+          <Route element={<Gate />}>
             <Route
               path="/"
               element={context && membership(context) ? <HomePage /> : <HousesPage />}
@@ -177,7 +198,13 @@ export function App() {
             <Route path="/news" element={<NewsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/community" element={<CommunityPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/community/polls" element={<PollsPage />} />
+            <Route path="/community/polls/:id" element={<PollPage />} />
+            <Route path="/community/calendar" element={<CalendarPage />} />
+            <Route path="/community/initiatives" element={<InitiativesPage />} />
             <Route element={<Manager />}>
+              <Route path="/community/polls/new" element={<CreatePollPage />} />
               <Route path="/chairman/join-requests" element={<ReviewJoinRequestsPage />} />
               <Route path="/chairman/invitations" element={<InvitationsPage />} />
               <Route path="/chairman/members" element={<MembersPage />} />

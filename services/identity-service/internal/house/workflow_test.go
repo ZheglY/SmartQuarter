@@ -74,6 +74,11 @@ func TestPostgresHouseWorkflow(t *testing.T) {
 			t.Fatalf("%s: got %v want %v", op, e, want)
 		}
 	}
+	deny(resident, "", "CreateHouseRegistration", house.Command{Name: "Denied", City: "Test", Address: "1"}, codes.PermissionDenied)
+	deny(resident, "", "GrantChairmanPermission", house.Command{UserID: resident}, codes.PermissionDenied)
+	for _, u := range []string{chair, resident, third, foreign} {
+		call(admin, "", "GrantChairmanPermission", house.Command{UserID: u})
+	}
 	reg := call(chair, "", "CreateHouseRegistration", house.Command{Name: "Test house", City: "Москва", Address: "Ёлочная, " + uuid.NewString()})
 	id := reg["id"].(string)
 	deny(chair, "", "ApproveHouseRegistration", house.Command{ID: id}, codes.PermissionDenied)

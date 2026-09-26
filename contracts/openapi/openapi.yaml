@@ -1,9 +1,11 @@
 "openapi": "3.1.0"
 "info":
   "title": "SmartQuarter max-gateway"
-  "version": "1.1.0"
+  "version": "1.2.0"
   "description": "Gateway API with real Identity, Issue and Community services. Session actor and active house are server-owned. House registration requires explicit platform administrator approval. Stable HTTP errors map gRPC status codes."
 "servers":
+  -
+    "url": "https://maxhack.ru"
   -
     "url": "http://localhost:18080"
 "security":
@@ -1446,11 +1448,457 @@
             "text/plain":
               "schema":
                 "type": "string"
+  "/api/v1/admin/users":
+    "get":
+      "summary": "ListPlatformUsers"
+      "operationId": "get__api_v1_admin_users"
+      "description": "Required role: Explicit platform administrator allowlist. gRPC: Identity.HouseService.ListPlatformUsers.  List responses are bounded to 100 records (members: 500). Mutation requests require a JSON object, including {} for commands without fields."
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/PlatformUserList"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "query"
+          "in": "query"
+          "required": true
+          "schema":
+            "type": "string"
+            "maxLength": 255
+  "/api/v1/admin/users/{user_id}/chairman":
+    "post":
+      "summary": "GrantChairmanPermission"
+      "operationId": "post__api_v1_admin_users_user_id_chairman"
+      "description": "Required role: Explicit platform administrator allowlist. gRPC: Identity.HouseService.GrantChairmanPermission.  List responses are bounded to 100 records (members: 500). Mutation requests require a JSON object, including {} for commands without fields."
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/PlatformUser"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "user_id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "additionalProperties": false
+              "properties": {}
+              "required": []
+    "delete":
+      "summary": "RevokeChairmanPermission"
+      "operationId": "delete__api_v1_admin_users_user_id_chairman"
+      "description": "Required role: Explicit platform administrator allowlist. gRPC: Identity.HouseService.RevokeChairmanPermission.  List responses are bounded to 100 records (members: 500). Mutation requests require a JSON object, including {} for commands without fields."
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/PlatformUser"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "user_id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "additionalProperties": false
+              "properties": {}
+              "required": []
+  "/api/v1/admin/houses":
+    "get":
+      "summary": "ListAdminHouses"
+      "operationId": "get__api_v1_admin_houses"
+      "description": "Required role: Explicit platform administrator allowlist. gRPC: Identity.HouseService.ListAdminHouses.  List responses are bounded to 100 records (members: 500). Mutation requests require a JSON object, including {} for commands without fields."
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/AdminHouseList"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "query"
+          "in": "query"
+          "required": true
+          "schema":
+            "type": "string"
+            "maxLength": 255
+  "/api/v1/admin/houses/{house_id}/chairman":
+    "put":
+      "summary": "AssignHouseChairman"
+      "operationId": "put__api_v1_admin_houses_house_id_chairman"
+      "description": "Required role: Explicit platform administrator allowlist. gRPC: Identity.HouseService.AssignHouseChairman.  List responses are bounded to 100 records (members: 500). Mutation requests require a JSON object, including {} for commands without fields."
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/AdminHouse"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "house_id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "additionalProperties": false
+              "properties":
+                "target_user_id":
+                  "type": "string"
+                  "format": "uuid"
+              "required":
+                - "target_user_id"
+    "delete":
+      "summary": "RemoveHouseChairman"
+      "operationId": "delete__api_v1_admin_houses_house_id_chairman"
+      "description": "Required role: Explicit platform administrator allowlist. gRPC: Identity.HouseService.RemoveHouseChairman.  List responses are bounded to 100 records (members: 500). Mutation requests require a JSON object, including {} for commands without fields."
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/AdminHouse"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "house_id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "additionalProperties": false
+              "properties": {}
+              "required": []
   "/api/v1/house-registrations":
     "post":
       "summary": "CreateHouseRegistration"
       "operationId": "post__api_v1_house-registrations"
-      "description": "Required role: Authenticated user, including without membership. gRPC: Identity.HouseService.CreateHouseRegistration.  List responses are bounded to 100 records (members: 500). Mutation requests require a JSON object, including {} for commands without fields."
+      "description": "Required role: Administrator-approved chairman or platform administrator. gRPC: Identity.HouseService.CreateHouseRegistration.  List responses are bounded to 100 records (members: 500). Mutation requests require a JSON object, including {} for commands without fields."
       "responses":
         "202":
           "description": "Success"
@@ -4028,6 +4476,1062 @@
           "application/json":
             "schema":
               "$ref": "#/components/schemas/Empty"
+  "/api/v1/polls":
+    "get":
+      "summary": "ListPolls"
+      "operationId": "get__api_v1_polls"
+      "description": "Required role: Current ACTIVE member. gRPC: Community.ListPolls. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/PollList"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "page_size"
+          "in": "query"
+          "schema":
+            "type": "integer"
+            "default": 20
+            "minimum": 1
+            "maximum": 100
+        -
+          "name": "page_token"
+          "in": "query"
+          "schema":
+            "type": "string"
+          "description": "Opaque token; empty next_page_token means end."
+        -
+          "name": "status"
+          "in": "query"
+          "schema":
+            "type": "string"
+            "enum":
+              - "OPEN"
+              - "CLOSED"
+    "post":
+      "summary": "CreatePoll"
+      "operationId": "post__api_v1_polls"
+      "description": "Required role: Current ACTIVE CHAIRMAN or house ADMIN. gRPC: Community.CreatePoll. "
+      "responses":
+        "201":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/Poll"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/CreatePoll"
+  "/api/v1/polls/{id}":
+    "get":
+      "summary": "GetPoll"
+      "operationId": "get__api_v1_polls_id"
+      "description": "Required role: Current ACTIVE member. gRPC: Community.GetPoll. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/PollDetails"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+  "/api/v1/polls/{id}/close":
+    "post":
+      "summary": "ClosePoll"
+      "operationId": "post__api_v1_polls_id_close"
+      "description": "Required role: Current ACTIVE CHAIRMAN or house ADMIN. gRPC: Community.ClosePoll. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/PollDetails"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/Empty"
+  "/api/v1/calendar":
+    "get":
+      "summary": "ListCalendarEvents"
+      "operationId": "get__api_v1_calendar"
+      "description": "Required role: Current ACTIVE member. gRPC: Community.ListCalendarEvents. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/CalendarList"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "from"
+          "in": "query"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "date-time"
+          "description": "Inclusive start / exclusive end; events overlapping interval, up to 366 days."
+        -
+          "name": "to"
+          "in": "query"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "date-time"
+          "description": "Inclusive start / exclusive end; events overlapping interval, up to 366 days."
+    "post":
+      "summary": "CreateCalendarEvent"
+      "operationId": "post__api_v1_calendar"
+      "description": "Required role: Current ACTIVE CHAIRMAN or house ADMIN. gRPC: Community.CreateCalendarEvent. "
+      "responses":
+        "201":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/CalendarEvent"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/CalendarInput"
+  "/api/v1/calendar/{id}":
+    "patch":
+      "summary": "UpdateCalendarEvent"
+      "operationId": "patch__api_v1_calendar_id"
+      "description": "Required role: Current ACTIVE CHAIRMAN or house ADMIN. gRPC: Community.UpdateCalendarEvent. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/CalendarEvent"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/CalendarInput"
+    "delete":
+      "summary": "Delete calendar event"
+      "operationId": "delete__api_v1_calendar_id"
+      "description": "Required role: Current ACTIVE CHAIRMAN or house ADMIN. gRPC: Community.DeleteCalendarEvent. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "additionalProperties": false
+                "properties":
+                  "id":
+                    "type": "string"
+                    "format": "uuid"
+                "required":
+                  - "id"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/Empty"
+  "/api/v1/initiatives":
+    "get":
+      "summary": "ListInitiatives"
+      "operationId": "get__api_v1_initiatives"
+      "description": "Required role: Current ACTIVE member. gRPC: Community.ListInitiatives. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/InitiativeList"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "page_size"
+          "in": "query"
+          "schema":
+            "type": "integer"
+            "default": 20
+            "minimum": 1
+            "maximum": 100
+        -
+          "name": "page_token"
+          "in": "query"
+          "schema":
+            "type": "string"
+          "description": "Opaque token; empty next_page_token means end."
+    "post":
+      "summary": "CreateInitiative"
+      "operationId": "post__api_v1_initiatives"
+      "description": "Required role: Current ACTIVE member. gRPC: Community.CreateInitiative. "
+      "responses":
+        "201":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/Initiative"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/InitiativeInput"
+  "/api/v1/initiatives/{id}/close":
+    "post":
+      "summary": "CloseInitiative"
+      "operationId": "post__api_v1_initiatives_id_close"
+      "description": "Required role: Current ACTIVE CHAIRMAN or house ADMIN. gRPC: Community.CloseInitiative. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "$ref": "#/components/schemas/Initiative"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/Empty"
+  "/api/v1/polls/{id}/vote":
+    "post":
+      "summary": "Vote once for an open poll"
+      "operationId": "post__api_v1_polls_id_vote"
+      "description": "Required role: ACTIVE member. gRPC: Community.VotePoll. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "additionalProperties": false
+                "properties":
+                  "poll_id":
+                    "type": "string"
+                    "format": "uuid"
+                  "option_id":
+                    "type": "string"
+                    "format": "uuid"
+                  "total_votes":
+                    "type": "integer"
+                    "minimum": 0
+                  "my_option_id":
+                    "type": "string"
+                    "format": "uuid"
+                "required":
+                  - "poll_id"
+                  - "option_id"
+                  - "total_votes"
+                  - "my_option_id"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "additionalProperties": false
+              "properties":
+                "option_id":
+                  "type": "string"
+                  "format": "uuid"
+              "required":
+                - "option_id"
+  "/api/v1/initiatives/{id}/support":
+    "post":
+      "summary": "Support an open initiative once"
+      "operationId": "post__api_v1_initiatives_id_support"
+      "description": "Required role: ACTIVE member. gRPC: Community.SupportInitiative. "
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "additionalProperties": false
+                "properties":
+                  "initiative_id":
+                    "type": "string"
+                    "format": "uuid"
+                  "supports_count":
+                    "type": "integer"
+                    "minimum": 0
+                  "supported_by_me":
+                    "type": "boolean"
+                "required":
+                  - "initiative_id"
+                  - "supports_count"
+                  - "supported_by_me"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "id"
+          "in": "path"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uuid"
+        -
+          "name": "Origin"
+          "in": "header"
+          "required": true
+          "schema":
+            "type": "string"
+            "format": "uri"
+          "description": "Exact origin from TRUSTED_ORIGINS. Missing or foreign Origin is rejected (CSRF protection)."
+        -
+          "name": "Idempotency-Key"
+          "in": "header"
+          "schema":
+            "type": "string"
+            "format": "uuid"
+          "description": "Optional. Scope: user + active house. Key binds method, path and compact JSON bytes (key order significant). Same request replays success for 24h; changed payload 409 IDEMPOTENCY_KEY_REUSED; concurrent/ambiguous outcome 409 IDEMPOTENCY_IN_PROGRESS. Reconcile before creating a new key; no exactly-once guarantee."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "$ref": "#/components/schemas/Empty"
+  "/api/v1/health":
+    "get":
+      "summary": "Application dependency readiness"
+      "operationId": "get__api_v1_health"
+      "description": ""
+      "responses":
+        "200":
+          "description": "Success"
+          "headers":
+            "X-Request-Id":
+              "schema":
+                "type": "string"
+                "format": "uuid"
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "additionalProperties": false
+                "properties":
+                  "status":
+                    "type": "string"
+                    "enum":
+                      - "ready"
+                "required":
+                  - "status"
+        "400":
+          "$ref": "#/components/responses/Error400"
+        "401":
+          "$ref": "#/components/responses/Error401"
+        "403":
+          "$ref": "#/components/responses/Error403"
+        "404":
+          "$ref": "#/components/responses/Error404"
+        "409":
+          "$ref": "#/components/responses/Error409"
+        "413":
+          "$ref": "#/components/responses/Error413"
+        "415":
+          "$ref": "#/components/responses/Error415"
+        "429":
+          "$ref": "#/components/responses/Error429"
+        "500":
+          "$ref": "#/components/responses/Error500"
+        "502":
+          "$ref": "#/components/responses/Error502"
+        "503":
+          "$ref": "#/components/responses/Error503"
+        "504":
+          "$ref": "#/components/responses/Error504"
+        "408":
+          "$ref": "#/components/responses/Error408"
+      "parameters":
+        -
+          "name": "X-Request-Id"
+          "in": "header"
+          "required": false
+          "schema":
+            "type": "string"
+            "format": "uuid"
+      "security": []
 "components":
   "securitySchemes":
     "SessionAuth":
@@ -4624,6 +6128,74 @@
         - "JOIN_REQUEST_SOURCE_SEARCH"
         - "JOIN_REQUEST_SOURCE_INVITE"
         - "JOIN_REQUEST_SOURCE_ADMIN"
+    "PlatformUser":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "id":
+          "type": "string"
+          "format": "uuid"
+        "display_name":
+          "type": "string"
+        "max_user_id":
+          "type": "string"
+          "pattern": "^[0-9]+$"
+        "can_register_house":
+          "type": "boolean"
+        "managed_houses":
+          "type": "integer"
+          "format": "int32"
+      "required":
+        - "id"
+        - "display_name"
+        - "max_user_id"
+        - "can_register_house"
+        - "managed_houses"
+    "PlatformUserList":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "items":
+          "type": "array"
+          "items":
+            "$ref": "#/components/schemas/PlatformUser"
+      "required":
+        - "items"
+    "AdminHouse":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "id":
+          "type": "string"
+          "format": "uuid"
+        "name":
+          "type": "string"
+        "address":
+          "type": "string"
+        "city":
+          "type": "string"
+        "chairman_user_id":
+          "type": "string"
+          "description": "Chairman UUID or empty when vacant"
+        "chairman_display_name":
+          "type": "string"
+      "required":
+        - "id"
+        - "name"
+        - "address"
+        - "city"
+        - "chairman_user_id"
+        - "chairman_display_name"
+    "AdminHouseList":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "items":
+          "type": "array"
+          "items":
+            "$ref": "#/components/schemas/AdminHouse"
+      "required":
+        - "items"
     "HouseRegistration":
       "type": "object"
       "additionalProperties": false
@@ -4859,12 +6431,15 @@
           "format": "int32"
         "can_manage_active_house":
           "type": "boolean"
+        "can_register_house":
+          "type": "boolean"
       "required":
         - "platform_admin"
         - "pending_registrations"
         - "pending_join_requests"
         - "incoming_join_requests"
         - "can_manage_active_house"
+        - "can_register_house"
     "NotificationPreferences":
       "type": "object"
       "additionalProperties": false
@@ -5087,6 +6662,275 @@
             "$ref": "#/components/schemas/ServiceContact"
       "required":
         - "items"
+    "PollOption":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "id":
+          "type": "string"
+          "format": "uuid"
+        "text":
+          "type": "string"
+        "position":
+          "type": "integer"
+          "minimum": 0
+      "required":
+        - "id"
+        - "text"
+        - "position"
+    "Poll":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "id":
+          "type": "string"
+          "format": "uuid"
+        "house_id":
+          "type": "string"
+          "format": "uuid"
+        "author_user_id":
+          "type": "string"
+          "format": "uuid"
+        "question":
+          "type": "string"
+        "status":
+          "type": "string"
+          "enum":
+            - "POLL_STATUS_OPEN"
+            - "POLL_STATUS_CLOSED"
+        "options":
+          "type": "array"
+          "items":
+            "$ref": "#/components/schemas/PollOption"
+        "ends_at":
+          "type": "string"
+          "format": "date-time"
+        "created_at":
+          "type": "string"
+          "format": "date-time"
+      "required":
+        - "id"
+        - "house_id"
+        - "author_user_id"
+        - "question"
+        - "status"
+        - "options"
+        - "ends_at"
+        - "created_at"
+    "PollDetails":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "poll":
+          "$ref": "#/components/schemas/Poll"
+        "results":
+          "type": "array"
+          "items":
+            "type": "object"
+            "additionalProperties": false
+            "properties":
+              "option_id":
+                "type": "string"
+                "format": "uuid"
+              "votes_count":
+                "type": "integer"
+                "minimum": 0
+            "required":
+              - "option_id"
+              - "votes_count"
+        "total_votes":
+          "type": "integer"
+          "minimum": 0
+        "my_option_id":
+          "type": "string"
+      "required":
+        - "poll"
+        - "results"
+        - "total_votes"
+        - "my_option_id"
+    "PollList":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "items":
+          "type": "array"
+          "items":
+            "$ref": "#/components/schemas/Poll"
+        "next_page_token":
+          "type": "string"
+      "required":
+        - "items"
+        - "next_page_token"
+    "CreatePoll":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "question":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 500
+        "options":
+          "type": "array"
+          "items":
+            "type": "string"
+            "minLength": 1
+            "maxLength": 200
+          "minItems": 2
+          "maxItems": 10
+          "uniqueItems": true
+        "ends_at":
+          "type": "string"
+          "format": "date-time"
+      "required":
+        - "question"
+        - "options"
+        - "ends_at"
+    "CalendarInput":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "title":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 200
+        "description":
+          "type": "string"
+          "maxLength": 5000
+        "starts_at":
+          "type": "string"
+          "format": "date-time"
+        "ends_at":
+          "type": "string"
+          "format": "date-time"
+      "required":
+        - "title"
+        - "description"
+        - "starts_at"
+        - "ends_at"
+    "CalendarEvent":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "title":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 200
+        "description":
+          "type": "string"
+          "maxLength": 5000
+        "starts_at":
+          "type": "string"
+          "format": "date-time"
+        "ends_at":
+          "type": "string"
+          "format": "date-time"
+        "id":
+          "type": "string"
+          "format": "uuid"
+        "house_id":
+          "type": "string"
+          "format": "uuid"
+        "created_by":
+          "type": "string"
+          "format": "uuid"
+        "created_at":
+          "type": "string"
+          "format": "date-time"
+      "required":
+        - "title"
+        - "description"
+        - "starts_at"
+        - "ends_at"
+        - "id"
+        - "house_id"
+        - "created_by"
+        - "created_at"
+    "CalendarList":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "items":
+          "type": "array"
+          "items":
+            "$ref": "#/components/schemas/CalendarEvent"
+      "required":
+        - "items"
+    "InitiativeInput":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "title":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 200
+        "description":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 5000
+      "required":
+        - "title"
+        - "description"
+    "Initiative":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "title":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 200
+        "description":
+          "type": "string"
+          "minLength": 1
+          "maxLength": 5000
+        "id":
+          "type": "string"
+          "format": "uuid"
+        "house_id":
+          "type": "string"
+          "format": "uuid"
+        "author_user_id":
+          "type": "string"
+          "format": "uuid"
+        "status":
+          "type": "string"
+          "enum":
+            - "INITIATIVE_STATUS_OPEN"
+            - "INITIATIVE_STATUS_CLOSED"
+        "supports_count":
+          "type": "integer"
+          "minimum": 0
+        "supported_by_me":
+          "type": "boolean"
+        "created_at":
+          "type": "string"
+          "format": "date-time"
+        "updated_at":
+          "type": "string"
+          "format": "date-time"
+      "required":
+        - "title"
+        - "description"
+        - "id"
+        - "house_id"
+        - "author_user_id"
+        - "status"
+        - "supports_count"
+        - "supported_by_me"
+        - "created_at"
+        - "updated_at"
+    "InitiativeList":
+      "type": "object"
+      "additionalProperties": false
+      "properties":
+        "items":
+          "type": "array"
+          "items":
+            "$ref": "#/components/schemas/Initiative"
+        "next_page_token":
+          "type": "string"
+      "required":
+        - "items"
+        - "next_page_token"
   "responses":
     "Error400":
       "description": "Invalid JSON, enum, identifier or pagination"

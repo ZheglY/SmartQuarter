@@ -1,7 +1,7 @@
 name: smartquarter
 
 # Development only: public entry point is max-gateway.
-# Databases, Redis and S3 will be added with the corresponding adapters.
+# Full application stack: deploy/server/compose.yaml; isolated tests: deploy/test/compose.yaml.
 services:
   max-gateway:
     build:
@@ -19,6 +19,7 @@ services:
     security_opt:
       - no-new-privileges:true
     stop_grace_period: 15s
+    # Ubuntu CA trust mount is configured in deploy/server/compose.yaml.
 
   identity-service:
     build:

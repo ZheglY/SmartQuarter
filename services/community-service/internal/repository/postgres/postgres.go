@@ -61,7 +61,7 @@ func (r *CommunityRepo) CreateAnnouncement(ctx context.Context, a *domain.Announ
 func (r *CommunityRepo) ListAnnouncements(ctx context.Context, houseID string, limit, offset int) ([]domain.Announcement, error) {
 	query := `
 		SELECT id, house_id, author_user_id, title, body, status, published_at, created_at
-		FROM announcements WHERE house_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`
+		FROM announcements WHERE house_id = $1 ORDER BY created_at DESC,id DESC LIMIT $2 OFFSET $3`
 	rows, err := r.db.Query(ctx, query, houseID, limit, offset)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (r *CommunityRepo) ListAnnouncements(ctx context.Context, houseID string, l
 		}
 		items = append(items, a)
 	}
-	return items, nil
+	return items, rows.Err()
 }
 
 func (r *CommunityRepo) CreatePoll(ctx context.Context, p *domain.Poll) error {
@@ -152,31 +152,37 @@ func (r *CommunityRepo) GetPoll(ctx context.Context, houseID, pollID, userID str
 		details.TotalVotes += res.VotesCount
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	rows.Close()
 	queryMyVote := `SELECT option_id FROM poll_votes WHERE poll_id = $1 AND user_id = $2`
 	var myOpt string
 	err = r.db.QueryRow(ctx, queryMyVote, pollID, userID).Scan(&myOpt)
 	if err == nil {
 		details.MyOptionID = myOpt
+	} else if err != pgx.ErrNoRows {
+		return nil, err
 	}
 
 	return &details, nil
 }
 
 func (r *CommunityRepo) ListPolls(ctx context.Context, houseID string, statuses []string, limit, offset int) ([]domain.Poll, error) {
-	query := `SELECT id, house_id, author_user_id, question, status, ends_at, created_at FROM polls WHERE house_id = $1`
+	query := `SELECT id, house_id, author_user_id, question, CASE WHEN ends_at<=now() THEN 'CLOSED' ELSE status END, ends_at, created_at FROM polls WHERE house_id = $1`
 
 	if len(statuses) > 0 {
-		query += ` AND status = ANY($4) ORDER BY created_at DESC LIMIT $2 OFFSET $3`
+		query += ` AND (CASE WHEN ends_at<=now() THEN 'CLOSED' ELSE status END) = ANY($4) ORDER BY created_at DESC,id DESC LIMIT $2 OFFSET $3`
 		rows, err := r.db.Query(ctx, query, houseID, limit, offset, statuses)
-		return r.scanPolls(rows, err)
+		return r.scanPolls(ctx, rows, err)
 	}
 
-	query += ` ORDER BY created_at DESC LIMIT $2 OFFSET $3`
+	query += ` ORDER BY created_at DESC,id DESC LIMIT $2 OFFSET $3`
 	rows, err := r.db.Query(ctx, query, houseID, limit, offset)
-	return r.scanPolls(rows, err)
+	return r.scanPolls(ctx, rows, err)
 }
 
-func (r *CommunityRepo) scanPolls(rows pgx.Rows, err error) ([]domain.Poll, error) {
+func (r *CommunityRepo) scanPolls(ctx context.Context, rows pgx.Rows, err error) ([]domain.Poll, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +195,34 @@ func (r *CommunityRepo) scanPolls(rows pgx.Rows, err error) ([]domain.Poll, erro
 		}
 		items = append(items, p)
 	}
-	return items, nil
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	rows.Close()
+	if len(items) == 0 {
+		return items, nil
+	}
+	ids := make([]string, len(items))
+	indices := make(map[string]int, len(items))
+	for i, p := range items {
+		ids[i] = p.ID
+		indices[p.ID] = i
+	}
+	opts, err := r.db.Query(ctx, `SELECT poll_id,id,text,position FROM poll_options WHERE poll_id=ANY($1::uuid[]) ORDER BY poll_id,position`, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer opts.Close()
+	for opts.Next() {
+		var pollID string
+		var opt domain.PollOption
+		if err = opts.Scan(&pollID, &opt.ID, &opt.Text, &opt.Position); err != nil {
+			return nil, err
+		}
+		i := indices[pollID]
+		items[i].Options = append(items[i].Options, opt)
+	}
+	return items, opts.Err()
 }
 
 func (r *CommunityRepo) VotePoll(ctx context.Context, houseID, pollID, optionID, userID string) error {
@@ -199,6 +232,23 @@ func (r *CommunityRepo) VotePoll(ctx context.Context, houseID, pollID, optionID,
 	}
 	defer tx.Rollback(ctx)
 
+	var status string
+	var end time.Time
+	if err = tx.QueryRow(ctx, `SELECT status,ends_at FROM polls WHERE id=$1 AND house_id=$2 FOR UPDATE`, pollID, houseID).Scan(&status, &end); err == pgx.ErrNoRows {
+		return domain.ErrNotFound
+	} else if err != nil {
+		return err
+	}
+	if status != "OPEN" || !end.After(time.Now()) {
+		return domain.ErrPollClosed
+	}
+	var option bool
+	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM poll_options WHERE id=$1 AND poll_id=$2)`, optionID, pollID).Scan(&option); err != nil {
+		return err
+	}
+	if !option {
+		return domain.ErrInvalidArgument
+	}
 	query := `INSERT INTO poll_votes (poll_id, option_id, user_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`
 	res, err := tx.Exec(ctx, query, pollID, optionID, userID)
 	if err != nil {
@@ -247,7 +297,7 @@ func (r *CommunityRepo) CreateCalendarEvent(ctx context.Context, e *domain.Calen
 }
 
 func (r *CommunityRepo) ListCalendarEvents(ctx context.Context, houseID string, from, to time.Time) ([]domain.CalendarEvent, error) {
-	query := `SELECT id, house_id, created_by, title, description, starts_at, ends_at, created_at FROM calendar_events WHERE house_id = $1 AND starts_at >= $2 AND starts_at < $3 ORDER BY starts_at ASC`
+	query := `SELECT id, house_id, created_by, title, description, starts_at, ends_at, created_at FROM calendar_events WHERE house_id = $1 AND ends_at > $2 AND starts_at < $3 ORDER BY starts_at ASC`
 	rows, err := r.db.Query(ctx, query, houseID, from, to)
 	if err != nil {
 		return nil, err
@@ -262,7 +312,7 @@ func (r *CommunityRepo) ListCalendarEvents(ctx context.Context, houseID string, 
 		}
 		items = append(items, e)
 	}
-	return items, nil
+	return items, rows.Err()
 }
 
 func (r *CommunityRepo) CreateInitiative(ctx context.Context, i *domain.Initiative) error {
@@ -312,7 +362,7 @@ func (r *CommunityRepo) ListInitiatives(ctx context.Context, houseID, userID str
 		}
 		items = append(items, i)
 	}
-	return items, nil
+	return items, rows.Err()
 }
 
 func (r *CommunityRepo) SupportInitiative(ctx context.Context, houseID, initiativeID, userID string) error {
@@ -322,6 +372,15 @@ func (r *CommunityRepo) SupportInitiative(ctx context.Context, houseID, initiati
 	}
 	defer tx.Rollback(ctx)
 
+	var state string
+	if err = tx.QueryRow(ctx, `SELECT status FROM initiatives WHERE id=$1 AND house_id=$2 FOR UPDATE`, initiativeID, houseID).Scan(&state); err == pgx.ErrNoRows {
+		return domain.ErrNotFound
+	} else if err != nil {
+		return err
+	}
+	if state != "OPEN" {
+		return domain.ErrInitiativeClosed
+	}
 	querySupport := `INSERT INTO initiative_supports (initiative_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`
 	res, err := tx.Exec(ctx, querySupport, initiativeID, userID)
 	if err != nil {
@@ -332,7 +391,7 @@ func (r *CommunityRepo) SupportInitiative(ctx context.Context, houseID, initiati
 		return domain.ErrAlreadyVoted
 	}
 
-	queryUpdate := `UPDATE initiatives SET supports_count = supports_count + 1 WHERE id = $1`
+	queryUpdate := `UPDATE initiatives SET supports_count = supports_count + 1,updated_at=now() WHERE id = $1`
 	if _, err := tx.Exec(ctx, queryUpdate, initiativeID); err != nil {
 		return err
 	}
@@ -362,7 +421,7 @@ func (r *CommunityRepo) GetUnpublishedOutboxEvents(ctx context.Context, limit in
 		}
 		events = append(events, e)
 	}
-	return events, nil
+	return events, rows.Err()
 }
 
 func (r *CommunityRepo) MarkOutboxEventsPublished(ctx context.Context, eventIDs []string) error {

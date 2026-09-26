@@ -61,8 +61,8 @@ services:
     image: postgres:17-bookworm
     environment: {PGPASSWORD: acceptance-only}
     entrypoint: [psql]
-    command: ['-h', community-db, '-U', test, '-d', community_test, '-v', ON_ERROR_STOP=1, '-f', /migration.sql, '-f', /contacts.sql]
-    volumes: ['../../services/community-service/migrations/000001_init.up.sql:/migration.sql:ro', '../../services/community-service/migrations/000002_service_contacts.up.sql:/contacts.sql:ro']
+    command: ['-h', community-db, '-U', test, '-d', community_test, '-v', ON_ERROR_STOP=1, '-f', /migration.sql, '-f', /contacts.sql, '-f', /community-integrity.sql]
+    volumes: ['../../services/community-service/migrations/000001_init.up.sql:/migration.sql:ro', '../../services/community-service/migrations/000002_service_contacts.up.sql:/contacts.sql:ro', '../../services/community-service/migrations/000003_community_integrity.up.sql:/community-integrity.sql:ro']
     depends_on:
       community-db: {condition: service_healthy}
   issue-service:

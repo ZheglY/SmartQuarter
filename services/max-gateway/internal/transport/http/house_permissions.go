@@ -22,6 +22,9 @@ func (a *API) housePermission(access string, next http.HandlerFunc) http.Handler
 		if access == "admin" {
 			allowed = state.PlatformAdmin
 		}
+		if access == "chairman" {
+			allowed = state.CanRegisterHouse
+		}
 		if !allowed {
 			a.fail(w, r, 403, "PERMISSION_DENIED", "access denied")
 			return

@@ -46,6 +46,7 @@ async function setup(
     if (path.endsWith('/session/max'))
       return reply({ user_context: userContext, expires_at: '2099-01-01T00:00:00Z' });
     if (path.endsWith('/me')) return reply(userContext);
+    if (path.endsWith('/house-access')) return reply({platform_admin:false,can_register_house:role==='CHAIRMAN',can_manage_active_house:role==='CHAIRMAN',pending_registrations:0,pending_join_requests:0,incoming_join_requests:0});
     if (path.endsWith('/session/active-house')) {
       active = req.postDataJSON().house_id;
       return reply({ active_house_id: active, role });

@@ -106,7 +106,7 @@ services:
     environment:
       PGPASSWORD: ${COMMUNITY_DB_PASSWORD}
     entrypoint: [psql]
-    command: ['-h', community-db, '-U', community, '-d', community_db, '-v', ON_ERROR_STOP=1, '-f', /migration.sql, '-f', /contacts.sql]
+    command: ['-h', community-db, '-U', community, '-d', community_db, '-v', ON_ERROR_STOP=1, '-f', /migration.sql, '-f', /contacts.sql, '-f', /community-integrity.sql]
     volumes:
       - ../../services/community-service/migrations/000001_init.up.sql:/migration.sql:ro
       - ../../services/community-service/migrations/000002_service_contacts.up.sql:/contacts.sql:ro
@@ -154,6 +154,14 @@ services:
   max-gateway:
     <<: *app
     build: ../../services/max-gateway
+    volumes:
+      # Use the operator-maintained Ubuntu trust store for MAX TLS.
+      - type: bind
+        source: ${MAX_CA_BUNDLE:-/etc/ssl/certs/ca-certificates.crt}
+        target: /etc/ssl/certs/ca-certificates.crt
+        read_only: true
+        bind:
+          create_host_path: false
     environment:
       APP_ENV: production
       HTTP_ADDR: ':8080'

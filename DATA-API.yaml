@@ -1,0 +1,207 @@
+schemaVersion: "1.0"
+solution:
+  name: "Умный Квартал"
+api:
+  baseUrl: "https://maxhack.ru"
+  openapi: "./contracts/openapi/openapi.yaml"
+  defaultHeaders:
+    Accept: "application/json"
+    Content-Type: "application/json"
+    Origin: "https://maxhack.ru"
+
+# Session cookies for resident, chairman and admin are supplied separately.
+# Use a dedicated review house. Never store credentials in this document.
+checks:
+  - id: health
+    name: "Готовность сервисов приложения"
+    method: GET
+    path: /api/v1/health
+    role: public
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [status]
+      bodySchema:
+        type: object
+        required: [status]
+        properties:
+          status: {const: ready}
+    timeoutMs: 5000
+    repeatable: true
+  - id: anonymous-denied
+    name: "Защита персональных данных без сессии"
+    method: GET
+    path: /api/v1/me
+    role: public
+    expected:
+      statusCodes: [401]
+      contentType: application/json
+      requiredFields: [error.code, error.request_id]
+    repeatable: true
+  - id: resident-context
+    name: "Профиль жителя и активный дом"
+    method: GET
+    path: /api/v1/me
+    role: resident
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [user.id, houses, memberships, active_house_id]
+    repeatable: true
+  - id: role-state
+    name: "Состояние полномочий"
+    method: GET
+    path: /api/v1/house-access
+    role: resident
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [platform_admin, can_register_house, can_manage_active_house]
+    repeatable: true
+  - id: resident-admin-denied
+    name: "Житель не может просматривать админку"
+    method: GET
+    path: /api/v1/admin/users
+    role: resident
+    expected:
+      statusCodes: [403]
+      contentType: application/json
+      requiredFields: [error.code]
+    repeatable: true
+  - id: admin-houses
+    name: "Администратор видит дома и председателей"
+    method: GET
+    path: /api/v1/admin/houses
+    role: admin
+    request:
+      query: {query: ""}
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [items]
+    repeatable: true
+  - id: issues
+    name: "Проблемы активного дома"
+    method: GET
+    path: /api/v1/issues
+    role: resident
+    request:
+      query: {page_size: 20}
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [items, next_page_token]
+    repeatable: true
+  - id: announcements
+    name: "Объявления дома"
+    method: GET
+    path: /api/v1/announcements
+    role: resident
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [items, next_page_token]
+    repeatable: true
+  - id: polls
+    name: "Опросы дома"
+    method: GET
+    path: /api/v1/polls
+    role: resident
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [items, next_page_token]
+    repeatable: true
+  - id: initiatives
+    name: "Инициативы и поддержка жильцов"
+    method: GET
+    path: /api/v1/initiatives
+    role: resident
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [items, next_page_token]
+    repeatable: true
+  - id: contacts
+    name: "Справочник служб"
+    method: GET
+    path: /api/v1/house/service-contacts
+    role: resident
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [items]
+    repeatable: true
+  - id: create-event-denied
+    name: "Житель не может создавать события"
+    method: POST
+    path: /api/v1/calendar
+    role: resident
+    request:
+      body: {title: "DATA-API: проверка", description: "Тест", starts_at: "2030-06-01T10:00:00Z", ends_at: "2030-06-01T11:00:00Z"}
+    expected:
+      statusCodes: [403]
+      contentType: application/json
+      requiredFields: [error.code]
+    repeatable: true
+  - id: create-event
+    name: "Председатель создаёт событие"
+    description: "Создаётся только тестовая запись; ID используется в следующих шагах и cleanup."
+    method: POST
+    path: /api/v1/calendar
+    role: chairman
+    request:
+      body: {title: "DATA-API: проверка", description: "Удаляется после проверки", starts_at: "2030-06-01T10:00:00Z", ends_at: "2030-06-01T11:00:00Z"}
+    expected:
+      statusCodes: [201]
+      contentType: application/json
+      requiredFields: [id, title, starts_at, ends_at]
+    timeoutMs: 10000
+    repeatable: false
+    extract: {eventId: "$.id"}
+  - id: read-calendar
+    name: "Житель видит календарь"
+    method: GET
+    path: /api/v1/calendar
+    role: resident
+    dependsOn: [create-event]
+    request:
+      query: {from: "2030-06-01T00:00:00Z", to: "2030-06-02T00:00:00Z"}
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [items]
+      bodySchema:
+        type: object
+        properties:
+          items: {type: array, minItems: 1}
+    repeatable: true
+  - id: edit-event
+    name: "Председатель редактирует созданное событие"
+    method: PATCH
+    path: /api/v1/calendar/{id}
+    role: chairman
+    dependsOn: [create-event]
+    request:
+      path: {id: "${eventId}"}
+      body: {title: "DATA-API: событие изменено", description: "Удаляется после проверки", starts_at: "2030-06-01T12:00:00Z", ends_at: "2030-06-01T13:00:00Z"}
+    expected:
+      statusCodes: [200]
+      contentType: application/json
+      requiredFields: [id, title]
+      bodySchema:
+        type: object
+        properties:
+          title: {const: "DATA-API: событие изменено"}
+    repeatable: true
+cleanup:
+  - id: delete-event
+    method: DELETE
+    path: /api/v1/calendar/{id}
+    role: chairman
+    request:
+      path: {id: "${eventId}"}
+      body: {}
+    expected:
+      statusCodes: [200, 404]
+    timeoutMs: 10000

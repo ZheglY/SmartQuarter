@@ -19,6 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	CommunityService_ClosePoll_FullMethodName             = "/smartquarter.community.v1.CommunityService/ClosePoll"
+	CommunityService_UpdateCalendarEvent_FullMethodName   = "/smartquarter.community.v1.CommunityService/UpdateCalendarEvent"
+	CommunityService_DeleteCalendarEvent_FullMethodName   = "/smartquarter.community.v1.CommunityService/DeleteCalendarEvent"
+	CommunityService_CloseInitiative_FullMethodName       = "/smartquarter.community.v1.CommunityService/CloseInitiative"
 	CommunityService_CreateServiceContact_FullMethodName  = "/smartquarter.community.v1.CommunityService/CreateServiceContact"
 	CommunityService_ListServiceContacts_FullMethodName   = "/smartquarter.community.v1.CommunityService/ListServiceContacts"
 	CommunityService_GetServiceContact_FullMethodName     = "/smartquarter.community.v1.CommunityService/GetServiceContact"
@@ -41,6 +45,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CommunityServiceClient interface {
+	ClosePoll(ctx context.Context, in *GetPollRequest, opts ...grpc.CallOption) (*PollDetails, error)
+	UpdateCalendarEvent(ctx context.Context, in *UpdateCalendarEventRequest, opts ...grpc.CallOption) (*CalendarEvent, error)
+	DeleteCalendarEvent(ctx context.Context, in *DeleteCalendarEventRequest, opts ...grpc.CallOption) (*DeleteCalendarEventResponse, error)
+	CloseInitiative(ctx context.Context, in *SupportInitiativeRequest, opts ...grpc.CallOption) (*Initiative, error)
 	CreateServiceContact(ctx context.Context, in *CreateServiceContactRequest, opts ...grpc.CallOption) (*ServiceContact, error)
 	ListServiceContacts(ctx context.Context, in *ListServiceContactsRequest, opts ...grpc.CallOption) (*ListServiceContactsResponse, error)
 	GetServiceContact(ctx context.Context, in *GetServiceContactRequest, opts ...grpc.CallOption) (*ServiceContact, error)
@@ -65,6 +73,46 @@ type communityServiceClient struct {
 
 func NewCommunityServiceClient(cc grpc.ClientConnInterface) CommunityServiceClient {
 	return &communityServiceClient{cc}
+}
+
+func (c *communityServiceClient) ClosePoll(ctx context.Context, in *GetPollRequest, opts ...grpc.CallOption) (*PollDetails, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PollDetails)
+	err := c.cc.Invoke(ctx, CommunityService_ClosePoll_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communityServiceClient) UpdateCalendarEvent(ctx context.Context, in *UpdateCalendarEventRequest, opts ...grpc.CallOption) (*CalendarEvent, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CalendarEvent)
+	err := c.cc.Invoke(ctx, CommunityService_UpdateCalendarEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communityServiceClient) DeleteCalendarEvent(ctx context.Context, in *DeleteCalendarEventRequest, opts ...grpc.CallOption) (*DeleteCalendarEventResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteCalendarEventResponse)
+	err := c.cc.Invoke(ctx, CommunityService_DeleteCalendarEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communityServiceClient) CloseInitiative(ctx context.Context, in *SupportInitiativeRequest, opts ...grpc.CallOption) (*Initiative, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Initiative)
+	err := c.cc.Invoke(ctx, CommunityService_CloseInitiative_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *communityServiceClient) CreateServiceContact(ctx context.Context, in *CreateServiceContactRequest, opts ...grpc.CallOption) (*ServiceContact, error) {
@@ -231,6 +279,10 @@ func (c *communityServiceClient) SupportInitiative(ctx context.Context, in *Supp
 // All implementations must embed UnimplementedCommunityServiceServer
 // for forward compatibility.
 type CommunityServiceServer interface {
+	ClosePoll(context.Context, *GetPollRequest) (*PollDetails, error)
+	UpdateCalendarEvent(context.Context, *UpdateCalendarEventRequest) (*CalendarEvent, error)
+	DeleteCalendarEvent(context.Context, *DeleteCalendarEventRequest) (*DeleteCalendarEventResponse, error)
+	CloseInitiative(context.Context, *SupportInitiativeRequest) (*Initiative, error)
 	CreateServiceContact(context.Context, *CreateServiceContactRequest) (*ServiceContact, error)
 	ListServiceContacts(context.Context, *ListServiceContactsRequest) (*ListServiceContactsResponse, error)
 	GetServiceContact(context.Context, *GetServiceContactRequest) (*ServiceContact, error)
@@ -257,6 +309,18 @@ type CommunityServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCommunityServiceServer struct{}
 
+func (UnimplementedCommunityServiceServer) ClosePoll(context.Context, *GetPollRequest) (*PollDetails, error) {
+	return nil, status.Error(codes.Unimplemented, "method ClosePoll not implemented")
+}
+func (UnimplementedCommunityServiceServer) UpdateCalendarEvent(context.Context, *UpdateCalendarEventRequest) (*CalendarEvent, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateCalendarEvent not implemented")
+}
+func (UnimplementedCommunityServiceServer) DeleteCalendarEvent(context.Context, *DeleteCalendarEventRequest) (*DeleteCalendarEventResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteCalendarEvent not implemented")
+}
+func (UnimplementedCommunityServiceServer) CloseInitiative(context.Context, *SupportInitiativeRequest) (*Initiative, error) {
+	return nil, status.Error(codes.Unimplemented, "method CloseInitiative not implemented")
+}
 func (UnimplementedCommunityServiceServer) CreateServiceContact(context.Context, *CreateServiceContactRequest) (*ServiceContact, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateServiceContact not implemented")
 }
@@ -324,6 +388,78 @@ func RegisterCommunityServiceServer(s grpc.ServiceRegistrar, srv CommunityServic
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CommunityService_ServiceDesc, srv)
+}
+
+func _CommunityService_ClosePoll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPollRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).ClosePoll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_ClosePoll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).ClosePoll(ctx, req.(*GetPollRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunityService_UpdateCalendarEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCalendarEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).UpdateCalendarEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_UpdateCalendarEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).UpdateCalendarEvent(ctx, req.(*UpdateCalendarEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunityService_DeleteCalendarEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCalendarEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).DeleteCalendarEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_DeleteCalendarEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).DeleteCalendarEvent(ctx, req.(*DeleteCalendarEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunityService_CloseInitiative_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SupportInitiativeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).CloseInitiative(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_CloseInitiative_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).CloseInitiative(ctx, req.(*SupportInitiativeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _CommunityService_CreateServiceContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -621,6 +757,22 @@ var CommunityService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "smartquarter.community.v1.CommunityService",
 	HandlerType: (*CommunityServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ClosePoll",
+			Handler:    _CommunityService_ClosePoll_Handler,
+		},
+		{
+			MethodName: "UpdateCalendarEvent",
+			Handler:    _CommunityService_UpdateCalendarEvent_Handler,
+		},
+		{
+			MethodName: "DeleteCalendarEvent",
+			Handler:    _CommunityService_DeleteCalendarEvent_Handler,
+		},
+		{
+			MethodName: "CloseInitiative",
+			Handler:    _CommunityService_CloseInitiative_Handler,
+		},
 		{
 			MethodName: "CreateServiceContact",
 			Handler:    _CommunityService_CreateServiceContact_Handler,

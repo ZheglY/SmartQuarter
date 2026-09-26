@@ -40,6 +40,7 @@ def fonts():
 
 
 def inline(text):
+    text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'\1', text)
     text = escape(text)
     text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
     text = re.sub(r'`([^`]+)`', r'<font name="Code">\1</font>', text)
@@ -57,7 +58,7 @@ def decorate(canvas, doc):
     canvas.setStrokeColor(colors.HexColor('#DAE4E9'))
     canvas.line(MARGIN, 36, WIDTH - MARGIN, 36)
     canvas.setFont('Body', 8)
-    canvas.drawString(MARGIN, 23, 'Ubuntu 24.04 LTS  •  Docker Compose  |  22.09.2026')
+    canvas.drawString(MARGIN, 23, 'Ubuntu 24.04 LTS  •  Docker Compose  |  26.09.2026')
     canvas.drawRightString(WIDTH - MARGIN, 23, f'{doc.page:02d}')
     canvas.restoreState()
 

@@ -143,6 +143,10 @@ func TestHouseWorkflowHTTP(t *testing.T) {
 	chairID, residentID, thirdID, outsiderID := base+1, base+2, base+3, base+4
 	admin, chair, resident, third, outsider := login(201), login(chairID), login(residentID), login(thirdID), login(outsiderID)
 	empty := map[string]any{}
+	chairUser := call(chair, "GET", "/me", nil, "", 200)["user"].(map[string]any)["id"].(string)
+	call(chair, "POST", "/house-registrations", map[string]string{"name": "Denied", "city": "Test", "address": "1"}, "", 403)
+	call(chair, "POST", "/admin/users/"+chairUser+"/chairman", empty, "", 403)
+	call(admin, "POST", "/admin/users/"+chairUser+"/chairman", empty, "", 200)
 	group := "house-test-" + uuid.NewString()
 	stream := "stream:notifications"
 	if e = r.XGroupCreateMkStream(ctx, stream, group, "$").Err(); e != nil {
@@ -167,7 +171,7 @@ func TestHouseWorkflowHTTP(t *testing.T) {
 	approved := call(admin, "POST", "/admin/house-registrations/"+rid+"/approve", empty, "", 200)
 	house := approved["resulting_house_id"].(string)
 	call(chair, "POST", "/session/active-house", map[string]string{"house_id": house}, "", 200)
-	call(outsider, "POST", "/house-registrations", body, "", 409)
+	call(outsider, "POST", "/house-registrations", body, "", 403)
 	t.Log("4-5: chairman contacts; public residents cannot mutate or read audit fields")
 	contact := map[string]any{"category": "EMERGENCY_DISPATCH", "title": "Аварийная служба", "phone": "+79991234567", "emergency": true}
 	created := call(chair, "POST", "/chairman/service-contacts", contact, uuid.NewString(), 201)
@@ -207,6 +211,7 @@ func TestHouseWorkflowHTTP(t *testing.T) {
 	t.Log("12-13: transfer acceptance revokes former chairman, even idempotency replay")
 	me := call(resident, "GET", "/me", nil, "", 200)
 	target := me["user"].(map[string]any)["id"].(string)
+	call(admin, "POST", "/admin/users/"+target+"/chairman", empty, "", 200)
 	transfer := call(chair, "POST", "/chairman/transfers", map[string]string{"target_user_id": target}, "", 202)
 	tid := transfer["id"].(string)
 	call(third, "POST", "/chairman/transfers/"+tid+"/accept", empty, "", 403)
@@ -278,5 +283,98 @@ func TestHouseWorkflowHTTP(t *testing.T) {
 		e := db.QueryRow(ctx, `SELECT count(*) FROM identity_outbox WHERE payload->>'house_id'=$1 AND published_at IS NOT NULL`, house).Scan(&n)
 		return e == nil && n >= 8
 	})
-	t.Log("house workflow passed with real Identity, Community, PostgreSQL and Redis")
+	t.Log("17: polls: role checks, idempotency, options, duplicate vote, results and closure")
+	pollBody := map[string]any{"question": "Когда провести собрание?", "options": []string{"Утром", "Вечером"}, "ends_at": time.Now().Add(time.Hour).UTC().Format(time.RFC3339)}
+	call(chair, "POST", "/polls", pollBody, "", 403)
+	pk := uuid.NewString()
+	poll := call(resident, "POST", "/polls", pollBody, pk, 201)
+	pid := poll["id"].(string)
+	if call(resident, "POST", "/polls", pollBody, pk, 201)["id"] != pid {
+		t.Fatal("poll idempotency")
+	}
+	options := poll["options"].([]any)
+	opt := options[0].(map[string]any)["id"].(string)
+	otherPoll := call(resident, "POST", "/polls", pollBody, "", 201)
+	foreignOpt := otherPoll["options"].([]any)[0].(map[string]any)["id"].(string)
+	call(chair, "POST", "/polls/"+pid+"/vote", map[string]string{"option_id": foreignOpt}, "", 400)
+	voteKey := uuid.NewString()
+	voteBody := map[string]string{"option_id": opt}
+	call(chair, "POST", "/polls/"+pid+"/vote", voteBody, voteKey, 200)
+	call(chair, "POST", "/polls/"+pid+"/vote", voteBody, voteKey, 200)
+	call(chair, "POST", "/polls/"+pid+"/vote", voteBody, "", 409)
+	call(third, "POST", "/polls/"+pid+"/vote", voteBody, "", 200)
+	details := call(chair, "GET", "/polls/"+pid, nil, "", 200)
+	if details["total_votes"] != float64(2) || details["my_option_id"] != opt {
+		t.Fatal("wrong poll results", details)
+	}
+	call(chair, "POST", "/polls/"+pid+"/close", empty, "", 403)
+	call(resident, "POST", "/polls/"+pid+"/close", empty, "", 200)
+	call(resident, "POST", "/polls/"+pid+"/vote", voteBody, "", 409)
+	closed := call(chair, "GET", "/polls?status=CLOSED", nil, "", 200)
+	if len(closed["items"].([]any)) != 1 {
+		t.Fatal("closed filter", closed)
+	}
+	call(chair, "GET", "/polls?status=INVALID", nil, "", 400)
+
+	t.Log("18: calendar: create, overlap, edit, validation and deletion")
+	start := time.Now().UTC().Truncate(time.Second)
+	end := start.Add(48 * time.Hour)
+	calendarBody := map[string]any{"title": "Работы во дворе", "description": "Временное ограничение доступа", "starts_at": start.Format(time.RFC3339), "ends_at": end.Format(time.RFC3339)}
+	call(chair, "POST", "/calendar", calendarBody, "", 403)
+	calendar := call(resident, "POST", "/calendar", calendarBody, uuid.NewString(), 201)
+	eid := calendar["id"].(string)
+	period := "/calendar?from=" + start.Add(24*time.Hour).Format(time.RFC3339) + "&to=" + end.Add(time.Hour).Format(time.RFC3339)
+	if len(call(chair, "GET", period, nil, "", 200)["items"].([]any)) != 1 {
+		t.Fatal("overlapping calendar event omitted")
+	}
+	calendarBody["title"] = "Перенос работ"
+	call(resident, "PATCH", "/calendar/"+eid, calendarBody, "", 200)
+	calendarBody["ends_at"] = start.Add(-time.Hour).Format(time.RFC3339)
+	call(resident, "PATCH", "/calendar/"+eid, calendarBody, "", 400)
+	call(chair, "DELETE", "/calendar/"+eid, empty, "", 403)
+
+	t.Log("19: initiatives: exact count for older item, duplicate support and closure")
+	ib := map[string]string{"title": "Деревья во дворе", "description": "Посадить деревья весной"}
+	i1 := call(chair, "POST", "/initiatives", ib, "", 201)["id"].(string)
+	call(third, "POST", "/initiatives", ib, "", 201)
+	if call(third, "POST", "/initiatives/"+i1+"/support", empty, "", 200)["supports_count"] != float64(1) {
+		t.Fatal("old initiative count")
+	}
+	call(third, "POST", "/initiatives/"+i1+"/support", empty, "", 409)
+	call(chair, "POST", "/initiatives/"+i1+"/close", empty, "", 403)
+	call(resident, "POST", "/initiatives/"+i1+"/close", empty, "", 200)
+	call(resident, "POST", "/initiatives/"+i1+"/support", empty, "", 409)
+
+	t.Log("20: isolation for a chairman of another house")
+	outUser := call(outsider, "GET", "/me", nil, "", 200)["user"].(map[string]any)["id"].(string)
+	call(admin, "POST", "/admin/users/"+outUser+"/chairman", empty, "", 200)
+	oreg := call(outsider, "POST", "/house-registrations", map[string]string{"name": "Other house", "city": "Test", "address": uuid.NewString()}, "", 202)
+	ohouse := call(admin, "POST", "/admin/house-registrations/"+oreg["id"].(string)+"/approve", empty, "", 200)["resulting_house_id"].(string)
+	call(outsider, "POST", "/session/active-house", map[string]string{"house_id": ohouse}, "", 200)
+	call(outsider, "GET", "/polls/"+pid, nil, "", 404)
+	call(outsider, "POST", "/polls/"+pid+"/close", empty, "", 404)
+	call(outsider, "DELETE", "/calendar/"+eid, empty, "", 404)
+	call(outsider, "POST", "/initiatives/"+i1+"/support", empty, "", 404)
+	call(outsider, "POST", "/initiatives/"+i1+"/close", empty, "", 404)
+	call(resident, "DELETE", "/calendar/"+eid, empty, "", 200)
+	if len(call(chair, "GET", period, nil, "", 200)["items"].([]any)) != 0 {
+		t.Fatal("event not deleted")
+	}
+
+	t.Log("21: admin replaces and removes house chairman; revocation invalidates cached writes")
+	call(chair, "GET", "/admin/users", nil, "", 403)
+	call(admin, "GET", "/admin/users?query="+chairUser, nil, "", 200)
+	assigned := call(admin, "PUT", "/admin/houses/"+house+"/chairman", map[string]string{"target_user_id": chairUser}, "", 200)
+	if assigned["chairman_user_id"] != chairUser {
+		t.Fatal("admin assignment")
+	}
+	call(resident, "POST", "/polls", pollBody, pk, 403)
+	call(admin, "DELETE", "/admin/houses/"+house+"/chairman", empty, "", 200)
+	call(chair, "POST", "/polls", pollBody, "", 403)
+	call(admin, "PUT", "/admin/houses/"+house+"/chairman", map[string]string{"target_user_id": chairUser}, "", 200)
+	call(admin, "DELETE", "/admin/users/"+chairUser+"/chairman", empty, "", 200)
+	call(chair, "POST", "/polls", pollBody, "", 403)
+	call(chair, "POST", "/house-registrations", body, "", 403)
+	call(chair, "GET", "/polls/"+pid, nil, "", 200)
+	t.Log("house and community workflow passed with real Identity, Community, PostgreSQL and Redis")
 }

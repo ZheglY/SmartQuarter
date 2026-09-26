@@ -235,6 +235,12 @@ var IdentityService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
+	HouseService_ListPlatformUsers_FullMethodName             = "/smartquarter.identity.v1.HouseService/ListPlatformUsers"
+	HouseService_GrantChairmanPermission_FullMethodName       = "/smartquarter.identity.v1.HouseService/GrantChairmanPermission"
+	HouseService_RevokeChairmanPermission_FullMethodName      = "/smartquarter.identity.v1.HouseService/RevokeChairmanPermission"
+	HouseService_ListAdminHouses_FullMethodName               = "/smartquarter.identity.v1.HouseService/ListAdminHouses"
+	HouseService_AssignHouseChairman_FullMethodName           = "/smartquarter.identity.v1.HouseService/AssignHouseChairman"
+	HouseService_RemoveHouseChairman_FullMethodName           = "/smartquarter.identity.v1.HouseService/RemoveHouseChairman"
 	HouseService_CreateHouseRegistration_FullMethodName       = "/smartquarter.identity.v1.HouseService/CreateHouseRegistration"
 	HouseService_GetHouseRegistration_FullMethodName          = "/smartquarter.identity.v1.HouseService/GetHouseRegistration"
 	HouseService_ListMyHouseRegistrations_FullMethodName      = "/smartquarter.identity.v1.HouseService/ListMyHouseRegistrations"
@@ -274,6 +280,12 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HouseServiceClient interface {
+	ListPlatformUsers(ctx context.Context, in *ListPlatformUsersRequest, opts ...grpc.CallOption) (*PlatformUserList, error)
+	GrantChairmanPermission(ctx context.Context, in *GrantChairmanPermissionRequest, opts ...grpc.CallOption) (*PlatformUser, error)
+	RevokeChairmanPermission(ctx context.Context, in *RevokeChairmanPermissionRequest, opts ...grpc.CallOption) (*PlatformUser, error)
+	ListAdminHouses(ctx context.Context, in *ListAdminHousesRequest, opts ...grpc.CallOption) (*AdminHouseList, error)
+	AssignHouseChairman(ctx context.Context, in *AssignHouseChairmanRequest, opts ...grpc.CallOption) (*AdminHouse, error)
+	RemoveHouseChairman(ctx context.Context, in *RemoveHouseChairmanRequest, opts ...grpc.CallOption) (*AdminHouse, error)
 	CreateHouseRegistration(ctx context.Context, in *CreateHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error)
 	GetHouseRegistration(ctx context.Context, in *GetHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error)
 	ListMyHouseRegistrations(ctx context.Context, in *ListMyHouseRegistrationsRequest, opts ...grpc.CallOption) (*HouseRegistrationList, error)
@@ -315,6 +327,66 @@ type houseServiceClient struct {
 
 func NewHouseServiceClient(cc grpc.ClientConnInterface) HouseServiceClient {
 	return &houseServiceClient{cc}
+}
+
+func (c *houseServiceClient) ListPlatformUsers(ctx context.Context, in *ListPlatformUsersRequest, opts ...grpc.CallOption) (*PlatformUserList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlatformUserList)
+	err := c.cc.Invoke(ctx, HouseService_ListPlatformUsers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) GrantChairmanPermission(ctx context.Context, in *GrantChairmanPermissionRequest, opts ...grpc.CallOption) (*PlatformUser, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlatformUser)
+	err := c.cc.Invoke(ctx, HouseService_GrantChairmanPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) RevokeChairmanPermission(ctx context.Context, in *RevokeChairmanPermissionRequest, opts ...grpc.CallOption) (*PlatformUser, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlatformUser)
+	err := c.cc.Invoke(ctx, HouseService_RevokeChairmanPermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) ListAdminHouses(ctx context.Context, in *ListAdminHousesRequest, opts ...grpc.CallOption) (*AdminHouseList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminHouseList)
+	err := c.cc.Invoke(ctx, HouseService_ListAdminHouses_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) AssignHouseChairman(ctx context.Context, in *AssignHouseChairmanRequest, opts ...grpc.CallOption) (*AdminHouse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminHouse)
+	err := c.cc.Invoke(ctx, HouseService_AssignHouseChairman_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *houseServiceClient) RemoveHouseChairman(ctx context.Context, in *RemoveHouseChairmanRequest, opts ...grpc.CallOption) (*AdminHouse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminHouse)
+	err := c.cc.Invoke(ctx, HouseService_RemoveHouseChairman_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *houseServiceClient) CreateHouseRegistration(ctx context.Context, in *CreateHouseRegistrationRequest, opts ...grpc.CallOption) (*HouseRegistration, error) {
@@ -651,6 +723,12 @@ func (c *houseServiceClient) ListNotificationRecipients(ctx context.Context, in 
 // All implementations must embed UnimplementedHouseServiceServer
 // for forward compatibility.
 type HouseServiceServer interface {
+	ListPlatformUsers(context.Context, *ListPlatformUsersRequest) (*PlatformUserList, error)
+	GrantChairmanPermission(context.Context, *GrantChairmanPermissionRequest) (*PlatformUser, error)
+	RevokeChairmanPermission(context.Context, *RevokeChairmanPermissionRequest) (*PlatformUser, error)
+	ListAdminHouses(context.Context, *ListAdminHousesRequest) (*AdminHouseList, error)
+	AssignHouseChairman(context.Context, *AssignHouseChairmanRequest) (*AdminHouse, error)
+	RemoveHouseChairman(context.Context, *RemoveHouseChairmanRequest) (*AdminHouse, error)
 	CreateHouseRegistration(context.Context, *CreateHouseRegistrationRequest) (*HouseRegistration, error)
 	GetHouseRegistration(context.Context, *GetHouseRegistrationRequest) (*HouseRegistration, error)
 	ListMyHouseRegistrations(context.Context, *ListMyHouseRegistrationsRequest) (*HouseRegistrationList, error)
@@ -694,6 +772,24 @@ type HouseServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedHouseServiceServer struct{}
 
+func (UnimplementedHouseServiceServer) ListPlatformUsers(context.Context, *ListPlatformUsersRequest) (*PlatformUserList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPlatformUsers not implemented")
+}
+func (UnimplementedHouseServiceServer) GrantChairmanPermission(context.Context, *GrantChairmanPermissionRequest) (*PlatformUser, error) {
+	return nil, status.Error(codes.Unimplemented, "method GrantChairmanPermission not implemented")
+}
+func (UnimplementedHouseServiceServer) RevokeChairmanPermission(context.Context, *RevokeChairmanPermissionRequest) (*PlatformUser, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevokeChairmanPermission not implemented")
+}
+func (UnimplementedHouseServiceServer) ListAdminHouses(context.Context, *ListAdminHousesRequest) (*AdminHouseList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAdminHouses not implemented")
+}
+func (UnimplementedHouseServiceServer) AssignHouseChairman(context.Context, *AssignHouseChairmanRequest) (*AdminHouse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AssignHouseChairman not implemented")
+}
+func (UnimplementedHouseServiceServer) RemoveHouseChairman(context.Context, *RemoveHouseChairmanRequest) (*AdminHouse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveHouseChairman not implemented")
+}
 func (UnimplementedHouseServiceServer) CreateHouseRegistration(context.Context, *CreateHouseRegistrationRequest) (*HouseRegistration, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateHouseRegistration not implemented")
 }
@@ -812,6 +908,114 @@ func RegisterHouseServiceServer(s grpc.ServiceRegistrar, srv HouseServiceServer)
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&HouseService_ServiceDesc, srv)
+}
+
+func _HouseService_ListPlatformUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPlatformUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListPlatformUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListPlatformUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListPlatformUsers(ctx, req.(*ListPlatformUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_GrantChairmanPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GrantChairmanPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).GrantChairmanPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_GrantChairmanPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).GrantChairmanPermission(ctx, req.(*GrantChairmanPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_RevokeChairmanPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokeChairmanPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).RevokeChairmanPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_RevokeChairmanPermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).RevokeChairmanPermission(ctx, req.(*RevokeChairmanPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_ListAdminHouses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAdminHousesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).ListAdminHouses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_ListAdminHouses_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).ListAdminHouses(ctx, req.(*ListAdminHousesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_AssignHouseChairman_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssignHouseChairmanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).AssignHouseChairman(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_AssignHouseChairman_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).AssignHouseChairman(ctx, req.(*AssignHouseChairmanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HouseService_RemoveHouseChairman_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveHouseChairmanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HouseServiceServer).RemoveHouseChairman(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HouseService_RemoveHouseChairman_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HouseServiceServer).RemoveHouseChairman(ctx, req.(*RemoveHouseChairmanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _HouseService_CreateHouseRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -1415,6 +1619,30 @@ var HouseService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "smartquarter.identity.v1.HouseService",
 	HandlerType: (*HouseServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListPlatformUsers",
+			Handler:    _HouseService_ListPlatformUsers_Handler,
+		},
+		{
+			MethodName: "GrantChairmanPermission",
+			Handler:    _HouseService_GrantChairmanPermission_Handler,
+		},
+		{
+			MethodName: "RevokeChairmanPermission",
+			Handler:    _HouseService_RevokeChairmanPermission_Handler,
+		},
+		{
+			MethodName: "ListAdminHouses",
+			Handler:    _HouseService_ListAdminHouses_Handler,
+		},
+		{
+			MethodName: "AssignHouseChairman",
+			Handler:    _HouseService_AssignHouseChairman_Handler,
+		},
+		{
+			MethodName: "RemoveHouseChairman",
+			Handler:    _HouseService_RemoveHouseChairman_Handler,
+		},
 		{
 			MethodName: "CreateHouseRegistration",
 			Handler:    _HouseService_CreateHouseRegistration_Handler,

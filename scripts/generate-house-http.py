@@ -15,7 +15,7 @@ for o in registry['operations']:
     # Fresh permissions live in Identity, including platform-admin bootstrap
     # and recipients accepting transfers without chairman privileges.
     if o['method']!='GET': handler='a.idempotent('+handler+')'
-    if o['access'] in ['manager','admin']: handler='a.housePermission("'+o['access']+'",'+handler+')'
+    if o['access'] in ['manager','admin','chairman']: handler='a.housePermission("'+o['access']+'",'+handler+')'
     src+=f' mux.HandleFunc("{o["method"]} /api/v1{o["path"]}",a.origin(a.authenticate(false,false,{handler})))\n'
 src+='}\n'
 for o in registry['operations']:

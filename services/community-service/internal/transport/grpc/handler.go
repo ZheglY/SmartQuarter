@@ -3,7 +3,9 @@ package grpc
 import (
 	"context"
 	"errors"
+	"github.com/google/uuid"
 	"strconv"
+	"strings"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -27,32 +29,35 @@ func NewCommunityHandler(useCase domain.CommunityService, logger *zap.Logger) *C
 	return &CommunityHandler{useCase: useCase, logger: logger}
 }
 
-func extractContext(ctx context.Context, requestedHouseID string) (userID, role string, err error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return "", "", status.Error(codes.Unauthenticated, "metadata is not provided")
+func extractContext(ctx context.Context, requestedHouseID string) (string, string, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	u, role, h := md.Get("x-actor-user-id"), md.Get("x-actor-role"), md.Get("x-house-id")
+	if len(u) != 1 || !validID(u[0]) {
+		return "", "", status.Error(codes.Unauthenticated, "authenticated actor required")
 	}
-
-	userVals := md.Get("x-actor-user-id")
-	if len(userVals) == 0 {
-		return "", "", status.Error(codes.Unauthenticated, "x-actor-user-id is missing")
+	if len(role) != 1 || len(h) != 1 || h[0] != requestedHouseID || !validID(requestedHouseID) {
+		return "", "", status.Error(codes.PermissionDenied, "trusted house context required")
 	}
-
-	roleVals := md.Get("x-actor-role")
-	roleStr := "RESIDENT"
-	if len(roleVals) > 0 {
-		roleStr = roleVals[0]
+	if role[0] != "RESIDENT" && role[0] != "CHAIRMAN" && role[0] != "ADMIN" {
+		return "", "", status.Error(codes.PermissionDenied, "active membership required")
 	}
-
-	houseVals := md.Get("x-house-id")
-	if len(houseVals) > 0 && houseVals[0] != requestedHouseID {
-		return "", "", status.Error(codes.PermissionDenied, "access to this house is denied")
-	}
-
-	return userVals[0], roleStr, nil
+	return u[0], role[0], nil
+}
+func validID(s string) bool {
+	v, e := uuid.Parse(s)
+	return e == nil && v != uuid.Nil && v.String() == s
 }
 
 func mapError(err error) error {
+	if errors.Is(err, domain.ErrInvalidArgument) || errors.Is(err, domain.ErrInvalidDate) {
+		return status.Error(codes.InvalidArgument, "invalid request")
+	}
+	if errors.Is(err, domain.ErrInitiativeClosed) {
+		return status.Error(codes.FailedPrecondition, "initiative is closed")
+	}
+	if errors.Is(err, domain.ErrAccessDenied) {
+		return status.Error(codes.PermissionDenied, "access denied")
+	}
 	if errors.Is(err, domain.ErrAlreadyVoted) {
 		return status.Error(codes.AlreadyExists, err.Error())
 	}
@@ -62,7 +67,7 @@ func mapError(err error) error {
 	if errors.Is(err, domain.ErrNotFound) {
 		return status.Error(codes.NotFound, err.Error())
 	}
-	return status.Errorf(codes.Internal, "internal server error: %v", err)
+	return status.Error(codes.Internal, "community unavailable")
 }
 
 func (h *CommunityHandler) CreateAnnouncement(ctx context.Context, req *communityv1.CreateAnnouncementRequest) (*communityv1.Announcement, error) {
@@ -97,10 +102,9 @@ func (h *CommunityHandler) ListAnnouncements(ctx context.Context, req *community
 		return nil, err
 	}
 
-	limit := int(req.GetPageSize())
-	offset := 0
-	if req.GetPageToken() != "" {
-		offset, _ = strconv.Atoi(req.GetPageToken())
+	limit, offset, pageErr := pagination(req.GetPageSize(), req.GetPageToken())
+	if pageErr != nil {
+		return nil, pageErr
 	}
 
 	list, err := h.useCase.ListAnnouncements(ctx, req.GetHouseId(), limit, offset)
@@ -137,6 +141,9 @@ func (h *CommunityHandler) CreatePoll(ctx context.Context, req *communityv1.Crea
 		return nil, status.Error(codes.PermissionDenied, "only chairman or admin can create polls")
 	}
 
+	if req.GetEndsAt().CheckValid() != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
 	p, err := h.useCase.CreatePoll(ctx, req.GetHouseId(), actorID, req.GetQuestion(), req.GetOptions(), req.GetEndsAt().AsTime())
 	if err != nil {
 		return nil, mapError(err)
@@ -164,6 +171,9 @@ func (h *CommunityHandler) GetPoll(ctx context.Context, req *communityv1.GetPoll
 		return nil, err
 	}
 
+	if !validID(req.GetPollId()) {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
 	d, err := h.useCase.GetPoll(ctx, req.GetHouseId(), req.GetPollId(), actorID)
 	if err != nil {
 		return nil, mapError(err)
@@ -206,15 +216,17 @@ func (h *CommunityHandler) ListPolls(ctx context.Context, req *communityv1.ListP
 		return nil, err
 	}
 
-	limit := int(req.GetPageSize())
-	offset := 0
-	if req.GetPageToken() != "" {
-		offset, _ = strconv.Atoi(req.GetPageToken())
+	limit, offset, pageErr := pagination(req.GetPageSize(), req.GetPageToken())
+	if pageErr != nil {
+		return nil, pageErr
 	}
 
 	var statuses []string
 	for _, st := range req.GetStatus() {
-		statuses = append(statuses, st.String())
+		if st != communityv1.PollStatus_POLL_STATUS_OPEN && st != communityv1.PollStatus_POLL_STATUS_CLOSED {
+			return nil, status.Error(codes.InvalidArgument, "invalid status")
+		}
+		statuses = append(statuses, strings.TrimPrefix(st.String(), "POLL_STATUS_"))
 	}
 
 	list, err := h.useCase.ListPolls(ctx, req.GetHouseId(), statuses, limit, offset)
@@ -224,6 +236,10 @@ func (h *CommunityHandler) ListPolls(ctx context.Context, req *communityv1.ListP
 
 	var items []*communityv1.Poll
 	for _, p := range list {
+		var options []*communityv1.PollOption
+		for _, o := range p.Options {
+			options = append(options, &communityv1.PollOption{Id: o.ID, Text: o.Text, Position: o.Position})
+		}
 		statusEnum := communityv1.PollStatus_POLL_STATUS_OPEN
 		if p.Status == "CLOSED" {
 			statusEnum = communityv1.PollStatus_POLL_STATUS_CLOSED
@@ -234,6 +250,7 @@ func (h *CommunityHandler) ListPolls(ctx context.Context, req *communityv1.ListP
 			AuthorUserId: p.AuthorUserID,
 			Question:     p.Question,
 			Status:       statusEnum,
+			Options:      options,
 			EndsAt:       timestamppb.New(p.EndsAt),
 			CreatedAt:    timestamppb.New(p.CreatedAt),
 		})
@@ -251,6 +268,9 @@ func (h *CommunityHandler) VotePoll(ctx context.Context, req *communityv1.VotePo
 		return nil, err
 	}
 
+	if !validID(req.GetPollId()) || !validID(req.GetOptionId()) {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
 	total, myOpt, err := h.useCase.VotePoll(ctx, req.GetHouseId(), req.GetPollId(), req.GetOptionId(), actorID)
 	if err != nil {
 		return nil, mapError(err)
@@ -267,6 +287,9 @@ func (h *CommunityHandler) CreateCalendarEvent(ctx context.Context, req *communi
 		return nil, status.Error(codes.PermissionDenied, "only chairman or admin can create calendar events")
 	}
 
+	if req.GetStartsAt().CheckValid() != nil || req.GetEndsAt().CheckValid() != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
 	e, err := h.useCase.CreateCalendarEvent(ctx, req.GetHouseId(), actorID, req.GetTitle(), req.GetDescription(), req.GetStartsAt().AsTime(), req.GetEndsAt().AsTime())
 	if err != nil {
 		return nil, mapError(err)
@@ -289,6 +312,9 @@ func (h *CommunityHandler) ListCalendarEvents(ctx context.Context, req *communit
 		return nil, err
 	}
 
+	if req.GetFrom().CheckValid() != nil || req.GetTo().CheckValid() != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
 	list, err := h.useCase.ListCalendarEvents(ctx, req.GetHouseId(), req.GetFrom().AsTime(), req.GetTo().AsTime())
 	if err != nil {
 		return nil, mapError(err)
@@ -339,10 +365,9 @@ func (h *CommunityHandler) ListInitiatives(ctx context.Context, req *communityv1
 		return nil, err
 	}
 
-	limit := int(req.GetPageSize())
-	offset := 0
-	if req.GetPageToken() != "" {
-		offset, _ = strconv.Atoi(req.GetPageToken())
+	limit, offset, pageErr := pagination(req.GetPageSize(), req.GetPageToken())
+	if pageErr != nil {
+		return nil, pageErr
 	}
 
 	list, err := h.useCase.ListInitiatives(ctx, req.GetHouseId(), actorID, limit, offset)
@@ -382,6 +407,9 @@ func (h *CommunityHandler) SupportInitiative(ctx context.Context, req *community
 		return nil, err
 	}
 
+	if !validID(req.GetInitiativeId()) {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
 	count, err := h.useCase.SupportInitiative(ctx, req.GetHouseId(), req.GetInitiativeId(), actorID)
 	if err != nil {
 		return nil, mapError(err)
@@ -391,4 +419,19 @@ func (h *CommunityHandler) SupportInitiative(ctx context.Context, req *community
 		SupportsCount: count,
 		SupportedByMe: true,
 	}, nil
+}
+
+func pagination(size int32, token string) (int, int, error) {
+	if size == 0 {
+		size = 20
+	}
+	offset := 0
+	var e error
+	if token != "" {
+		offset, e = strconv.Atoi(token)
+	}
+	if size < 1 || size > 100 || offset < 0 || e != nil {
+		return 0, 0, status.Error(codes.InvalidArgument, "invalid pagination")
+	}
+	return int(size), offset, nil
 }

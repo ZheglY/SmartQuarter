@@ -17,6 +17,11 @@ func (s *Service) registration(ctx context.Context, tx pgx.Tx, a actor, op strin
 		rs, e := rows(ctx, tx, `SELECT jsonb_build_object('id',h.id,'name',h.name,'address',h.address,'city',h.city,'has_chairman',EXISTS(SELECT 1 FROM memberships m WHERE m.house_id=h.id AND m.role='CHAIRMAN' AND m.status='ACTIVE'),'join_available',NOT EXISTS(SELECT 1 FROM memberships m WHERE m.house_id=h.id AND m.user_id=$2 AND m.status='ACTIVE')) FROM houses h WHERE position(lower($1) in lower(h.city||' '||h.address||' '||h.name))>0 ORDER BY h.city,h.address,h.id LIMIT 100`, strings.TrimSpace(c.Query), a.User)
 		return list(rs, ""), e
 	case "CreateHouseRegistration":
+		if yes, e := chairmanAllowed(ctx, tx, a.User); e != nil {
+			return nil, e
+		} else if !yes && !a.Admin {
+			return nil, denied()
+		}
 		if !textOK(c.Name, 255) || !textOK(c.Address, 1000) || !textOK(c.City, 100) {
 			return nil, invalid()
 		}
@@ -73,6 +78,11 @@ func (s *Service) registration(ctx context.Context, tx pgx.Tx, a actor, op strin
 	}
 	houseID := ""
 	if target == "APPROVED" {
+		if yes, err := chairmanAllowed(ctx, tx, r.str("applicant_user_id")); err != nil {
+			return nil, err
+		} else if !yes && !s.Admins[r.str("applicant_user_id")] {
+			return nil, denied()
+		}
 		e = tx.QueryRow(ctx, `INSERT INTO houses(name,address,city) VALUES($1,$2,$3) RETURNING id::text`, r.str("requested_name"), r.str("original_address"), r.str("city")).Scan(&houseID)
 		if e != nil {
 			return nil, e

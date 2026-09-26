@@ -1,6 +1,94 @@
 {
   "operations": [
     {
+      "name": "ListPlatformUsers",
+      "fields": [
+        [
+          "string",
+          "query"
+        ]
+      ],
+      "response": "PlatformUserList",
+      "method": "GET",
+      "path": "/admin/users",
+      "access": "admin",
+      "code": 200
+    },
+    {
+      "name": "GrantChairmanPermission",
+      "fields": [
+        [
+          "string",
+          "user_id"
+        ]
+      ],
+      "response": "PlatformUser",
+      "method": "POST",
+      "path": "/admin/users/{user_id}/chairman",
+      "access": "admin",
+      "code": 200
+    },
+    {
+      "name": "RevokeChairmanPermission",
+      "fields": [
+        [
+          "string",
+          "user_id"
+        ]
+      ],
+      "response": "PlatformUser",
+      "method": "DELETE",
+      "path": "/admin/users/{user_id}/chairman",
+      "access": "admin",
+      "code": 200
+    },
+    {
+      "name": "ListAdminHouses",
+      "fields": [
+        [
+          "string",
+          "query"
+        ]
+      ],
+      "response": "AdminHouseList",
+      "method": "GET",
+      "path": "/admin/houses",
+      "access": "admin",
+      "code": 200
+    },
+    {
+      "name": "AssignHouseChairman",
+      "fields": [
+        [
+          "string",
+          "house_id"
+        ],
+        [
+          "string",
+          "target_user_id"
+        ]
+      ],
+      "response": "AdminHouse",
+      "method": "PUT",
+      "path": "/admin/houses/{house_id}/chairman",
+      "access": "admin",
+      "code": 200
+    },
+    {
+      "name": "RemoveHouseChairman",
+      "fields": [
+        [
+          "string",
+          "house_id"
+        ]
+      ],
+      "response": "AdminHouse",
+      "method": "DELETE",
+      "path": "/admin/houses/{house_id}/chairman",
+      "access": "admin",
+      "code": 200
+    },
+    {
       "name": "CreateHouseRegistration",
       "fields": [
         [
@@ -19,7 +107,7 @@
       "response": "HouseRegistration",
       "method": "POST",
       "path": "/house-registrations",
-      "access": "session",
+      "access": "chairman",
       "code": 202
     },
     {
@@ -461,6 +549,66 @@
     }
   ],
   "entities": {
+    "PlatformUser": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "display_name"
+      ],
+      [
+        "string",
+        "max_user_id"
+      ],
+      [
+        "bool",
+        "can_register_house"
+      ],
+      [
+        "int32",
+        "managed_houses"
+      ]
+    ],
+    "PlatformUserList": [
+      [
+        "repeated PlatformUser",
+        "items"
+      ]
+    ],
+    "AdminHouse": [
+      [
+        "string",
+        "id"
+      ],
+      [
+        "string",
+        "name"
+      ],
+      [
+        "string",
+        "address"
+      ],
+      [
+        "string",
+        "city"
+      ],
+      [
+        "string",
+        "chairman_user_id"
+      ],
+      [
+        "string",
+        "chairman_display_name"
+      ]
+    ],
+    "AdminHouseList": [
+      [
+        "repeated AdminHouse",
+        "items"
+      ]
+    ],
     "HouseRegistration": [
       [
         "string",
@@ -695,6 +843,10 @@
       [
         "bool",
         "can_manage_active_house"
+      ],
+      [
+        "bool",
+        "can_register_house"
       ]
     ],
     "NotificationPreferences": [
