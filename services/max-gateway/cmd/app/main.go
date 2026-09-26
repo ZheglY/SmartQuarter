@@ -13,7 +13,6 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
-	"google.golang.org/grpc/connectivity"
 
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/config"
 	cpb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/community/v1"
@@ -97,24 +96,7 @@ func run() error {
 		api.Community = cpb.NewCommunityServiceClient(community)
 		api.CommunityReady = rpc.HTTPReady(community, cfg.CommunityReadyURL)
 	}
-	api.IssueReady = func(ctx context.Context) error {
-		if conn.GetState() != connectivity.Ready {
-			return errors.New("Issue gRPC unavailable")
-		}
-		req, e := http.NewRequestWithContext(ctx, "GET", cfg.IssueReadyURL, nil)
-		if e != nil {
-			return e
-		}
-		res, e := (&http.Client{Timeout: 2 * time.Second}).Do(req)
-		if e != nil {
-			return e
-		}
-		defer res.Body.Close()
-		if res.StatusCode != 200 {
-			return errors.New("Issue dependencies unavailable")
-		}
-		return nil
-	}
+	api.IssueReady = rpc.HTTPReady(conn, cfg.IssueReadyURL)
 	workerCtx, cancelWorker := context.WithCancel(context.Background())
 	workerDone := make(chan struct{})
 	worker := &notification.Consumer{Redis: r, Stream: cfg.Stream, Group: cfg.Group, Identity: api.Identity, Bot: bot, Metrics: metrics, Logger: logger}

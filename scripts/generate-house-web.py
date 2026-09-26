@@ -11,8 +11,8 @@ for name,fields in data['entities'].items():
     for t,f in fields:
         if t=='string':
             rule="z.string()"
-            if f=='id' or f.endswith('_user_id') or f=='house_id' or f=='created_by':rule='z.string().uuid()'
-            if f=='resulting_house_id':rule="z.union([z.string().uuid(),z.literal('')])"
+            if f!='max_user_id' and (f=='id' or f.endswith('_user_id') or f=='house_id' or f=='created_by'):rule='z.string().uuid()'
+            if f in ['resulting_house_id','chairman_user_id']:rule="z.union([z.string().uuid(),z.literal('')])"
         elif t=='bool':rule='z.boolean()'
         elif t=='int32':rule='z.number().int()'
         elif t=='google.protobuf.Timestamp':rule='z.string().datetime({offset:true}).nullable().optional()'

@@ -1766,6 +1766,186 @@ func (x *SupportInitiativeResponse) GetSupportedByMe() bool {
 	return false
 }
 
+type UpdateCalendarEventRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HouseId       string                 `protobuf:"bytes,1,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	StartsAt      *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=starts_at,json=startsAt,proto3" json:"starts_at,omitempty"`
+	EndsAt        *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=ends_at,json=endsAt,proto3" json:"ends_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCalendarEventRequest) Reset() {
+	*x = UpdateCalendarEventRequest{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCalendarEventRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCalendarEventRequest) ProtoMessage() {}
+
+func (x *UpdateCalendarEventRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCalendarEventRequest.ProtoReflect.Descriptor instead.
+func (*UpdateCalendarEventRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *UpdateCalendarEventRequest) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
+}
+
+func (x *UpdateCalendarEventRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateCalendarEventRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *UpdateCalendarEventRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateCalendarEventRequest) GetStartsAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartsAt
+	}
+	return nil
+}
+
+func (x *UpdateCalendarEventRequest) GetEndsAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndsAt
+	}
+	return nil
+}
+
+type DeleteCalendarEventRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HouseId       string                 `protobuf:"bytes,1,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCalendarEventRequest) Reset() {
+	*x = DeleteCalendarEventRequest{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCalendarEventRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCalendarEventRequest) ProtoMessage() {}
+
+func (x *DeleteCalendarEventRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCalendarEventRequest.ProtoReflect.Descriptor instead.
+func (*DeleteCalendarEventRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *DeleteCalendarEventRequest) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
+}
+
+func (x *DeleteCalendarEventRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteCalendarEventResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCalendarEventResponse) Reset() {
+	*x = DeleteCalendarEventResponse{}
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCalendarEventResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCalendarEventResponse) ProtoMessage() {}
+
+func (x *DeleteCalendarEventResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCalendarEventResponse.ProtoReflect.Descriptor instead.
+func (*DeleteCalendarEventResponse) Descriptor() ([]byte, []int) {
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *DeleteCalendarEventResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 // Service contacts (additive contract).
 type ServiceContactInput struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
@@ -1785,7 +1965,7 @@ type ServiceContactInput struct {
 
 func (x *ServiceContactInput) Reset() {
 	*x = ServiceContactInput{}
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[24]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1797,7 +1977,7 @@ func (x *ServiceContactInput) String() string {
 func (*ServiceContactInput) ProtoMessage() {}
 
 func (x *ServiceContactInput) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[24]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1810,7 +1990,7 @@ func (x *ServiceContactInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServiceContactInput.ProtoReflect.Descriptor instead.
 func (*ServiceContactInput) Descriptor() ([]byte, []int) {
-	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{24}
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ServiceContactInput) GetCategory() string {
@@ -1907,7 +2087,7 @@ type ServiceContact struct {
 
 func (x *ServiceContact) Reset() {
 	*x = ServiceContact{}
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[25]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1919,7 +2099,7 @@ func (x *ServiceContact) String() string {
 func (*ServiceContact) ProtoMessage() {}
 
 func (x *ServiceContact) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[25]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1932,7 +2112,7 @@ func (x *ServiceContact) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServiceContact.ProtoReflect.Descriptor instead.
 func (*ServiceContact) Descriptor() ([]byte, []int) {
-	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{25}
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ServiceContact) GetId() string {
@@ -2057,7 +2237,7 @@ type CreateServiceContactRequest struct {
 
 func (x *CreateServiceContactRequest) Reset() {
 	*x = CreateServiceContactRequest{}
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[26]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2069,7 +2249,7 @@ func (x *CreateServiceContactRequest) String() string {
 func (*CreateServiceContactRequest) ProtoMessage() {}
 
 func (x *CreateServiceContactRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[26]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2082,7 +2262,7 @@ func (x *CreateServiceContactRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateServiceContactRequest.ProtoReflect.Descriptor instead.
 func (*CreateServiceContactRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{26}
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *CreateServiceContactRequest) GetHouseId() string {
@@ -2110,7 +2290,7 @@ type UpdateServiceContactRequest struct {
 
 func (x *UpdateServiceContactRequest) Reset() {
 	*x = UpdateServiceContactRequest{}
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[27]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2122,7 +2302,7 @@ func (x *UpdateServiceContactRequest) String() string {
 func (*UpdateServiceContactRequest) ProtoMessage() {}
 
 func (x *UpdateServiceContactRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[27]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2135,7 +2315,7 @@ func (x *UpdateServiceContactRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateServiceContactRequest.ProtoReflect.Descriptor instead.
 func (*UpdateServiceContactRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{27}
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *UpdateServiceContactRequest) GetHouseId() string {
@@ -2169,7 +2349,7 @@ type GetServiceContactRequest struct {
 
 func (x *GetServiceContactRequest) Reset() {
 	*x = GetServiceContactRequest{}
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[28]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2181,7 +2361,7 @@ func (x *GetServiceContactRequest) String() string {
 func (*GetServiceContactRequest) ProtoMessage() {}
 
 func (x *GetServiceContactRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[28]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2194,7 +2374,7 @@ func (x *GetServiceContactRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetServiceContactRequest.ProtoReflect.Descriptor instead.
 func (*GetServiceContactRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{28}
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *GetServiceContactRequest) GetHouseId() string {
@@ -2221,7 +2401,7 @@ type ArchiveServiceContactRequest struct {
 
 func (x *ArchiveServiceContactRequest) Reset() {
 	*x = ArchiveServiceContactRequest{}
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[29]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2233,7 +2413,7 @@ func (x *ArchiveServiceContactRequest) String() string {
 func (*ArchiveServiceContactRequest) ProtoMessage() {}
 
 func (x *ArchiveServiceContactRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[29]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2246,7 +2426,7 @@ func (x *ArchiveServiceContactRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArchiveServiceContactRequest.ProtoReflect.Descriptor instead.
 func (*ArchiveServiceContactRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{29}
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *ArchiveServiceContactRequest) GetHouseId() string {
@@ -2273,7 +2453,7 @@ type ListServiceContactsRequest struct {
 
 func (x *ListServiceContactsRequest) Reset() {
 	*x = ListServiceContactsRequest{}
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[30]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2285,7 +2465,7 @@ func (x *ListServiceContactsRequest) String() string {
 func (*ListServiceContactsRequest) ProtoMessage() {}
 
 func (x *ListServiceContactsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[30]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2298,7 +2478,7 @@ func (x *ListServiceContactsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListServiceContactsRequest.ProtoReflect.Descriptor instead.
 func (*ListServiceContactsRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{30}
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ListServiceContactsRequest) GetHouseId() string {
@@ -2324,7 +2504,7 @@ type ListServiceContactsResponse struct {
 
 func (x *ListServiceContactsResponse) Reset() {
 	*x = ListServiceContactsResponse{}
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[31]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2336,7 +2516,7 @@ func (x *ListServiceContactsResponse) String() string {
 func (*ListServiceContactsResponse) ProtoMessage() {}
 
 func (x *ListServiceContactsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_community_v1_community_proto_msgTypes[31]
+	mi := &file_smartquarter_community_v1_community_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2349,7 +2529,7 @@ func (x *ListServiceContactsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListServiceContactsResponse.ProtoReflect.Descriptor instead.
 func (*ListServiceContactsResponse) Descriptor() ([]byte, []int) {
-	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{31}
+	return file_smartquarter_community_v1_community_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *ListServiceContactsResponse) GetItems() []*ServiceContact {
@@ -2496,7 +2676,19 @@ const file_smartquarter_community_v1_community_proto_rawDesc = "" +
 	"\x19SupportInitiativeResponse\x12#\n" +
 	"\rinitiative_id\x18\x01 \x01(\tR\finitiativeId\x12%\n" +
 	"\x0esupports_count\x18\x02 \x01(\x05R\rsupportsCount\x12&\n" +
-	"\x0fsupported_by_me\x18\x03 \x01(\bR\rsupportedByMe\"\xc4\x02\n" +
+	"\x0fsupported_by_me\x18\x03 \x01(\bR\rsupportedByMe\"\xed\x01\n" +
+	"\x1aUpdateCalendarEventRequest\x12\x19\n" +
+	"\bhouse_id\x18\x01 \x01(\tR\ahouseId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12\x14\n" +
+	"\x05title\x18\x03 \x01(\tR\x05title\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x127\n" +
+	"\tstarts_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\bstartsAt\x123\n" +
+	"\aends_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x06endsAt\"G\n" +
+	"\x1aDeleteCalendarEventRequest\x12\x19\n" +
+	"\bhouse_id\x18\x01 \x01(\tR\ahouseId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"-\n" +
+	"\x1bDeleteCalendarEventResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xc4\x02\n" +
 	"\x13ServiceContactInput\x12\x1a\n" +
 	"\bcategory\x18\x01 \x01(\tR\bcategory\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12+\n" +
@@ -2561,8 +2753,12 @@ const file_smartquarter_community_v1_community_proto_rawDesc = "" +
 	"\x10InitiativeStatus\x12!\n" +
 	"\x1dINITIATIVE_STATUS_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16INITIATIVE_STATUS_OPEN\x10\x01\x12\x1c\n" +
-	"\x18INITIATIVE_STATUS_CLOSED\x10\x022\xe3\x0e\n" +
-	"\x10CommunityService\x12y\n" +
+	"\x18INITIATIVE_STATUS_CLOSED\x10\x022\xb1\x12\n" +
+	"\x10CommunityService\x12^\n" +
+	"\tClosePoll\x12).smartquarter.community.v1.GetPollRequest\x1a&.smartquarter.community.v1.PollDetails\x12v\n" +
+	"\x13UpdateCalendarEvent\x125.smartquarter.community.v1.UpdateCalendarEventRequest\x1a(.smartquarter.community.v1.CalendarEvent\x12\x84\x01\n" +
+	"\x13DeleteCalendarEvent\x125.smartquarter.community.v1.DeleteCalendarEventRequest\x1a6.smartquarter.community.v1.DeleteCalendarEventResponse\x12m\n" +
+	"\x0fCloseInitiative\x123.smartquarter.community.v1.SupportInitiativeRequest\x1a%.smartquarter.community.v1.Initiative\x12y\n" +
 	"\x14CreateServiceContact\x126.smartquarter.community.v1.CreateServiceContactRequest\x1a).smartquarter.community.v1.ServiceContact\x12\x84\x01\n" +
 	"\x13ListServiceContacts\x125.smartquarter.community.v1.ListServiceContactsRequest\x1a6.smartquarter.community.v1.ListServiceContactsResponse\x12s\n" +
 	"\x11GetServiceContact\x123.smartquarter.community.v1.GetServiceContactRequest\x1a).smartquarter.community.v1.ServiceContact\x12y\n" +
@@ -2594,7 +2790,7 @@ func file_smartquarter_community_v1_community_proto_rawDescGZIP() []byte {
 }
 
 var file_smartquarter_community_v1_community_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_smartquarter_community_v1_community_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
+var file_smartquarter_community_v1_community_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_smartquarter_community_v1_community_proto_goTypes = []any{
 	(AnnouncementStatus)(0),              // 0: smartquarter.community.v1.AnnouncementStatus
 	(PollStatus)(0),                      // 1: smartquarter.community.v1.PollStatus
@@ -2623,84 +2819,97 @@ var file_smartquarter_community_v1_community_proto_goTypes = []any{
 	(*ListInitiativesResponse)(nil),      // 24: smartquarter.community.v1.ListInitiativesResponse
 	(*SupportInitiativeRequest)(nil),     // 25: smartquarter.community.v1.SupportInitiativeRequest
 	(*SupportInitiativeResponse)(nil),    // 26: smartquarter.community.v1.SupportInitiativeResponse
-	(*ServiceContactInput)(nil),          // 27: smartquarter.community.v1.ServiceContactInput
-	(*ServiceContact)(nil),               // 28: smartquarter.community.v1.ServiceContact
-	(*CreateServiceContactRequest)(nil),  // 29: smartquarter.community.v1.CreateServiceContactRequest
-	(*UpdateServiceContactRequest)(nil),  // 30: smartquarter.community.v1.UpdateServiceContactRequest
-	(*GetServiceContactRequest)(nil),     // 31: smartquarter.community.v1.GetServiceContactRequest
-	(*ArchiveServiceContactRequest)(nil), // 32: smartquarter.community.v1.ArchiveServiceContactRequest
-	(*ListServiceContactsRequest)(nil),   // 33: smartquarter.community.v1.ListServiceContactsRequest
-	(*ListServiceContactsResponse)(nil),  // 34: smartquarter.community.v1.ListServiceContactsResponse
-	(*timestamppb.Timestamp)(nil),        // 35: google.protobuf.Timestamp
+	(*UpdateCalendarEventRequest)(nil),   // 27: smartquarter.community.v1.UpdateCalendarEventRequest
+	(*DeleteCalendarEventRequest)(nil),   // 28: smartquarter.community.v1.DeleteCalendarEventRequest
+	(*DeleteCalendarEventResponse)(nil),  // 29: smartquarter.community.v1.DeleteCalendarEventResponse
+	(*ServiceContactInput)(nil),          // 30: smartquarter.community.v1.ServiceContactInput
+	(*ServiceContact)(nil),               // 31: smartquarter.community.v1.ServiceContact
+	(*CreateServiceContactRequest)(nil),  // 32: smartquarter.community.v1.CreateServiceContactRequest
+	(*UpdateServiceContactRequest)(nil),  // 33: smartquarter.community.v1.UpdateServiceContactRequest
+	(*GetServiceContactRequest)(nil),     // 34: smartquarter.community.v1.GetServiceContactRequest
+	(*ArchiveServiceContactRequest)(nil), // 35: smartquarter.community.v1.ArchiveServiceContactRequest
+	(*ListServiceContactsRequest)(nil),   // 36: smartquarter.community.v1.ListServiceContactsRequest
+	(*ListServiceContactsResponse)(nil),  // 37: smartquarter.community.v1.ListServiceContactsResponse
+	(*timestamppb.Timestamp)(nil),        // 38: google.protobuf.Timestamp
 }
 var file_smartquarter_community_v1_community_proto_depIdxs = []int32{
 	0,  // 0: smartquarter.community.v1.Announcement.status:type_name -> smartquarter.community.v1.AnnouncementStatus
-	35, // 1: smartquarter.community.v1.Announcement.published_at:type_name -> google.protobuf.Timestamp
-	35, // 2: smartquarter.community.v1.Announcement.created_at:type_name -> google.protobuf.Timestamp
+	38, // 1: smartquarter.community.v1.Announcement.published_at:type_name -> google.protobuf.Timestamp
+	38, // 2: smartquarter.community.v1.Announcement.created_at:type_name -> google.protobuf.Timestamp
 	3,  // 3: smartquarter.community.v1.ListAnnouncementsResponse.items:type_name -> smartquarter.community.v1.Announcement
 	1,  // 4: smartquarter.community.v1.Poll.status:type_name -> smartquarter.community.v1.PollStatus
 	7,  // 5: smartquarter.community.v1.Poll.options:type_name -> smartquarter.community.v1.PollOption
-	35, // 6: smartquarter.community.v1.Poll.ends_at:type_name -> google.protobuf.Timestamp
-	35, // 7: smartquarter.community.v1.Poll.created_at:type_name -> google.protobuf.Timestamp
+	38, // 6: smartquarter.community.v1.Poll.ends_at:type_name -> google.protobuf.Timestamp
+	38, // 7: smartquarter.community.v1.Poll.created_at:type_name -> google.protobuf.Timestamp
 	8,  // 8: smartquarter.community.v1.PollDetails.poll:type_name -> smartquarter.community.v1.Poll
 	9,  // 9: smartquarter.community.v1.PollDetails.results:type_name -> smartquarter.community.v1.PollOptionResult
-	35, // 10: smartquarter.community.v1.CreatePollRequest.ends_at:type_name -> google.protobuf.Timestamp
+	38, // 10: smartquarter.community.v1.CreatePollRequest.ends_at:type_name -> google.protobuf.Timestamp
 	1,  // 11: smartquarter.community.v1.ListPollsRequest.status:type_name -> smartquarter.community.v1.PollStatus
 	8,  // 12: smartquarter.community.v1.ListPollsResponse.items:type_name -> smartquarter.community.v1.Poll
-	35, // 13: smartquarter.community.v1.CalendarEvent.starts_at:type_name -> google.protobuf.Timestamp
-	35, // 14: smartquarter.community.v1.CalendarEvent.ends_at:type_name -> google.protobuf.Timestamp
-	35, // 15: smartquarter.community.v1.CalendarEvent.created_at:type_name -> google.protobuf.Timestamp
-	35, // 16: smartquarter.community.v1.CreateCalendarEventRequest.starts_at:type_name -> google.protobuf.Timestamp
-	35, // 17: smartquarter.community.v1.CreateCalendarEventRequest.ends_at:type_name -> google.protobuf.Timestamp
-	35, // 18: smartquarter.community.v1.ListCalendarEventsRequest.from:type_name -> google.protobuf.Timestamp
-	35, // 19: smartquarter.community.v1.ListCalendarEventsRequest.to:type_name -> google.protobuf.Timestamp
+	38, // 13: smartquarter.community.v1.CalendarEvent.starts_at:type_name -> google.protobuf.Timestamp
+	38, // 14: smartquarter.community.v1.CalendarEvent.ends_at:type_name -> google.protobuf.Timestamp
+	38, // 15: smartquarter.community.v1.CalendarEvent.created_at:type_name -> google.protobuf.Timestamp
+	38, // 16: smartquarter.community.v1.CreateCalendarEventRequest.starts_at:type_name -> google.protobuf.Timestamp
+	38, // 17: smartquarter.community.v1.CreateCalendarEventRequest.ends_at:type_name -> google.protobuf.Timestamp
+	38, // 18: smartquarter.community.v1.ListCalendarEventsRequest.from:type_name -> google.protobuf.Timestamp
+	38, // 19: smartquarter.community.v1.ListCalendarEventsRequest.to:type_name -> google.protobuf.Timestamp
 	17, // 20: smartquarter.community.v1.ListCalendarEventsResponse.items:type_name -> smartquarter.community.v1.CalendarEvent
 	2,  // 21: smartquarter.community.v1.Initiative.status:type_name -> smartquarter.community.v1.InitiativeStatus
-	35, // 22: smartquarter.community.v1.Initiative.created_at:type_name -> google.protobuf.Timestamp
-	35, // 23: smartquarter.community.v1.Initiative.updated_at:type_name -> google.protobuf.Timestamp
+	38, // 22: smartquarter.community.v1.Initiative.created_at:type_name -> google.protobuf.Timestamp
+	38, // 23: smartquarter.community.v1.Initiative.updated_at:type_name -> google.protobuf.Timestamp
 	21, // 24: smartquarter.community.v1.ListInitiativesResponse.items:type_name -> smartquarter.community.v1.Initiative
-	35, // 25: smartquarter.community.v1.ServiceContact.created_at:type_name -> google.protobuf.Timestamp
-	35, // 26: smartquarter.community.v1.ServiceContact.updated_at:type_name -> google.protobuf.Timestamp
-	27, // 27: smartquarter.community.v1.CreateServiceContactRequest.contact:type_name -> smartquarter.community.v1.ServiceContactInput
-	27, // 28: smartquarter.community.v1.UpdateServiceContactRequest.contact:type_name -> smartquarter.community.v1.ServiceContactInput
-	28, // 29: smartquarter.community.v1.ListServiceContactsResponse.items:type_name -> smartquarter.community.v1.ServiceContact
-	29, // 30: smartquarter.community.v1.CommunityService.CreateServiceContact:input_type -> smartquarter.community.v1.CreateServiceContactRequest
-	33, // 31: smartquarter.community.v1.CommunityService.ListServiceContacts:input_type -> smartquarter.community.v1.ListServiceContactsRequest
-	31, // 32: smartquarter.community.v1.CommunityService.GetServiceContact:input_type -> smartquarter.community.v1.GetServiceContactRequest
-	30, // 33: smartquarter.community.v1.CommunityService.UpdateServiceContact:input_type -> smartquarter.community.v1.UpdateServiceContactRequest
-	32, // 34: smartquarter.community.v1.CommunityService.ArchiveServiceContact:input_type -> smartquarter.community.v1.ArchiveServiceContactRequest
-	4,  // 35: smartquarter.community.v1.CommunityService.CreateAnnouncement:input_type -> smartquarter.community.v1.CreateAnnouncementRequest
-	5,  // 36: smartquarter.community.v1.CommunityService.ListAnnouncements:input_type -> smartquarter.community.v1.ListAnnouncementsRequest
-	11, // 37: smartquarter.community.v1.CommunityService.CreatePoll:input_type -> smartquarter.community.v1.CreatePollRequest
-	12, // 38: smartquarter.community.v1.CommunityService.GetPoll:input_type -> smartquarter.community.v1.GetPollRequest
-	13, // 39: smartquarter.community.v1.CommunityService.ListPolls:input_type -> smartquarter.community.v1.ListPollsRequest
-	15, // 40: smartquarter.community.v1.CommunityService.VotePoll:input_type -> smartquarter.community.v1.VotePollRequest
-	18, // 41: smartquarter.community.v1.CommunityService.CreateCalendarEvent:input_type -> smartquarter.community.v1.CreateCalendarEventRequest
-	19, // 42: smartquarter.community.v1.CommunityService.ListCalendarEvents:input_type -> smartquarter.community.v1.ListCalendarEventsRequest
-	22, // 43: smartquarter.community.v1.CommunityService.CreateInitiative:input_type -> smartquarter.community.v1.CreateInitiativeRequest
-	23, // 44: smartquarter.community.v1.CommunityService.ListInitiatives:input_type -> smartquarter.community.v1.ListInitiativesRequest
-	25, // 45: smartquarter.community.v1.CommunityService.SupportInitiative:input_type -> smartquarter.community.v1.SupportInitiativeRequest
-	28, // 46: smartquarter.community.v1.CommunityService.CreateServiceContact:output_type -> smartquarter.community.v1.ServiceContact
-	34, // 47: smartquarter.community.v1.CommunityService.ListServiceContacts:output_type -> smartquarter.community.v1.ListServiceContactsResponse
-	28, // 48: smartquarter.community.v1.CommunityService.GetServiceContact:output_type -> smartquarter.community.v1.ServiceContact
-	28, // 49: smartquarter.community.v1.CommunityService.UpdateServiceContact:output_type -> smartquarter.community.v1.ServiceContact
-	28, // 50: smartquarter.community.v1.CommunityService.ArchiveServiceContact:output_type -> smartquarter.community.v1.ServiceContact
-	3,  // 51: smartquarter.community.v1.CommunityService.CreateAnnouncement:output_type -> smartquarter.community.v1.Announcement
-	6,  // 52: smartquarter.community.v1.CommunityService.ListAnnouncements:output_type -> smartquarter.community.v1.ListAnnouncementsResponse
-	8,  // 53: smartquarter.community.v1.CommunityService.CreatePoll:output_type -> smartquarter.community.v1.Poll
-	10, // 54: smartquarter.community.v1.CommunityService.GetPoll:output_type -> smartquarter.community.v1.PollDetails
-	14, // 55: smartquarter.community.v1.CommunityService.ListPolls:output_type -> smartquarter.community.v1.ListPollsResponse
-	16, // 56: smartquarter.community.v1.CommunityService.VotePoll:output_type -> smartquarter.community.v1.VotePollResponse
-	17, // 57: smartquarter.community.v1.CommunityService.CreateCalendarEvent:output_type -> smartquarter.community.v1.CalendarEvent
-	20, // 58: smartquarter.community.v1.CommunityService.ListCalendarEvents:output_type -> smartquarter.community.v1.ListCalendarEventsResponse
-	21, // 59: smartquarter.community.v1.CommunityService.CreateInitiative:output_type -> smartquarter.community.v1.Initiative
-	24, // 60: smartquarter.community.v1.CommunityService.ListInitiatives:output_type -> smartquarter.community.v1.ListInitiativesResponse
-	26, // 61: smartquarter.community.v1.CommunityService.SupportInitiative:output_type -> smartquarter.community.v1.SupportInitiativeResponse
-	46, // [46:62] is the sub-list for method output_type
-	30, // [30:46] is the sub-list for method input_type
-	30, // [30:30] is the sub-list for extension type_name
-	30, // [30:30] is the sub-list for extension extendee
-	0,  // [0:30] is the sub-list for field type_name
+	38, // 25: smartquarter.community.v1.UpdateCalendarEventRequest.starts_at:type_name -> google.protobuf.Timestamp
+	38, // 26: smartquarter.community.v1.UpdateCalendarEventRequest.ends_at:type_name -> google.protobuf.Timestamp
+	38, // 27: smartquarter.community.v1.ServiceContact.created_at:type_name -> google.protobuf.Timestamp
+	38, // 28: smartquarter.community.v1.ServiceContact.updated_at:type_name -> google.protobuf.Timestamp
+	30, // 29: smartquarter.community.v1.CreateServiceContactRequest.contact:type_name -> smartquarter.community.v1.ServiceContactInput
+	30, // 30: smartquarter.community.v1.UpdateServiceContactRequest.contact:type_name -> smartquarter.community.v1.ServiceContactInput
+	31, // 31: smartquarter.community.v1.ListServiceContactsResponse.items:type_name -> smartquarter.community.v1.ServiceContact
+	12, // 32: smartquarter.community.v1.CommunityService.ClosePoll:input_type -> smartquarter.community.v1.GetPollRequest
+	27, // 33: smartquarter.community.v1.CommunityService.UpdateCalendarEvent:input_type -> smartquarter.community.v1.UpdateCalendarEventRequest
+	28, // 34: smartquarter.community.v1.CommunityService.DeleteCalendarEvent:input_type -> smartquarter.community.v1.DeleteCalendarEventRequest
+	25, // 35: smartquarter.community.v1.CommunityService.CloseInitiative:input_type -> smartquarter.community.v1.SupportInitiativeRequest
+	32, // 36: smartquarter.community.v1.CommunityService.CreateServiceContact:input_type -> smartquarter.community.v1.CreateServiceContactRequest
+	36, // 37: smartquarter.community.v1.CommunityService.ListServiceContacts:input_type -> smartquarter.community.v1.ListServiceContactsRequest
+	34, // 38: smartquarter.community.v1.CommunityService.GetServiceContact:input_type -> smartquarter.community.v1.GetServiceContactRequest
+	33, // 39: smartquarter.community.v1.CommunityService.UpdateServiceContact:input_type -> smartquarter.community.v1.UpdateServiceContactRequest
+	35, // 40: smartquarter.community.v1.CommunityService.ArchiveServiceContact:input_type -> smartquarter.community.v1.ArchiveServiceContactRequest
+	4,  // 41: smartquarter.community.v1.CommunityService.CreateAnnouncement:input_type -> smartquarter.community.v1.CreateAnnouncementRequest
+	5,  // 42: smartquarter.community.v1.CommunityService.ListAnnouncements:input_type -> smartquarter.community.v1.ListAnnouncementsRequest
+	11, // 43: smartquarter.community.v1.CommunityService.CreatePoll:input_type -> smartquarter.community.v1.CreatePollRequest
+	12, // 44: smartquarter.community.v1.CommunityService.GetPoll:input_type -> smartquarter.community.v1.GetPollRequest
+	13, // 45: smartquarter.community.v1.CommunityService.ListPolls:input_type -> smartquarter.community.v1.ListPollsRequest
+	15, // 46: smartquarter.community.v1.CommunityService.VotePoll:input_type -> smartquarter.community.v1.VotePollRequest
+	18, // 47: smartquarter.community.v1.CommunityService.CreateCalendarEvent:input_type -> smartquarter.community.v1.CreateCalendarEventRequest
+	19, // 48: smartquarter.community.v1.CommunityService.ListCalendarEvents:input_type -> smartquarter.community.v1.ListCalendarEventsRequest
+	22, // 49: smartquarter.community.v1.CommunityService.CreateInitiative:input_type -> smartquarter.community.v1.CreateInitiativeRequest
+	23, // 50: smartquarter.community.v1.CommunityService.ListInitiatives:input_type -> smartquarter.community.v1.ListInitiativesRequest
+	25, // 51: smartquarter.community.v1.CommunityService.SupportInitiative:input_type -> smartquarter.community.v1.SupportInitiativeRequest
+	10, // 52: smartquarter.community.v1.CommunityService.ClosePoll:output_type -> smartquarter.community.v1.PollDetails
+	17, // 53: smartquarter.community.v1.CommunityService.UpdateCalendarEvent:output_type -> smartquarter.community.v1.CalendarEvent
+	29, // 54: smartquarter.community.v1.CommunityService.DeleteCalendarEvent:output_type -> smartquarter.community.v1.DeleteCalendarEventResponse
+	21, // 55: smartquarter.community.v1.CommunityService.CloseInitiative:output_type -> smartquarter.community.v1.Initiative
+	31, // 56: smartquarter.community.v1.CommunityService.CreateServiceContact:output_type -> smartquarter.community.v1.ServiceContact
+	37, // 57: smartquarter.community.v1.CommunityService.ListServiceContacts:output_type -> smartquarter.community.v1.ListServiceContactsResponse
+	31, // 58: smartquarter.community.v1.CommunityService.GetServiceContact:output_type -> smartquarter.community.v1.ServiceContact
+	31, // 59: smartquarter.community.v1.CommunityService.UpdateServiceContact:output_type -> smartquarter.community.v1.ServiceContact
+	31, // 60: smartquarter.community.v1.CommunityService.ArchiveServiceContact:output_type -> smartquarter.community.v1.ServiceContact
+	3,  // 61: smartquarter.community.v1.CommunityService.CreateAnnouncement:output_type -> smartquarter.community.v1.Announcement
+	6,  // 62: smartquarter.community.v1.CommunityService.ListAnnouncements:output_type -> smartquarter.community.v1.ListAnnouncementsResponse
+	8,  // 63: smartquarter.community.v1.CommunityService.CreatePoll:output_type -> smartquarter.community.v1.Poll
+	10, // 64: smartquarter.community.v1.CommunityService.GetPoll:output_type -> smartquarter.community.v1.PollDetails
+	14, // 65: smartquarter.community.v1.CommunityService.ListPolls:output_type -> smartquarter.community.v1.ListPollsResponse
+	16, // 66: smartquarter.community.v1.CommunityService.VotePoll:output_type -> smartquarter.community.v1.VotePollResponse
+	17, // 67: smartquarter.community.v1.CommunityService.CreateCalendarEvent:output_type -> smartquarter.community.v1.CalendarEvent
+	20, // 68: smartquarter.community.v1.CommunityService.ListCalendarEvents:output_type -> smartquarter.community.v1.ListCalendarEventsResponse
+	21, // 69: smartquarter.community.v1.CommunityService.CreateInitiative:output_type -> smartquarter.community.v1.Initiative
+	24, // 70: smartquarter.community.v1.CommunityService.ListInitiatives:output_type -> smartquarter.community.v1.ListInitiativesResponse
+	26, // 71: smartquarter.community.v1.CommunityService.SupportInitiative:output_type -> smartquarter.community.v1.SupportInitiativeResponse
+	52, // [52:72] is the sub-list for method output_type
+	32, // [32:52] is the sub-list for method input_type
+	32, // [32:32] is the sub-list for extension type_name
+	32, // [32:32] is the sub-list for extension extendee
+	0,  // [0:32] is the sub-list for field type_name
 }
 
 func init() { file_smartquarter_community_v1_community_proto_init() }
@@ -2714,7 +2923,7 @@ func file_smartquarter_community_v1_community_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_smartquarter_community_v1_community_proto_rawDesc), len(file_smartquarter_community_v1_community_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   32,
+			NumMessages:   35,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

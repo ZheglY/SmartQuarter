@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { houseApi } from '../shared/api/house';
+import { useHouseQuery } from '../features/session/houseWorkflow';
 import { Link } from 'react-router-dom';
 import { useSession, useUser } from '../features/session/SessionProvider';
 import { canManage, membership, roleLabels } from '../shared/utils/presentation';
@@ -9,6 +11,7 @@ export function ProfilePage({ embedded = false }: { embedded?: boolean }) {
     [house, setHouse] = useState(''),
     [error, setError] = useState<unknown>(),
     [pending, setPending] = useState(false);
+  const access = useHouseQuery('access', (s) => houseApi.GetHouseAccessState(s));
   const role = membership(user)?.role;
   async function changeHouse() {
     const selected = house;
@@ -39,13 +42,36 @@ export function ProfilePage({ embedded = false }: { embedded?: boolean }) {
         <h2>{user.user.display_name || 'Житель'}</h2>
         {user.user.username && <p>@{user.user.username}</p>}
         <p>MAX ID: {user.user.max_user_id}</p>
-        <span className="category-badge">{role ? roleLabels[role] : 'Нет активной роли'}</span>
-        <p>{role ? 'Участие в активном доме: активно' : 'Нет активного участия в выбранном доме'}</p>
+        <span className="category-badge">
+          {access.data?.platform_admin
+            ? 'Администратор платформы'
+            : access.data?.can_register_house
+              ? 'Председатель'
+              : role
+                ? roleLabels[role]
+                : 'Гражданин'}
+        </span>
+        <p>
+          {role ? 'Участие в активном доме: активно' : 'Нет активного участия в выбранном доме'}
+        </p>
       </section>
       <section className="issue-block">
-        <Link className="management-link" to="/houses">Дома, заявки и управление →</Link>
-        <Link className="management-link" to="/notifications/settings">Настройки уведомлений →</Link>
-        <Link className="management-link" to="/service-contacts">Контакты служб →</Link>
+        <Link className="management-link" to="/houses">
+          Дома, заявки и управление →
+        </Link>
+        <Link className="management-link" to="/notifications/settings">
+          Настройки уведомлений →
+        </Link>
+        {role && (
+          <Link className="management-link" to="/service-contacts">
+            Контакты служб →
+          </Link>
+        )}
+        {access.data?.platform_admin && (
+          <Link className="management-link" to="/admin">
+            Администрирование платформы →
+          </Link>
+        )}
         <h2>Мои дома</h2>
         {user.houses
           .filter((h) =>
@@ -107,11 +133,15 @@ export function CommunityPage() {
           <h3>Объявления дома →</h3>
           <p>Новости от вашего председателя</p>
         </Link>
-        {['Опросы', 'Календарь', 'Инициативы'].map((title) => (
-          <section className="unavailable-card" key={title}>
+        {[
+          ['Опросы', 'polls', 'Голосуйте и смотрите результаты'],
+          ['Календарь', 'calendar', 'Собрания, работы и события дома'],
+          ['Инициативы', 'initiatives', 'Предлагайте идеи и поддерживайте соседей'],
+        ].map(([title, path, description]) => (
+          <Link className="news-card" key={title} to={'/community/' + path}>
             <h3>{title}</h3>
-            <p>Пока недоступно</p>
-          </section>
+            <p>{description} →</p>
+          </Link>
         ))}
       </main>
     </>

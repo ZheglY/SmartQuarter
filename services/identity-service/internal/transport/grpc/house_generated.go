@@ -35,6 +35,36 @@ func (h *HouseHandler) call(ctx context.Context, op string, req, res proto.Messa
 	}
 	return nil
 }
+func (h *HouseHandler) ListPlatformUsers(ctx context.Context, req *pb.ListPlatformUsersRequest) (*pb.PlatformUserList, error) {
+	res := new(pb.PlatformUserList)
+	err := h.call(ctx, "ListPlatformUsers", req, res)
+	return res, err
+}
+func (h *HouseHandler) GrantChairmanPermission(ctx context.Context, req *pb.GrantChairmanPermissionRequest) (*pb.PlatformUser, error) {
+	res := new(pb.PlatformUser)
+	err := h.call(ctx, "GrantChairmanPermission", req, res)
+	return res, err
+}
+func (h *HouseHandler) RevokeChairmanPermission(ctx context.Context, req *pb.RevokeChairmanPermissionRequest) (*pb.PlatformUser, error) {
+	res := new(pb.PlatformUser)
+	err := h.call(ctx, "RevokeChairmanPermission", req, res)
+	return res, err
+}
+func (h *HouseHandler) ListAdminHouses(ctx context.Context, req *pb.ListAdminHousesRequest) (*pb.AdminHouseList, error) {
+	res := new(pb.AdminHouseList)
+	err := h.call(ctx, "ListAdminHouses", req, res)
+	return res, err
+}
+func (h *HouseHandler) AssignHouseChairman(ctx context.Context, req *pb.AssignHouseChairmanRequest) (*pb.AdminHouse, error) {
+	res := new(pb.AdminHouse)
+	err := h.call(ctx, "AssignHouseChairman", req, res)
+	return res, err
+}
+func (h *HouseHandler) RemoveHouseChairman(ctx context.Context, req *pb.RemoveHouseChairmanRequest) (*pb.AdminHouse, error) {
+	res := new(pb.AdminHouse)
+	err := h.call(ctx, "RemoveHouseChairman", req, res)
+	return res, err
+}
 func (h *HouseHandler) CreateHouseRegistration(ctx context.Context, req *pb.CreateHouseRegistrationRequest) (*pb.HouseRegistration, error) {
 	res := new(pb.HouseRegistration)
 	err := h.call(ctx, "CreateHouseRegistration", req, res)

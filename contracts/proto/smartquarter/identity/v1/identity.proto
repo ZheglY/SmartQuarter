@@ -119,6 +119,27 @@ enum JoinRequestSource {
   JOIN_REQUEST_SOURCE_INVITE = 2;
   JOIN_REQUEST_SOURCE_ADMIN = 3;
 }
+message PlatformUser {
+  string id = 1;
+  string display_name = 2;
+  string max_user_id = 3;
+  bool can_register_house = 4;
+  int32 managed_houses = 5;
+}
+message PlatformUserList {
+  repeated PlatformUser items = 1;
+}
+message AdminHouse {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  string city = 4;
+  string chairman_user_id = 5;
+  string chairman_display_name = 6;
+}
+message AdminHouseList {
+  repeated AdminHouse items = 1;
+}
 message HouseRegistration {
   string id = 1;
   string applicant_user_id = 2;
@@ -189,6 +210,7 @@ message HouseAccessState {
   int32 pending_join_requests = 3;
   int32 incoming_join_requests = 4;
   bool can_manage_active_house = 5;
+  bool can_register_house = 6;
 }
 message NotificationPreferences {
   bool notifications_enabled = 1;
@@ -221,6 +243,25 @@ message NotificationRecipientList {
 }
 message HouseSearchResult {
   repeated HouseSummary items = 1;
+}
+message ListPlatformUsersRequest {
+  string query = 1;
+}
+message GrantChairmanPermissionRequest {
+  string user_id = 1;
+}
+message RevokeChairmanPermissionRequest {
+  string user_id = 1;
+}
+message ListAdminHousesRequest {
+  string query = 1;
+}
+message AssignHouseChairmanRequest {
+  string house_id = 1;
+  string target_user_id = 2;
+}
+message RemoveHouseChairmanRequest {
+  string house_id = 1;
 }
 message CreateHouseRegistrationRequest {
   string name = 1;
@@ -330,6 +371,12 @@ message ListNotificationRecipientsRequest {
   string after_user_id = 4;
 }
 service HouseService {
+  rpc ListPlatformUsers(ListPlatformUsersRequest) returns (PlatformUserList);
+  rpc GrantChairmanPermission(GrantChairmanPermissionRequest) returns (PlatformUser);
+  rpc RevokeChairmanPermission(RevokeChairmanPermissionRequest) returns (PlatformUser);
+  rpc ListAdminHouses(ListAdminHousesRequest) returns (AdminHouseList);
+  rpc AssignHouseChairman(AssignHouseChairmanRequest) returns (AdminHouse);
+  rpc RemoveHouseChairman(RemoveHouseChairmanRequest) returns (AdminHouse);
   rpc CreateHouseRegistration(CreateHouseRegistrationRequest) returns (HouseRegistration);
   rpc GetHouseRegistration(GetHouseRegistrationRequest) returns (HouseRegistration);
   rpc ListMyHouseRegistrations(ListMyHouseRegistrationsRequest) returns (HouseRegistrationList);

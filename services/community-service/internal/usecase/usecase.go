@@ -2,7 +2,9 @@ package usecase
 
 import (
 	"context"
+	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 
@@ -18,6 +20,9 @@ func NewCommunityService(repo domain.CommunityRepository) domain.CommunityServic
 }
 
 func (u *communityUseCase) CreateAnnouncement(ctx context.Context, houseID, authorID, title, body string) (*domain.Announcement, error) {
+	if !validText(title, 200) || !validText(body, 10000) {
+		return nil, domain.ErrInvalidArgument
+	}
 	ann := &domain.Announcement{
 		ID:           uuid.New().String(),
 		HouseID:      houseID,
@@ -42,7 +47,20 @@ func (u *communityUseCase) ListAnnouncements(ctx context.Context, houseID string
 }
 
 func (u *communityUseCase) CreatePoll(ctx context.Context, houseID, authorID, question string, options []string, endsAt time.Time) (*domain.Poll, error) {
-	if endsAt.Before(time.Now()) {
+	if !validText(question, 500) || len(options) < 2 || len(options) > 10 {
+		return nil, domain.ErrInvalidArgument
+	}
+	seen := map[string]bool{}
+	for j, v := range options {
+		v = strings.TrimSpace(v)
+		key := strings.ToLower(v)
+		if !validText(v, 200) || seen[key] {
+			return nil, domain.ErrInvalidArgument
+		}
+		seen[key] = true
+		options[j] = v
+	}
+	if !endsAt.After(time.Now()) {
 		return nil, domain.ErrInvalidDate
 	}
 
@@ -69,7 +87,11 @@ func (u *communityUseCase) CreatePoll(ctx context.Context, houseID, authorID, qu
 }
 
 func (u *communityUseCase) GetPoll(ctx context.Context, houseID, pollID, userID string) (*domain.PollDetails, error) {
-	return u.repo.GetPoll(ctx, houseID, pollID, userID)
+	d, e := u.repo.GetPoll(ctx, houseID, pollID, userID)
+	if e == nil && !d.Poll.EndsAt.After(time.Now()) {
+		d.Poll.Status = "CLOSED"
+	}
+	return d, e
 }
 
 func (u *communityUseCase) ListPolls(ctx context.Context, houseID string, statuses []string, limit, offset int) ([]domain.Poll, error) {
@@ -102,7 +124,10 @@ func (u *communityUseCase) VotePoll(ctx context.Context, houseID, pollID, option
 }
 
 func (u *communityUseCase) CreateCalendarEvent(ctx context.Context, houseID, authorID, title, desc string, startsAt, endsAt time.Time) (*domain.CalendarEvent, error) {
-	if !endsAt.After(startsAt) {
+	if !validText(title, 200) || len([]rune(desc)) > 5000 {
+		return nil, domain.ErrInvalidArgument
+	}
+	if !endsAt.After(startsAt) || startsAt.IsZero() {
 		return nil, domain.ErrInvalidDate
 	}
 
@@ -123,10 +148,16 @@ func (u *communityUseCase) CreateCalendarEvent(ctx context.Context, houseID, aut
 }
 
 func (u *communityUseCase) ListCalendarEvents(ctx context.Context, houseID string, from, to time.Time) ([]domain.CalendarEvent, error) {
+	if !to.After(from) || to.Sub(from) > 366*24*time.Hour {
+		return nil, domain.ErrInvalidDate
+	}
 	return u.repo.ListCalendarEvents(ctx, houseID, from, to)
 }
 
 func (u *communityUseCase) CreateInitiative(ctx context.Context, houseID, authorID, title, desc string) (*domain.Initiative, error) {
+	if !validText(title, 200) || !validText(desc, 5000) {
+		return nil, domain.ErrInvalidArgument
+	}
 	now := time.Now()
 	i := &domain.Initiative{
 		ID:            uuid.New().String(),
@@ -159,14 +190,41 @@ func (u *communityUseCase) SupportInitiative(ctx context.Context, houseID, initi
 		return 0, err
 	}
 
-	items, err := u.repo.ListInitiatives(ctx, houseID, userID, 1, 0)
-	if err != nil || len(items) == 0 {
+	item, err := u.repo.GetInitiative(ctx, houseID, initiativeID, userID)
+	if err != nil {
 		return 0, err
 	}
-	for _, item := range items {
-		if item.ID == initiativeID {
-			return item.SupportsCount, nil
-		}
+	return item.SupportsCount, nil
+}
+
+func validText(s string, max int) bool {
+	return strings.TrimSpace(s) != "" && utf8.RuneCountInString(s) <= max && !strings.ContainsRune(s, 0)
+}
+func (u *communityUseCase) ClosePoll(ctx context.Context, house, id, user string) (*domain.PollDetails, error) {
+	if e := u.repo.ClosePoll(ctx, house, id); e != nil {
+		return nil, e
 	}
-	return 0, nil
+	return u.GetPoll(ctx, house, id, user)
+}
+func (u *communityUseCase) UpdateCalendarEvent(ctx context.Context, house, id, title, desc string, starts, ends time.Time) (*domain.CalendarEvent, error) {
+	if !validText(title, 200) || len([]rune(desc)) > 5000 {
+		return nil, domain.ErrInvalidArgument
+	}
+	if !ends.After(starts) || starts.IsZero() {
+		return nil, domain.ErrInvalidDate
+	}
+	v := &domain.CalendarEvent{ID: id, HouseID: house, Title: strings.TrimSpace(title), Description: strings.TrimSpace(desc), StartsAt: starts, EndsAt: ends}
+	if e := u.repo.UpdateCalendarEvent(ctx, v); e != nil {
+		return nil, e
+	}
+	return v, nil
+}
+func (u *communityUseCase) DeleteCalendarEvent(ctx context.Context, house, id string) error {
+	return u.repo.DeleteCalendarEvent(ctx, house, id)
+}
+func (u *communityUseCase) CloseInitiative(ctx context.Context, house, id, user string) (*domain.Initiative, error) {
+	if e := u.repo.CloseInitiative(ctx, house, id); e != nil {
+		return nil, e
+	}
+	return u.repo.GetInitiative(ctx, house, id, user)
 }

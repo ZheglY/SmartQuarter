@@ -20,15 +20,18 @@ export function HousesPage() {
   return (
     <WorkflowFrame title="Мои дома">
       <p className="intro">
-        Найдите свой дом или подайте заявку на регистрацию нового. Доступ появится после одобрения.
+        Найдите свой дом и подайте заявку на вступление. Председатели могут регистрировать новые
+        дома.
       </p>
       <div className="workflow-links">
         <Link className="primary-btn" to="/houses/search">
           Найти дом
         </Link>
-        <Link className="secondary-btn" to="/houses/register">
-          Зарегистрировать дом
-        </Link>
+        {access.data?.can_register_house && (
+          <Link className="secondary-btn" to="/houses/register">
+            Зарегистрировать дом
+          </Link>
+        )}
         <Link className="secondary-btn" to="/join-requests">
           Мои заявки
         </Link>
@@ -44,8 +47,8 @@ export function HousesPage() {
       </div>
       <QueryState query={access} />
       {access.data?.platform_admin && (
-        <Link className="management-link" to="/admin/house-registrations">
-          Заявки на регистрацию домов →
+        <Link className="management-link" to="/admin">
+          Администрирование платформы →
         </Link>
       )}
       {user.houses
@@ -82,11 +85,25 @@ export function HousesPage() {
   );
 }
 export function RegisterHousePage() {
+  const access = useHouseQuery('access', (s) => houseApi.GetHouseAccessState(s));
   const [name, setName] = useState(''),
     [city, setCity] = useState(''),
     [address, setAddress] = useState('');
   const action = useHouseAction(),
     navigate = useNavigate();
+  if (!access.data?.can_register_house)
+    return (
+      <WorkflowFrame title="Регистрация дома">
+        <QueryState query={access} />
+        {access.data && (
+          <EmptyState title="Нужны полномочия председателя">
+            Обратитесь к администратору платформы. Для вступления в существующий дом используйте
+            поиск.
+          </EmptyState>
+        )}
+        <Link to="/houses/search">Найти свой дом</Link>
+      </WorkflowFrame>
+    );
   return (
     <WorkflowFrame title="Регистрация дома">
       <p>

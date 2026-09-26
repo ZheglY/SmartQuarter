@@ -69,10 +69,13 @@ route('post','/webhooks/max','Receive official MAX Update',obj({'ok':{'type':'bo
 paths['/webhooks/max']['post']['security']=[{'MaxWebhookSecret':[]}]
 for path in ['/livez','/healthz','/readyz']:route('get',path,'Process liveness' if path!='/readyz' else 'Redis, Identity, Issue gRPC and Issue dependencies readiness',obj({'status':string()}),public=True)
 paths['/metrics']={'get':{'summary':'Prometheus metrics; restrict to internal monitoring at ingress','security':[],'responses':{'200':{'description':'Prometheus exposition','content':{'text/plain':{'schema':string()}}}}}}
-spec={'openapi':'3.1.0','info':{'title':'SmartQuarter max-gateway','version':'1.0.0','description':'Implemented Gateway API. Server owns actor user/house/role. No multipart uploads. Identity production integration is blocked pending agreed proto; Community announcements have transport coverage only. gRPC v1 exposes status codes without ErrorInfo, therefore stable generic HTTP error codes are used rather than parsing messages.'},'servers':[{'url':'http://localhost:18080'}],'security':[{'SessionAuth':[]}],'paths':paths,'components':{'securitySchemes':{'SessionAuth':{'type':'apiKey','in':'cookie','name':'sq_session'},'MaxWebhookSecret':{'type':'apiKey','in':'header','name':'X-Max-Bot-Api-Secret'}},'schemas':S}}
+spec={'openapi':'3.1.0','info':{'title':'SmartQuarter max-gateway','version':'1.0.0','description':'Implemented Gateway API. Server owns actor user/house/role. No multipart uploads. gRPC v1 exposes status codes without ErrorInfo, therefore stable generic HTTP error codes are used rather than parsing messages.'},'servers':[{'url':'http://localhost:18080'}],'security':[{'SessionAuth':[]}],'paths':paths,'components':{'securitySchemes':{'SessionAuth':{'type':'apiKey','in':'cookie','name':'sq_session'},'MaxWebhookSecret':{'type':'apiKey','in':'header','name':'X-Max-Bot-Api-Secret'}},'schemas':S}}
 from house_openapi import register
 register(S,route,paths,ref,obj,string,array)
-spec['info']['version']='1.1.0'
+from community_openapi import register as community_register
+community_register(S,route,paths,ref,obj,string,array)
+spec['servers']=[{'url':'https://maxhack.ru'},{'url':'http://localhost:18080'}]
+spec['info']['version']='1.2.0'
 spec['info']['description']='Gateway API with real Identity, Issue and Community services. Session actor and active house are server-owned. House registration requires explicit platform administrator approval. Stable HTTP errors map gRPC status codes.'
 # Hoist common error responses to keep the canonical contract small.
 responses={}

@@ -74,6 +74,11 @@ func (s *Service) transfer(ctx context.Context, tx pgx.Tx, a actor, op string, c
 		return list(rs, kind), e
 	}
 	if op == "CreateChairmanTransfer" {
+		if yes, e := chairmanAllowed(ctx, tx, c.TargetUserID); e != nil {
+			return nil, e
+		} else if !yes {
+			return nil, denied()
+		}
 		if !validID(c.TargetUserID) || c.TargetUserID == a.User {
 			return nil, invalid()
 		}
@@ -127,6 +132,11 @@ func (s *Service) transfer(ctx context.Context, tx pgx.Tx, a actor, op string, c
 		return decorate(r, kind), nil
 	}
 	if target == "ACCEPTED" {
+		if yes, e := chairmanAllowed(ctx, tx, a.User); e != nil {
+			return nil, e
+		} else if !yes {
+			return nil, denied()
+		}
 		tag, e := tx.Exec(ctx, `UPDATE memberships SET role='RESIDENT',updated_at=now() WHERE house_id=$1 AND user_id=$2 AND role='CHAIRMAN' AND status='ACTIVE'`, r.str("house_id"), r.str("current_chairman_user_id"))
 		if e != nil {
 			return nil, e

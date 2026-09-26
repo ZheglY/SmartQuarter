@@ -24,7 +24,13 @@ func (a *API) houseResponse(w http.ResponseWriter, r *http.Request, code int, v 
 	write(w, code, json.RawMessage(raw))
 }
 func (a *API) houseRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/v1/house-registrations", a.origin(a.authenticate(false, false, a.idempotent(a.houseCreateHouseRegistration))))
+	mux.HandleFunc("GET /api/v1/admin/users", a.origin(a.authenticate(false, false, a.housePermission("admin", a.houseListPlatformUsers))))
+	mux.HandleFunc("POST /api/v1/admin/users/{user_id}/chairman", a.origin(a.authenticate(false, false, a.housePermission("admin", a.idempotent(a.houseGrantChairmanPermission)))))
+	mux.HandleFunc("DELETE /api/v1/admin/users/{user_id}/chairman", a.origin(a.authenticate(false, false, a.housePermission("admin", a.idempotent(a.houseRevokeChairmanPermission)))))
+	mux.HandleFunc("GET /api/v1/admin/houses", a.origin(a.authenticate(false, false, a.housePermission("admin", a.houseListAdminHouses))))
+	mux.HandleFunc("PUT /api/v1/admin/houses/{house_id}/chairman", a.origin(a.authenticate(false, false, a.housePermission("admin", a.idempotent(a.houseAssignHouseChairman)))))
+	mux.HandleFunc("DELETE /api/v1/admin/houses/{house_id}/chairman", a.origin(a.authenticate(false, false, a.housePermission("admin", a.idempotent(a.houseRemoveHouseChairman)))))
+	mux.HandleFunc("POST /api/v1/house-registrations", a.origin(a.authenticate(false, false, a.housePermission("chairman", a.idempotent(a.houseCreateHouseRegistration)))))
 	mux.HandleFunc("GET /api/v1/house-registrations/{id}", a.origin(a.authenticate(false, false, a.houseGetHouseRegistration)))
 	mux.HandleFunc("GET /api/v1/house-registrations", a.origin(a.authenticate(false, false, a.houseListMyHouseRegistrations)))
 	mux.HandleFunc("POST /api/v1/house-registrations/{id}/cancel", a.origin(a.authenticate(false, false, a.idempotent(a.houseCancelHouseRegistration))))
@@ -56,6 +62,94 @@ func (a *API) houseRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /api/v1/house-access", a.origin(a.authenticate(false, false, a.houseGetHouseAccessState)))
 	mux.HandleFunc("GET /api/v1/notifications/settings", a.origin(a.authenticate(false, false, a.houseGetNotificationPreferences)))
 	mux.HandleFunc("PUT /api/v1/notifications/settings", a.origin(a.authenticate(false, false, a.idempotent(a.houseUpdateNotificationPreferences))))
+}
+func (a *API) houseListPlatformUsers(w http.ResponseWriter, r *http.Request) {
+	if a.House == nil {
+		a.fail(w, r, 503, "DEPENDENCY_UNAVAILABLE", "house workflow unavailable")
+		return
+	}
+	req := &ipb.ListPlatformUsersRequest{Query: r.URL.Query().Get("query")}
+	v, e := a.House.ListPlatformUsers(r.Context(), req)
+	a.houseResponse(w, r, 200, v, e)
+}
+func (a *API) houseGrantChairmanPermission(w http.ResponseWriter, r *http.Request) {
+	if a.House == nil {
+		a.fail(w, r, 503, "DEPENDENCY_UNAVAILABLE", "house workflow unavailable")
+		return
+	}
+	if !identity.ValidID(r.PathValue("user_id")) {
+		a.fail(w, r, 400, "INVALID_ARGUMENT", "invalid resource id")
+		return
+	}
+	var body struct{}
+	if !a.decode(w, r, &body) {
+		return
+	}
+	req := &ipb.GrantChairmanPermissionRequest{UserId: r.PathValue("user_id")}
+	v, e := a.House.GrantChairmanPermission(r.Context(), req)
+	a.houseResponse(w, r, 200, v, e)
+}
+func (a *API) houseRevokeChairmanPermission(w http.ResponseWriter, r *http.Request) {
+	if a.House == nil {
+		a.fail(w, r, 503, "DEPENDENCY_UNAVAILABLE", "house workflow unavailable")
+		return
+	}
+	if !identity.ValidID(r.PathValue("user_id")) {
+		a.fail(w, r, 400, "INVALID_ARGUMENT", "invalid resource id")
+		return
+	}
+	var body struct{}
+	if !a.decode(w, r, &body) {
+		return
+	}
+	req := &ipb.RevokeChairmanPermissionRequest{UserId: r.PathValue("user_id")}
+	v, e := a.House.RevokeChairmanPermission(r.Context(), req)
+	a.houseResponse(w, r, 200, v, e)
+}
+func (a *API) houseListAdminHouses(w http.ResponseWriter, r *http.Request) {
+	if a.House == nil {
+		a.fail(w, r, 503, "DEPENDENCY_UNAVAILABLE", "house workflow unavailable")
+		return
+	}
+	req := &ipb.ListAdminHousesRequest{Query: r.URL.Query().Get("query")}
+	v, e := a.House.ListAdminHouses(r.Context(), req)
+	a.houseResponse(w, r, 200, v, e)
+}
+func (a *API) houseAssignHouseChairman(w http.ResponseWriter, r *http.Request) {
+	if a.House == nil {
+		a.fail(w, r, 503, "DEPENDENCY_UNAVAILABLE", "house workflow unavailable")
+		return
+	}
+	if !identity.ValidID(r.PathValue("house_id")) {
+		a.fail(w, r, 400, "INVALID_ARGUMENT", "invalid resource id")
+		return
+	}
+	var body struct {
+		TargetUserId string `json:"target_user_id"`
+	}
+	if !a.decode(w, r, &body) {
+		return
+	}
+	req := &ipb.AssignHouseChairmanRequest{HouseId: r.PathValue("house_id"), TargetUserId: body.TargetUserId}
+	v, e := a.House.AssignHouseChairman(r.Context(), req)
+	a.houseResponse(w, r, 200, v, e)
+}
+func (a *API) houseRemoveHouseChairman(w http.ResponseWriter, r *http.Request) {
+	if a.House == nil {
+		a.fail(w, r, 503, "DEPENDENCY_UNAVAILABLE", "house workflow unavailable")
+		return
+	}
+	if !identity.ValidID(r.PathValue("house_id")) {
+		a.fail(w, r, 400, "INVALID_ARGUMENT", "invalid resource id")
+		return
+	}
+	var body struct{}
+	if !a.decode(w, r, &body) {
+		return
+	}
+	req := &ipb.RemoveHouseChairmanRequest{HouseId: r.PathValue("house_id")}
+	v, e := a.House.RemoveHouseChairman(r.Context(), req)
+	a.houseResponse(w, r, 200, v, e)
 }
 func (a *API) houseCreateHouseRegistration(w http.ResponseWriter, r *http.Request) {
 	if a.House == nil {

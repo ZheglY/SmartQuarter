@@ -6,7 +6,13 @@ ops=[]
 def op(name,fields,response,method,path,access='session',code=200):
     ops.append(dict(name=name,fields=fields,response=response,method=method,path=path,access=access,code=code))
 s='string';i='int32';b='bool'
-op('CreateHouseRegistration',[(s,'name'),(s,'address'),(s,'city')],'HouseRegistration','POST','/house-registrations',code=202)
+op('ListPlatformUsers',[(s,'query')],'PlatformUserList','GET','/admin/users','admin')
+op('GrantChairmanPermission',[(s,'user_id')],'PlatformUser','POST','/admin/users/{user_id}/chairman','admin')
+op('RevokeChairmanPermission',[(s,'user_id')],'PlatformUser','DELETE','/admin/users/{user_id}/chairman','admin')
+op('ListAdminHouses',[(s,'query')],'AdminHouseList','GET','/admin/houses','admin')
+op('AssignHouseChairman',[(s,'house_id'),(s,'target_user_id')],'AdminHouse','PUT','/admin/houses/{house_id}/chairman','admin')
+op('RemoveHouseChairman',[(s,'house_id')],'AdminHouse','DELETE','/admin/houses/{house_id}/chairman','admin')
+op('CreateHouseRegistration',[(s,'name'),(s,'address'),(s,'city')],'HouseRegistration','POST','/house-registrations','chairman',code=202)
 op('GetHouseRegistration',[(s,'id')],'HouseRegistration','GET','/house-registrations/{id}')
 op('ListMyHouseRegistrations',[],'HouseRegistrationList','GET','/house-registrations')
 op('CancelHouseRegistration',[(s,'id')],'HouseRegistration','POST','/house-registrations/{id}/cancel')
@@ -40,6 +46,10 @@ op('UpdateNotificationPreferences',prefs,'NotificationPreferences','PUT','/notif
 # Internal worker-only operation is deliberately not routed through HTTP.
 internal=[dict(name='ListNotificationRecipients',fields=[(s,'house_id'),(s,'user_id'),(s,'category'),(s,'after_user_id')],response='NotificationRecipientList')]
 entities={
+'PlatformUser':[(s,'id'),(s,'display_name'),(s,'max_user_id'),(b,'can_register_house'),(i,'managed_houses')],
+'PlatformUserList':[('repeated PlatformUser','items')],
+'AdminHouse':[(s,'id'),(s,'name'),(s,'address'),(s,'city'),(s,'chairman_user_id'),(s,'chairman_display_name')],
+'AdminHouseList':[('repeated AdminHouse','items')],
 'HouseRegistration':[(s,'id'),(s,'applicant_user_id'),(s,'requested_name'),(s,'original_address'),(s,'city'),('HouseRegistrationStatus','status'),(s,'resulting_house_id'),(s,'rejection_reason'),('google.protobuf.Timestamp','created_at'),('google.protobuf.Timestamp','reviewed_at')],
 'JoinRequest':[(s,'id'),(s,'user_id'),(s,'house_id'),('JoinRequestSource','source'),('JoinRequestStatus','status'),(s,'rejection_reason'),('google.protobuf.Timestamp','created_at'),('google.protobuf.Timestamp','reviewed_at')],
 'HouseInvitation':[(s,'id'),(s,'house_id'),(s,'created_by'),('google.protobuf.Timestamp','expires_at'),(i,'max_uses'),(i,'used_count'),('InvitationStatus','status'),('google.protobuf.Timestamp','created_at')],
@@ -47,7 +57,7 @@ entities={
 'ChairmanTransfer':[(s,'id'),(s,'house_id'),(s,'current_chairman_user_id'),(s,'target_user_id'),('ChairmanTransferStatus','status'),('google.protobuf.Timestamp','expires_at'),('google.protobuf.Timestamp','created_at')],
 'HouseSummary':[(s,'id'),(s,'name'),(s,'address'),(s,'city'),(b,'has_chairman'),(b,'join_available')],
 'HouseMember':[(s,'id'),(s,'user_id'),(s,'house_id'),(s,'display_name'),(s,'role'),(s,'status')],
-'HouseAccessState':[(b,'platform_admin'),(i,'pending_registrations'),(i,'pending_join_requests'),(i,'incoming_join_requests'),(b,'can_manage_active_house')],
+'HouseAccessState':[(b,'platform_admin'),(i,'pending_registrations'),(i,'pending_join_requests'),(i,'incoming_join_requests'),(b,'can_manage_active_house'),(b,'can_register_house')],
 'NotificationPreferences':prefs,
 'NotificationRecipient':[(s,'user_id'),(s,'max_user_id')],
 }

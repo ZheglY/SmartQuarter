@@ -963,6 +963,254 @@ func (x *ListMembershipsResponse) GetItems() []*Membership {
 	return nil
 }
 
+type PlatformUser struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	DisplayName      string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	MaxUserId        string                 `protobuf:"bytes,3,opt,name=max_user_id,json=maxUserId,proto3" json:"max_user_id,omitempty"`
+	CanRegisterHouse bool                   `protobuf:"varint,4,opt,name=can_register_house,json=canRegisterHouse,proto3" json:"can_register_house,omitempty"`
+	ManagedHouses    int32                  `protobuf:"varint,5,opt,name=managed_houses,json=managedHouses,proto3" json:"managed_houses,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *PlatformUser) Reset() {
+	*x = PlatformUser{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlatformUser) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlatformUser) ProtoMessage() {}
+
+func (x *PlatformUser) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlatformUser.ProtoReflect.Descriptor instead.
+func (*PlatformUser) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *PlatformUser) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *PlatformUser) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *PlatformUser) GetMaxUserId() string {
+	if x != nil {
+		return x.MaxUserId
+	}
+	return ""
+}
+
+func (x *PlatformUser) GetCanRegisterHouse() bool {
+	if x != nil {
+		return x.CanRegisterHouse
+	}
+	return false
+}
+
+func (x *PlatformUser) GetManagedHouses() int32 {
+	if x != nil {
+		return x.ManagedHouses
+	}
+	return 0
+}
+
+type PlatformUserList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*PlatformUser        `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlatformUserList) Reset() {
+	*x = PlatformUserList{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlatformUserList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlatformUserList) ProtoMessage() {}
+
+func (x *PlatformUserList) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlatformUserList.ProtoReflect.Descriptor instead.
+func (*PlatformUserList) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *PlatformUserList) GetItems() []*PlatformUser {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+type AdminHouse struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Address             string                 `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+	City                string                 `protobuf:"bytes,4,opt,name=city,proto3" json:"city,omitempty"`
+	ChairmanUserId      string                 `protobuf:"bytes,5,opt,name=chairman_user_id,json=chairmanUserId,proto3" json:"chairman_user_id,omitempty"`
+	ChairmanDisplayName string                 `protobuf:"bytes,6,opt,name=chairman_display_name,json=chairmanDisplayName,proto3" json:"chairman_display_name,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *AdminHouse) Reset() {
+	*x = AdminHouse{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminHouse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminHouse) ProtoMessage() {}
+
+func (x *AdminHouse) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminHouse.ProtoReflect.Descriptor instead.
+func (*AdminHouse) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *AdminHouse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AdminHouse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AdminHouse) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *AdminHouse) GetCity() string {
+	if x != nil {
+		return x.City
+	}
+	return ""
+}
+
+func (x *AdminHouse) GetChairmanUserId() string {
+	if x != nil {
+		return x.ChairmanUserId
+	}
+	return ""
+}
+
+func (x *AdminHouse) GetChairmanDisplayName() string {
+	if x != nil {
+		return x.ChairmanDisplayName
+	}
+	return ""
+}
+
+type AdminHouseList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*AdminHouse          `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminHouseList) Reset() {
+	*x = AdminHouseList{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminHouseList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminHouseList) ProtoMessage() {}
+
+func (x *AdminHouseList) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminHouseList.ProtoReflect.Descriptor instead.
+func (*AdminHouseList) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *AdminHouseList) GetItems() []*AdminHouse {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 type HouseRegistration struct {
 	state                protoimpl.MessageState  `protogen:"open.v1"`
 	Id                   string                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -982,7 +1230,7 @@ type HouseRegistration struct {
 
 func (x *HouseRegistration) Reset() {
 	*x = HouseRegistration{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[9]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -994,7 +1242,7 @@ func (x *HouseRegistration) String() string {
 func (*HouseRegistration) ProtoMessage() {}
 
 func (x *HouseRegistration) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[9]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1007,7 +1255,7 @@ func (x *HouseRegistration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HouseRegistration.ProtoReflect.Descriptor instead.
 func (*HouseRegistration) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{9}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *HouseRegistration) GetId() string {
@@ -1104,7 +1352,7 @@ type JoinRequest struct {
 
 func (x *JoinRequest) Reset() {
 	*x = JoinRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[10]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1116,7 +1364,7 @@ func (x *JoinRequest) String() string {
 func (*JoinRequest) ProtoMessage() {}
 
 func (x *JoinRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[10]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1129,7 +1377,7 @@ func (x *JoinRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinRequest.ProtoReflect.Descriptor instead.
 func (*JoinRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{10}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *JoinRequest) GetId() string {
@@ -1211,7 +1459,7 @@ type HouseInvitation struct {
 
 func (x *HouseInvitation) Reset() {
 	*x = HouseInvitation{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[11]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1223,7 +1471,7 @@ func (x *HouseInvitation) String() string {
 func (*HouseInvitation) ProtoMessage() {}
 
 func (x *HouseInvitation) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[11]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1236,7 +1484,7 @@ func (x *HouseInvitation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HouseInvitation.ProtoReflect.Descriptor instead.
 func (*HouseInvitation) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{11}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *HouseInvitation) GetId() string {
@@ -1306,7 +1554,7 @@ type CreatedInvitation struct {
 
 func (x *CreatedInvitation) Reset() {
 	*x = CreatedInvitation{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[12]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1318,7 +1566,7 @@ func (x *CreatedInvitation) String() string {
 func (*CreatedInvitation) ProtoMessage() {}
 
 func (x *CreatedInvitation) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[12]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1331,7 +1579,7 @@ func (x *CreatedInvitation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatedInvitation.ProtoReflect.Descriptor instead.
 func (*CreatedInvitation) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{12}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CreatedInvitation) GetInvitation() *HouseInvitation {
@@ -1370,7 +1618,7 @@ type ChairmanTransfer struct {
 
 func (x *ChairmanTransfer) Reset() {
 	*x = ChairmanTransfer{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[13]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1382,7 +1630,7 @@ func (x *ChairmanTransfer) String() string {
 func (*ChairmanTransfer) ProtoMessage() {}
 
 func (x *ChairmanTransfer) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[13]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1395,7 +1643,7 @@ func (x *ChairmanTransfer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChairmanTransfer.ProtoReflect.Descriptor instead.
 func (*ChairmanTransfer) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{13}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ChairmanTransfer) GetId() string {
@@ -1461,7 +1709,7 @@ type HouseSummary struct {
 
 func (x *HouseSummary) Reset() {
 	*x = HouseSummary{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[14]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1473,7 +1721,7 @@ func (x *HouseSummary) String() string {
 func (*HouseSummary) ProtoMessage() {}
 
 func (x *HouseSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[14]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1486,7 +1734,7 @@ func (x *HouseSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HouseSummary.ProtoReflect.Descriptor instead.
 func (*HouseSummary) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{14}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *HouseSummary) GetId() string {
@@ -1545,7 +1793,7 @@ type HouseMember struct {
 
 func (x *HouseMember) Reset() {
 	*x = HouseMember{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[15]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1557,7 +1805,7 @@ func (x *HouseMember) String() string {
 func (*HouseMember) ProtoMessage() {}
 
 func (x *HouseMember) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[15]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1570,7 +1818,7 @@ func (x *HouseMember) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HouseMember.ProtoReflect.Descriptor instead.
 func (*HouseMember) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{15}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *HouseMember) GetId() string {
@@ -1622,13 +1870,14 @@ type HouseAccessState struct {
 	PendingJoinRequests  int32                  `protobuf:"varint,3,opt,name=pending_join_requests,json=pendingJoinRequests,proto3" json:"pending_join_requests,omitempty"`
 	IncomingJoinRequests int32                  `protobuf:"varint,4,opt,name=incoming_join_requests,json=incomingJoinRequests,proto3" json:"incoming_join_requests,omitempty"`
 	CanManageActiveHouse bool                   `protobuf:"varint,5,opt,name=can_manage_active_house,json=canManageActiveHouse,proto3" json:"can_manage_active_house,omitempty"`
+	CanRegisterHouse     bool                   `protobuf:"varint,6,opt,name=can_register_house,json=canRegisterHouse,proto3" json:"can_register_house,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
 
 func (x *HouseAccessState) Reset() {
 	*x = HouseAccessState{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[16]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1640,7 +1889,7 @@ func (x *HouseAccessState) String() string {
 func (*HouseAccessState) ProtoMessage() {}
 
 func (x *HouseAccessState) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[16]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1653,7 +1902,7 @@ func (x *HouseAccessState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HouseAccessState.ProtoReflect.Descriptor instead.
 func (*HouseAccessState) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{16}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *HouseAccessState) GetPlatformAdmin() bool {
@@ -1691,6 +1940,13 @@ func (x *HouseAccessState) GetCanManageActiveHouse() bool {
 	return false
 }
 
+func (x *HouseAccessState) GetCanRegisterHouse() bool {
+	if x != nil {
+		return x.CanRegisterHouse
+	}
+	return false
+}
+
 type NotificationPreferences struct {
 	state                            protoimpl.MessageState `protogen:"open.v1"`
 	NotificationsEnabled             bool                   `protobuf:"varint,1,opt,name=notifications_enabled,json=notificationsEnabled,proto3" json:"notifications_enabled,omitempty"`
@@ -1704,7 +1960,7 @@ type NotificationPreferences struct {
 
 func (x *NotificationPreferences) Reset() {
 	*x = NotificationPreferences{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[17]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1716,7 +1972,7 @@ func (x *NotificationPreferences) String() string {
 func (*NotificationPreferences) ProtoMessage() {}
 
 func (x *NotificationPreferences) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[17]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1729,7 +1985,7 @@ func (x *NotificationPreferences) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationPreferences.ProtoReflect.Descriptor instead.
 func (*NotificationPreferences) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{17}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *NotificationPreferences) GetNotificationsEnabled() bool {
@@ -1777,7 +2033,7 @@ type NotificationRecipient struct {
 
 func (x *NotificationRecipient) Reset() {
 	*x = NotificationRecipient{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[18]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1789,7 +2045,7 @@ func (x *NotificationRecipient) String() string {
 func (*NotificationRecipient) ProtoMessage() {}
 
 func (x *NotificationRecipient) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[18]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1802,7 +2058,7 @@ func (x *NotificationRecipient) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationRecipient.ProtoReflect.Descriptor instead.
 func (*NotificationRecipient) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{18}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *NotificationRecipient) GetUserId() string {
@@ -1828,7 +2084,7 @@ type HouseRegistrationList struct {
 
 func (x *HouseRegistrationList) Reset() {
 	*x = HouseRegistrationList{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[19]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1840,7 +2096,7 @@ func (x *HouseRegistrationList) String() string {
 func (*HouseRegistrationList) ProtoMessage() {}
 
 func (x *HouseRegistrationList) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[19]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1853,7 +2109,7 @@ func (x *HouseRegistrationList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HouseRegistrationList.ProtoReflect.Descriptor instead.
 func (*HouseRegistrationList) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{19}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *HouseRegistrationList) GetItems() []*HouseRegistration {
@@ -1872,7 +2128,7 @@ type JoinRequestList struct {
 
 func (x *JoinRequestList) Reset() {
 	*x = JoinRequestList{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[20]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1884,7 +2140,7 @@ func (x *JoinRequestList) String() string {
 func (*JoinRequestList) ProtoMessage() {}
 
 func (x *JoinRequestList) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[20]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1897,7 +2153,7 @@ func (x *JoinRequestList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinRequestList.ProtoReflect.Descriptor instead.
 func (*JoinRequestList) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{20}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *JoinRequestList) GetItems() []*JoinRequest {
@@ -1916,7 +2172,7 @@ type HouseInvitationList struct {
 
 func (x *HouseInvitationList) Reset() {
 	*x = HouseInvitationList{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[21]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1928,7 +2184,7 @@ func (x *HouseInvitationList) String() string {
 func (*HouseInvitationList) ProtoMessage() {}
 
 func (x *HouseInvitationList) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[21]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1941,7 +2197,7 @@ func (x *HouseInvitationList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HouseInvitationList.ProtoReflect.Descriptor instead.
 func (*HouseInvitationList) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{21}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *HouseInvitationList) GetItems() []*HouseInvitation {
@@ -1960,7 +2216,7 @@ type ChairmanTransferList struct {
 
 func (x *ChairmanTransferList) Reset() {
 	*x = ChairmanTransferList{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[22]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1972,7 +2228,7 @@ func (x *ChairmanTransferList) String() string {
 func (*ChairmanTransferList) ProtoMessage() {}
 
 func (x *ChairmanTransferList) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[22]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1985,7 +2241,7 @@ func (x *ChairmanTransferList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChairmanTransferList.ProtoReflect.Descriptor instead.
 func (*ChairmanTransferList) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{22}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ChairmanTransferList) GetItems() []*ChairmanTransfer {
@@ -2004,7 +2260,7 @@ type HouseMemberList struct {
 
 func (x *HouseMemberList) Reset() {
 	*x = HouseMemberList{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[23]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2016,7 +2272,7 @@ func (x *HouseMemberList) String() string {
 func (*HouseMemberList) ProtoMessage() {}
 
 func (x *HouseMemberList) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[23]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2029,7 +2285,7 @@ func (x *HouseMemberList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HouseMemberList.ProtoReflect.Descriptor instead.
 func (*HouseMemberList) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{23}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *HouseMemberList) GetItems() []*HouseMember {
@@ -2048,7 +2304,7 @@ type NotificationRecipientList struct {
 
 func (x *NotificationRecipientList) Reset() {
 	*x = NotificationRecipientList{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[24]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2060,7 +2316,7 @@ func (x *NotificationRecipientList) String() string {
 func (*NotificationRecipientList) ProtoMessage() {}
 
 func (x *NotificationRecipientList) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[24]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2073,7 +2329,7 @@ func (x *NotificationRecipientList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationRecipientList.ProtoReflect.Descriptor instead.
 func (*NotificationRecipientList) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{24}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *NotificationRecipientList) GetItems() []*NotificationRecipient {
@@ -2092,7 +2348,7 @@ type HouseSearchResult struct {
 
 func (x *HouseSearchResult) Reset() {
 	*x = HouseSearchResult{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[25]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2104,7 +2360,7 @@ func (x *HouseSearchResult) String() string {
 func (*HouseSearchResult) ProtoMessage() {}
 
 func (x *HouseSearchResult) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[25]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2117,7 +2373,7 @@ func (x *HouseSearchResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HouseSearchResult.ProtoReflect.Descriptor instead.
 func (*HouseSearchResult) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{25}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *HouseSearchResult) GetItems() []*HouseSummary {
@@ -2125,6 +2381,278 @@ func (x *HouseSearchResult) GetItems() []*HouseSummary {
 		return x.Items
 	}
 	return nil
+}
+
+type ListPlatformUsersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPlatformUsersRequest) Reset() {
+	*x = ListPlatformUsersRequest{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPlatformUsersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPlatformUsersRequest) ProtoMessage() {}
+
+func (x *ListPlatformUsersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPlatformUsersRequest.ProtoReflect.Descriptor instead.
+func (*ListPlatformUsersRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *ListPlatformUsersRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+type GrantChairmanPermissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GrantChairmanPermissionRequest) Reset() {
+	*x = GrantChairmanPermissionRequest{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GrantChairmanPermissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrantChairmanPermissionRequest) ProtoMessage() {}
+
+func (x *GrantChairmanPermissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrantChairmanPermissionRequest.ProtoReflect.Descriptor instead.
+func (*GrantChairmanPermissionRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *GrantChairmanPermissionRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type RevokeChairmanPermissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RevokeChairmanPermissionRequest) Reset() {
+	*x = RevokeChairmanPermissionRequest{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RevokeChairmanPermissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RevokeChairmanPermissionRequest) ProtoMessage() {}
+
+func (x *RevokeChairmanPermissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RevokeChairmanPermissionRequest.ProtoReflect.Descriptor instead.
+func (*RevokeChairmanPermissionRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *RevokeChairmanPermissionRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type ListAdminHousesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAdminHousesRequest) Reset() {
+	*x = ListAdminHousesRequest{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAdminHousesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAdminHousesRequest) ProtoMessage() {}
+
+func (x *ListAdminHousesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAdminHousesRequest.ProtoReflect.Descriptor instead.
+func (*ListAdminHousesRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *ListAdminHousesRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+type AssignHouseChairmanRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HouseId       string                 `protobuf:"bytes,1,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	TargetUserId  string                 `protobuf:"bytes,2,opt,name=target_user_id,json=targetUserId,proto3" json:"target_user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssignHouseChairmanRequest) Reset() {
+	*x = AssignHouseChairmanRequest{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssignHouseChairmanRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssignHouseChairmanRequest) ProtoMessage() {}
+
+func (x *AssignHouseChairmanRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssignHouseChairmanRequest.ProtoReflect.Descriptor instead.
+func (*AssignHouseChairmanRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *AssignHouseChairmanRequest) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
+}
+
+func (x *AssignHouseChairmanRequest) GetTargetUserId() string {
+	if x != nil {
+		return x.TargetUserId
+	}
+	return ""
+}
+
+type RemoveHouseChairmanRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HouseId       string                 `protobuf:"bytes,1,opt,name=house_id,json=houseId,proto3" json:"house_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveHouseChairmanRequest) Reset() {
+	*x = RemoveHouseChairmanRequest{}
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveHouseChairmanRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveHouseChairmanRequest) ProtoMessage() {}
+
+func (x *RemoveHouseChairmanRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveHouseChairmanRequest.ProtoReflect.Descriptor instead.
+func (*RemoveHouseChairmanRequest) Descriptor() ([]byte, []int) {
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *RemoveHouseChairmanRequest) GetHouseId() string {
+	if x != nil {
+		return x.HouseId
+	}
+	return ""
 }
 
 type CreateHouseRegistrationRequest struct {
@@ -2138,7 +2666,7 @@ type CreateHouseRegistrationRequest struct {
 
 func (x *CreateHouseRegistrationRequest) Reset() {
 	*x = CreateHouseRegistrationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[26]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2150,7 +2678,7 @@ func (x *CreateHouseRegistrationRequest) String() string {
 func (*CreateHouseRegistrationRequest) ProtoMessage() {}
 
 func (x *CreateHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[26]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2163,7 +2691,7 @@ func (x *CreateHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateHouseRegistrationRequest.ProtoReflect.Descriptor instead.
 func (*CreateHouseRegistrationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{26}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *CreateHouseRegistrationRequest) GetName() string {
@@ -2196,7 +2724,7 @@ type GetHouseRegistrationRequest struct {
 
 func (x *GetHouseRegistrationRequest) Reset() {
 	*x = GetHouseRegistrationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[27]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2208,7 +2736,7 @@ func (x *GetHouseRegistrationRequest) String() string {
 func (*GetHouseRegistrationRequest) ProtoMessage() {}
 
 func (x *GetHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[27]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2221,7 +2749,7 @@ func (x *GetHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHouseRegistrationRequest.ProtoReflect.Descriptor instead.
 func (*GetHouseRegistrationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{27}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *GetHouseRegistrationRequest) GetId() string {
@@ -2239,7 +2767,7 @@ type ListMyHouseRegistrationsRequest struct {
 
 func (x *ListMyHouseRegistrationsRequest) Reset() {
 	*x = ListMyHouseRegistrationsRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[28]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2251,7 +2779,7 @@ func (x *ListMyHouseRegistrationsRequest) String() string {
 func (*ListMyHouseRegistrationsRequest) ProtoMessage() {}
 
 func (x *ListMyHouseRegistrationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[28]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2264,7 +2792,7 @@ func (x *ListMyHouseRegistrationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMyHouseRegistrationsRequest.ProtoReflect.Descriptor instead.
 func (*ListMyHouseRegistrationsRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{28}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{38}
 }
 
 type CancelHouseRegistrationRequest struct {
@@ -2276,7 +2804,7 @@ type CancelHouseRegistrationRequest struct {
 
 func (x *CancelHouseRegistrationRequest) Reset() {
 	*x = CancelHouseRegistrationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[29]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2288,7 +2816,7 @@ func (x *CancelHouseRegistrationRequest) String() string {
 func (*CancelHouseRegistrationRequest) ProtoMessage() {}
 
 func (x *CancelHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[29]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2301,7 +2829,7 @@ func (x *CancelHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelHouseRegistrationRequest.ProtoReflect.Descriptor instead.
 func (*CancelHouseRegistrationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{29}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *CancelHouseRegistrationRequest) GetId() string {
@@ -2319,7 +2847,7 @@ type ListPendingHouseRegistrationsRequest struct {
 
 func (x *ListPendingHouseRegistrationsRequest) Reset() {
 	*x = ListPendingHouseRegistrationsRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[30]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2331,7 +2859,7 @@ func (x *ListPendingHouseRegistrationsRequest) String() string {
 func (*ListPendingHouseRegistrationsRequest) ProtoMessage() {}
 
 func (x *ListPendingHouseRegistrationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[30]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2344,7 +2872,7 @@ func (x *ListPendingHouseRegistrationsRequest) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use ListPendingHouseRegistrationsRequest.ProtoReflect.Descriptor instead.
 func (*ListPendingHouseRegistrationsRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{30}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{40}
 }
 
 type ApproveHouseRegistrationRequest struct {
@@ -2357,7 +2885,7 @@ type ApproveHouseRegistrationRequest struct {
 
 func (x *ApproveHouseRegistrationRequest) Reset() {
 	*x = ApproveHouseRegistrationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[31]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2369,7 +2897,7 @@ func (x *ApproveHouseRegistrationRequest) String() string {
 func (*ApproveHouseRegistrationRequest) ProtoMessage() {}
 
 func (x *ApproveHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[31]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2382,7 +2910,7 @@ func (x *ApproveHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApproveHouseRegistrationRequest.ProtoReflect.Descriptor instead.
 func (*ApproveHouseRegistrationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{31}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *ApproveHouseRegistrationRequest) GetId() string {
@@ -2409,7 +2937,7 @@ type RejectHouseRegistrationRequest struct {
 
 func (x *RejectHouseRegistrationRequest) Reset() {
 	*x = RejectHouseRegistrationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[32]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2421,7 +2949,7 @@ func (x *RejectHouseRegistrationRequest) String() string {
 func (*RejectHouseRegistrationRequest) ProtoMessage() {}
 
 func (x *RejectHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[32]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2434,7 +2962,7 @@ func (x *RejectHouseRegistrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RejectHouseRegistrationRequest.ProtoReflect.Descriptor instead.
 func (*RejectHouseRegistrationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{32}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *RejectHouseRegistrationRequest) GetId() string {
@@ -2460,7 +2988,7 @@ type SearchHousesRequest struct {
 
 func (x *SearchHousesRequest) Reset() {
 	*x = SearchHousesRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[33]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2472,7 +3000,7 @@ func (x *SearchHousesRequest) String() string {
 func (*SearchHousesRequest) ProtoMessage() {}
 
 func (x *SearchHousesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[33]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2485,7 +3013,7 @@ func (x *SearchHousesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchHousesRequest.ProtoReflect.Descriptor instead.
 func (*SearchHousesRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{33}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *SearchHousesRequest) GetQuery() string {
@@ -2504,7 +3032,7 @@ type CreateJoinRequestRequest struct {
 
 func (x *CreateJoinRequestRequest) Reset() {
 	*x = CreateJoinRequestRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[34]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2516,7 +3044,7 @@ func (x *CreateJoinRequestRequest) String() string {
 func (*CreateJoinRequestRequest) ProtoMessage() {}
 
 func (x *CreateJoinRequestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[34]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2529,7 +3057,7 @@ func (x *CreateJoinRequestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateJoinRequestRequest.ProtoReflect.Descriptor instead.
 func (*CreateJoinRequestRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{34}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *CreateJoinRequestRequest) GetHouseId() string {
@@ -2547,7 +3075,7 @@ type ListMyJoinRequestsRequest struct {
 
 func (x *ListMyJoinRequestsRequest) Reset() {
 	*x = ListMyJoinRequestsRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[35]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2559,7 +3087,7 @@ func (x *ListMyJoinRequestsRequest) String() string {
 func (*ListMyJoinRequestsRequest) ProtoMessage() {}
 
 func (x *ListMyJoinRequestsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[35]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2572,7 +3100,7 @@ func (x *ListMyJoinRequestsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMyJoinRequestsRequest.ProtoReflect.Descriptor instead.
 func (*ListMyJoinRequestsRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{35}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{45}
 }
 
 type CancelJoinRequestRequest struct {
@@ -2584,7 +3112,7 @@ type CancelJoinRequestRequest struct {
 
 func (x *CancelJoinRequestRequest) Reset() {
 	*x = CancelJoinRequestRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[36]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2596,7 +3124,7 @@ func (x *CancelJoinRequestRequest) String() string {
 func (*CancelJoinRequestRequest) ProtoMessage() {}
 
 func (x *CancelJoinRequestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[36]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2609,7 +3137,7 @@ func (x *CancelJoinRequestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelJoinRequestRequest.ProtoReflect.Descriptor instead.
 func (*CancelJoinRequestRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{36}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *CancelJoinRequestRequest) GetId() string {
@@ -2627,7 +3155,7 @@ type ListHouseJoinRequestsRequest struct {
 
 func (x *ListHouseJoinRequestsRequest) Reset() {
 	*x = ListHouseJoinRequestsRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[37]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2639,7 +3167,7 @@ func (x *ListHouseJoinRequestsRequest) String() string {
 func (*ListHouseJoinRequestsRequest) ProtoMessage() {}
 
 func (x *ListHouseJoinRequestsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[37]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2652,7 +3180,7 @@ func (x *ListHouseJoinRequestsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListHouseJoinRequestsRequest.ProtoReflect.Descriptor instead.
 func (*ListHouseJoinRequestsRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{37}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{47}
 }
 
 type ApproveJoinRequestRequest struct {
@@ -2665,7 +3193,7 @@ type ApproveJoinRequestRequest struct {
 
 func (x *ApproveJoinRequestRequest) Reset() {
 	*x = ApproveJoinRequestRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[38]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2677,7 +3205,7 @@ func (x *ApproveJoinRequestRequest) String() string {
 func (*ApproveJoinRequestRequest) ProtoMessage() {}
 
 func (x *ApproveJoinRequestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[38]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2690,7 +3218,7 @@ func (x *ApproveJoinRequestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApproveJoinRequestRequest.ProtoReflect.Descriptor instead.
 func (*ApproveJoinRequestRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{38}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *ApproveJoinRequestRequest) GetId() string {
@@ -2717,7 +3245,7 @@ type RejectJoinRequestRequest struct {
 
 func (x *RejectJoinRequestRequest) Reset() {
 	*x = RejectJoinRequestRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[39]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2729,7 +3257,7 @@ func (x *RejectJoinRequestRequest) String() string {
 func (*RejectJoinRequestRequest) ProtoMessage() {}
 
 func (x *RejectJoinRequestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[39]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2742,7 +3270,7 @@ func (x *RejectJoinRequestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RejectJoinRequestRequest.ProtoReflect.Descriptor instead.
 func (*RejectJoinRequestRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{39}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *RejectJoinRequestRequest) GetId() string {
@@ -2769,7 +3297,7 @@ type CreateHouseInvitationRequest struct {
 
 func (x *CreateHouseInvitationRequest) Reset() {
 	*x = CreateHouseInvitationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[40]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2781,7 +3309,7 @@ func (x *CreateHouseInvitationRequest) String() string {
 func (*CreateHouseInvitationRequest) ProtoMessage() {}
 
 func (x *CreateHouseInvitationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[40]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2794,7 +3322,7 @@ func (x *CreateHouseInvitationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateHouseInvitationRequest.ProtoReflect.Descriptor instead.
 func (*CreateHouseInvitationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{40}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *CreateHouseInvitationRequest) GetExpiresInHours() int32 {
@@ -2819,7 +3347,7 @@ type ListHouseInvitationsRequest struct {
 
 func (x *ListHouseInvitationsRequest) Reset() {
 	*x = ListHouseInvitationsRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[41]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2831,7 +3359,7 @@ func (x *ListHouseInvitationsRequest) String() string {
 func (*ListHouseInvitationsRequest) ProtoMessage() {}
 
 func (x *ListHouseInvitationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[41]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2844,7 +3372,7 @@ func (x *ListHouseInvitationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListHouseInvitationsRequest.ProtoReflect.Descriptor instead.
 func (*ListHouseInvitationsRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{41}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{51}
 }
 
 type GetHouseInvitationRequest struct {
@@ -2856,7 +3384,7 @@ type GetHouseInvitationRequest struct {
 
 func (x *GetHouseInvitationRequest) Reset() {
 	*x = GetHouseInvitationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[42]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2868,7 +3396,7 @@ func (x *GetHouseInvitationRequest) String() string {
 func (*GetHouseInvitationRequest) ProtoMessage() {}
 
 func (x *GetHouseInvitationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[42]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2881,7 +3409,7 @@ func (x *GetHouseInvitationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHouseInvitationRequest.ProtoReflect.Descriptor instead.
 func (*GetHouseInvitationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{42}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *GetHouseInvitationRequest) GetId() string {
@@ -2900,7 +3428,7 @@ type RevokeHouseInvitationRequest struct {
 
 func (x *RevokeHouseInvitationRequest) Reset() {
 	*x = RevokeHouseInvitationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[43]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2912,7 +3440,7 @@ func (x *RevokeHouseInvitationRequest) String() string {
 func (*RevokeHouseInvitationRequest) ProtoMessage() {}
 
 func (x *RevokeHouseInvitationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[43]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2925,7 +3453,7 @@ func (x *RevokeHouseInvitationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeHouseInvitationRequest.ProtoReflect.Descriptor instead.
 func (*RevokeHouseInvitationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{43}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *RevokeHouseInvitationRequest) GetId() string {
@@ -2944,7 +3472,7 @@ type RedeemHouseInvitationRequest struct {
 
 func (x *RedeemHouseInvitationRequest) Reset() {
 	*x = RedeemHouseInvitationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[44]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2956,7 +3484,7 @@ func (x *RedeemHouseInvitationRequest) String() string {
 func (*RedeemHouseInvitationRequest) ProtoMessage() {}
 
 func (x *RedeemHouseInvitationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[44]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2969,7 +3497,7 @@ func (x *RedeemHouseInvitationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RedeemHouseInvitationRequest.ProtoReflect.Descriptor instead.
 func (*RedeemHouseInvitationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{44}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *RedeemHouseInvitationRequest) GetToken() string {
@@ -2988,7 +3516,7 @@ type PreviewHouseInvitationRequest struct {
 
 func (x *PreviewHouseInvitationRequest) Reset() {
 	*x = PreviewHouseInvitationRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[45]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3000,7 +3528,7 @@ func (x *PreviewHouseInvitationRequest) String() string {
 func (*PreviewHouseInvitationRequest) ProtoMessage() {}
 
 func (x *PreviewHouseInvitationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[45]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3013,7 +3541,7 @@ func (x *PreviewHouseInvitationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PreviewHouseInvitationRequest.ProtoReflect.Descriptor instead.
 func (*PreviewHouseInvitationRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{45}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *PreviewHouseInvitationRequest) GetToken() string {
@@ -3032,7 +3560,7 @@ type CreateChairmanTransferRequest struct {
 
 func (x *CreateChairmanTransferRequest) Reset() {
 	*x = CreateChairmanTransferRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[46]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3044,7 +3572,7 @@ func (x *CreateChairmanTransferRequest) String() string {
 func (*CreateChairmanTransferRequest) ProtoMessage() {}
 
 func (x *CreateChairmanTransferRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[46]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3057,7 +3585,7 @@ func (x *CreateChairmanTransferRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateChairmanTransferRequest.ProtoReflect.Descriptor instead.
 func (*CreateChairmanTransferRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{46}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *CreateChairmanTransferRequest) GetTargetUserId() string {
@@ -3075,7 +3603,7 @@ type ListChairmanTransfersRequest struct {
 
 func (x *ListChairmanTransfersRequest) Reset() {
 	*x = ListChairmanTransfersRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[47]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3087,7 +3615,7 @@ func (x *ListChairmanTransfersRequest) String() string {
 func (*ListChairmanTransfersRequest) ProtoMessage() {}
 
 func (x *ListChairmanTransfersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[47]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3100,7 +3628,7 @@ func (x *ListChairmanTransfersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListChairmanTransfersRequest.ProtoReflect.Descriptor instead.
 func (*ListChairmanTransfersRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{47}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{57}
 }
 
 type AcceptChairmanTransferRequest struct {
@@ -3112,7 +3640,7 @@ type AcceptChairmanTransferRequest struct {
 
 func (x *AcceptChairmanTransferRequest) Reset() {
 	*x = AcceptChairmanTransferRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[48]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3124,7 +3652,7 @@ func (x *AcceptChairmanTransferRequest) String() string {
 func (*AcceptChairmanTransferRequest) ProtoMessage() {}
 
 func (x *AcceptChairmanTransferRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[48]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3137,7 +3665,7 @@ func (x *AcceptChairmanTransferRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AcceptChairmanTransferRequest.ProtoReflect.Descriptor instead.
 func (*AcceptChairmanTransferRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{48}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *AcceptChairmanTransferRequest) GetId() string {
@@ -3156,7 +3684,7 @@ type RejectChairmanTransferRequest struct {
 
 func (x *RejectChairmanTransferRequest) Reset() {
 	*x = RejectChairmanTransferRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[49]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3168,7 +3696,7 @@ func (x *RejectChairmanTransferRequest) String() string {
 func (*RejectChairmanTransferRequest) ProtoMessage() {}
 
 func (x *RejectChairmanTransferRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[49]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3181,7 +3709,7 @@ func (x *RejectChairmanTransferRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RejectChairmanTransferRequest.ProtoReflect.Descriptor instead.
 func (*RejectChairmanTransferRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{49}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *RejectChairmanTransferRequest) GetId() string {
@@ -3200,7 +3728,7 @@ type CancelChairmanTransferRequest struct {
 
 func (x *CancelChairmanTransferRequest) Reset() {
 	*x = CancelChairmanTransferRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[50]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3212,7 +3740,7 @@ func (x *CancelChairmanTransferRequest) String() string {
 func (*CancelChairmanTransferRequest) ProtoMessage() {}
 
 func (x *CancelChairmanTransferRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[50]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3225,7 +3753,7 @@ func (x *CancelChairmanTransferRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelChairmanTransferRequest.ProtoReflect.Descriptor instead.
 func (*CancelChairmanTransferRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{50}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *CancelChairmanTransferRequest) GetId() string {
@@ -3243,7 +3771,7 @@ type ListHouseMembersRequest struct {
 
 func (x *ListHouseMembersRequest) Reset() {
 	*x = ListHouseMembersRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[51]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3255,7 +3783,7 @@ func (x *ListHouseMembersRequest) String() string {
 func (*ListHouseMembersRequest) ProtoMessage() {}
 
 func (x *ListHouseMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[51]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3268,7 +3796,7 @@ func (x *ListHouseMembersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListHouseMembersRequest.ProtoReflect.Descriptor instead.
 func (*ListHouseMembersRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{51}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{61}
 }
 
 type DeactivateMembershipRequest struct {
@@ -3281,7 +3809,7 @@ type DeactivateMembershipRequest struct {
 
 func (x *DeactivateMembershipRequest) Reset() {
 	*x = DeactivateMembershipRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[52]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3293,7 +3821,7 @@ func (x *DeactivateMembershipRequest) String() string {
 func (*DeactivateMembershipRequest) ProtoMessage() {}
 
 func (x *DeactivateMembershipRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[52]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3306,7 +3834,7 @@ func (x *DeactivateMembershipRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeactivateMembershipRequest.ProtoReflect.Descriptor instead.
 func (*DeactivateMembershipRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{52}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *DeactivateMembershipRequest) GetId() string {
@@ -3333,7 +3861,7 @@ type ReactivateMembershipRequest struct {
 
 func (x *ReactivateMembershipRequest) Reset() {
 	*x = ReactivateMembershipRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[53]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3345,7 +3873,7 @@ func (x *ReactivateMembershipRequest) String() string {
 func (*ReactivateMembershipRequest) ProtoMessage() {}
 
 func (x *ReactivateMembershipRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[53]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3358,7 +3886,7 @@ func (x *ReactivateMembershipRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReactivateMembershipRequest.ProtoReflect.Descriptor instead.
 func (*ReactivateMembershipRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{53}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *ReactivateMembershipRequest) GetId() string {
@@ -3385,7 +3913,7 @@ type RemoveMembershipRequest struct {
 
 func (x *RemoveMembershipRequest) Reset() {
 	*x = RemoveMembershipRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[54]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3397,7 +3925,7 @@ func (x *RemoveMembershipRequest) String() string {
 func (*RemoveMembershipRequest) ProtoMessage() {}
 
 func (x *RemoveMembershipRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[54]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3410,7 +3938,7 @@ func (x *RemoveMembershipRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveMembershipRequest.ProtoReflect.Descriptor instead.
 func (*RemoveMembershipRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{54}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *RemoveMembershipRequest) GetId() string {
@@ -3435,7 +3963,7 @@ type GetHouseAccessStateRequest struct {
 
 func (x *GetHouseAccessStateRequest) Reset() {
 	*x = GetHouseAccessStateRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[55]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3447,7 +3975,7 @@ func (x *GetHouseAccessStateRequest) String() string {
 func (*GetHouseAccessStateRequest) ProtoMessage() {}
 
 func (x *GetHouseAccessStateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[55]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3460,7 +3988,7 @@ func (x *GetHouseAccessStateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHouseAccessStateRequest.ProtoReflect.Descriptor instead.
 func (*GetHouseAccessStateRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{55}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{65}
 }
 
 type GetNotificationPreferencesRequest struct {
@@ -3471,7 +3999,7 @@ type GetNotificationPreferencesRequest struct {
 
 func (x *GetNotificationPreferencesRequest) Reset() {
 	*x = GetNotificationPreferencesRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[56]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3483,7 +4011,7 @@ func (x *GetNotificationPreferencesRequest) String() string {
 func (*GetNotificationPreferencesRequest) ProtoMessage() {}
 
 func (x *GetNotificationPreferencesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[56]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3496,7 +4024,7 @@ func (x *GetNotificationPreferencesRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetNotificationPreferencesRequest.ProtoReflect.Descriptor instead.
 func (*GetNotificationPreferencesRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{56}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{66}
 }
 
 type UpdateNotificationPreferencesRequest struct {
@@ -3512,7 +4040,7 @@ type UpdateNotificationPreferencesRequest struct {
 
 func (x *UpdateNotificationPreferencesRequest) Reset() {
 	*x = UpdateNotificationPreferencesRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[57]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3524,7 +4052,7 @@ func (x *UpdateNotificationPreferencesRequest) String() string {
 func (*UpdateNotificationPreferencesRequest) ProtoMessage() {}
 
 func (x *UpdateNotificationPreferencesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[57]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3537,7 +4065,7 @@ func (x *UpdateNotificationPreferencesRequest) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use UpdateNotificationPreferencesRequest.ProtoReflect.Descriptor instead.
 func (*UpdateNotificationPreferencesRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{57}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *UpdateNotificationPreferencesRequest) GetNotificationsEnabled() bool {
@@ -3587,7 +4115,7 @@ type ListNotificationRecipientsRequest struct {
 
 func (x *ListNotificationRecipientsRequest) Reset() {
 	*x = ListNotificationRecipientsRequest{}
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[58]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3599,7 +4127,7 @@ func (x *ListNotificationRecipientsRequest) String() string {
 func (*ListNotificationRecipientsRequest) ProtoMessage() {}
 
 func (x *ListNotificationRecipientsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[58]
+	mi := &file_smartquarter_identity_v1_identity_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3612,7 +4140,7 @@ func (x *ListNotificationRecipientsRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use ListNotificationRecipientsRequest.ProtoReflect.Descriptor instead.
 func (*ListNotificationRecipientsRequest) Descriptor() ([]byte, []int) {
-	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{58}
+	return file_smartquarter_identity_v1_identity_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *ListNotificationRecipientsRequest) GetHouseId() string {
@@ -3692,7 +4220,25 @@ const file_smartquarter_identity_v1_identity_proto_rawDesc = "" +
 	"\x16ListMembershipsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"U\n" +
 	"\x17ListMembershipsResponse\x12:\n" +
-	"\x05items\x18\x01 \x03(\v2$.smartquarter.identity.v1.MembershipR\x05items\"\x87\x04\n" +
+	"\x05items\x18\x01 \x03(\v2$.smartquarter.identity.v1.MembershipR\x05items\"\xb6\x01\n" +
+	"\fPlatformUser\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1e\n" +
+	"\vmax_user_id\x18\x03 \x01(\tR\tmaxUserId\x12,\n" +
+	"\x12can_register_house\x18\x04 \x01(\bR\x10canRegisterHouse\x12%\n" +
+	"\x0emanaged_houses\x18\x05 \x01(\x05R\rmanagedHouses\"P\n" +
+	"\x10PlatformUserList\x12<\n" +
+	"\x05items\x18\x01 \x03(\v2&.smartquarter.identity.v1.PlatformUserR\x05items\"\xbc\x01\n" +
+	"\n" +
+	"AdminHouse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
+	"\aaddress\x18\x03 \x01(\tR\aaddress\x12\x12\n" +
+	"\x04city\x18\x04 \x01(\tR\x04city\x12(\n" +
+	"\x10chairman_user_id\x18\x05 \x01(\tR\x0echairmanUserId\x122\n" +
+	"\x15chairman_display_name\x18\x06 \x01(\tR\x13chairmanDisplayName\"L\n" +
+	"\x0eAdminHouseList\x12:\n" +
+	"\x05items\x18\x01 \x03(\v2$.smartquarter.identity.v1.AdminHouseR\x05items\"\x87\x04\n" +
 	"\x11HouseRegistration\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12*\n" +
 	"\x11applicant_user_id\x18\x02 \x01(\tR\x0fapplicantUserId\x12%\n" +
@@ -3762,13 +4308,14 @@ const file_smartquarter_identity_v1_identity_proto_rawDesc = "" +
 	"\bhouse_id\x18\x03 \x01(\tR\ahouseId\x12!\n" +
 	"\fdisplay_name\x18\x04 \x01(\tR\vdisplayName\x12\x12\n" +
 	"\x04role\x18\x05 \x01(\tR\x04role\x12\x16\n" +
-	"\x06status\x18\x06 \x01(\tR\x06status\"\x8f\x02\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\"\xbd\x02\n" +
 	"\x10HouseAccessState\x12%\n" +
 	"\x0eplatform_admin\x18\x01 \x01(\bR\rplatformAdmin\x123\n" +
 	"\x15pending_registrations\x18\x02 \x01(\x05R\x14pendingRegistrations\x122\n" +
 	"\x15pending_join_requests\x18\x03 \x01(\x05R\x13pendingJoinRequests\x124\n" +
 	"\x16incoming_join_requests\x18\x04 \x01(\x05R\x14incomingJoinRequests\x125\n" +
-	"\x17can_manage_active_house\x18\x05 \x01(\bR\x14canManageActiveHouse\"\xe2\x02\n" +
+	"\x17can_manage_active_house\x18\x05 \x01(\bR\x14canManageActiveHouse\x12,\n" +
+	"\x12can_register_house\x18\x06 \x01(\bR\x10canRegisterHouse\"\xe2\x02\n" +
 	"\x17NotificationPreferences\x123\n" +
 	"\x15notifications_enabled\x18\x01 \x01(\bR\x14notificationsEnabled\x12>\n" +
 	"\x1bissue_notifications_enabled\x18\x02 \x01(\bR\x19issueNotificationsEnabled\x12L\n" +
@@ -3791,7 +4338,20 @@ const file_smartquarter_identity_v1_identity_proto_rawDesc = "" +
 	"\x19NotificationRecipientList\x12E\n" +
 	"\x05items\x18\x01 \x03(\v2/.smartquarter.identity.v1.NotificationRecipientR\x05items\"Q\n" +
 	"\x11HouseSearchResult\x12<\n" +
-	"\x05items\x18\x01 \x03(\v2&.smartquarter.identity.v1.HouseSummaryR\x05items\"b\n" +
+	"\x05items\x18\x01 \x03(\v2&.smartquarter.identity.v1.HouseSummaryR\x05items\"0\n" +
+	"\x18ListPlatformUsersRequest\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\"9\n" +
+	"\x1eGrantChairmanPermissionRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\":\n" +
+	"\x1fRevokeChairmanPermissionRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\".\n" +
+	"\x16ListAdminHousesRequest\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\"]\n" +
+	"\x1aAssignHouseChairmanRequest\x12\x19\n" +
+	"\bhouse_id\x18\x01 \x01(\tR\ahouseId\x12$\n" +
+	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId\"7\n" +
+	"\x1aRemoveHouseChairmanRequest\x12\x19\n" +
+	"\bhouse_id\x18\x01 \x01(\tR\ahouseId\"b\n" +
 	"\x1eCreateHouseRegistrationRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x12\n" +
@@ -3910,8 +4470,14 @@ const file_smartquarter_identity_v1_identity_proto_rawDesc = "" +
 	"\rUpsertMaxUser\x12..smartquarter.identity.v1.UpsertMaxUserRequest\x1a\x1e.smartquarter.identity.v1.User\x12h\n" +
 	"\x0eGetUserContext\x12/.smartquarter.identity.v1.GetUserContextRequest\x1a%.smartquarter.identity.v1.UserContext\x12e\n" +
 	"\rGetMembership\x12..smartquarter.identity.v1.GetMembershipRequest\x1a$.smartquarter.identity.v1.Membership\x12v\n" +
-	"\x0fListMemberships\x120.smartquarter.identity.v1.ListMembershipsRequest\x1a1.smartquarter.identity.v1.ListMembershipsResponse2\xac \n" +
-	"\fHouseService\x12\x80\x01\n" +
+	"\x0fListMemberships\x120.smartquarter.identity.v1.ListMembershipsRequest\x1a1.smartquarter.identity.v1.ListMembershipsResponse2\xf2%\n" +
+	"\fHouseService\x12s\n" +
+	"\x11ListPlatformUsers\x122.smartquarter.identity.v1.ListPlatformUsersRequest\x1a*.smartquarter.identity.v1.PlatformUserList\x12{\n" +
+	"\x17GrantChairmanPermission\x128.smartquarter.identity.v1.GrantChairmanPermissionRequest\x1a&.smartquarter.identity.v1.PlatformUser\x12}\n" +
+	"\x18RevokeChairmanPermission\x129.smartquarter.identity.v1.RevokeChairmanPermissionRequest\x1a&.smartquarter.identity.v1.PlatformUser\x12m\n" +
+	"\x0fListAdminHouses\x120.smartquarter.identity.v1.ListAdminHousesRequest\x1a(.smartquarter.identity.v1.AdminHouseList\x12q\n" +
+	"\x13AssignHouseChairman\x124.smartquarter.identity.v1.AssignHouseChairmanRequest\x1a$.smartquarter.identity.v1.AdminHouse\x12q\n" +
+	"\x13RemoveHouseChairman\x124.smartquarter.identity.v1.RemoveHouseChairmanRequest\x1a$.smartquarter.identity.v1.AdminHouse\x12\x80\x01\n" +
 	"\x17CreateHouseRegistration\x128.smartquarter.identity.v1.CreateHouseRegistrationRequest\x1a+.smartquarter.identity.v1.HouseRegistration\x12z\n" +
 	"\x14GetHouseRegistration\x125.smartquarter.identity.v1.GetHouseRegistrationRequest\x1a+.smartquarter.identity.v1.HouseRegistration\x12\x86\x01\n" +
 	"\x18ListMyHouseRegistrations\x129.smartquarter.identity.v1.ListMyHouseRegistrationsRequest\x1a/.smartquarter.identity.v1.HouseRegistrationList\x12\x80\x01\n" +
@@ -3959,7 +4525,7 @@ func file_smartquarter_identity_v1_identity_proto_rawDescGZIP() []byte {
 }
 
 var file_smartquarter_identity_v1_identity_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
-var file_smartquarter_identity_v1_identity_proto_msgTypes = make([]protoimpl.MessageInfo, 59)
+var file_smartquarter_identity_v1_identity_proto_msgTypes = make([]protoimpl.MessageInfo, 69)
 var file_smartquarter_identity_v1_identity_proto_goTypes = []any{
 	(Role)(0),                                    // 0: smartquarter.identity.v1.Role
 	(MembershipStatus)(0),                        // 1: smartquarter.identity.v1.MembershipStatus
@@ -3977,170 +4543,194 @@ var file_smartquarter_identity_v1_identity_proto_goTypes = []any{
 	(*GetMembershipRequest)(nil),                 // 13: smartquarter.identity.v1.GetMembershipRequest
 	(*ListMembershipsRequest)(nil),               // 14: smartquarter.identity.v1.ListMembershipsRequest
 	(*ListMembershipsResponse)(nil),              // 15: smartquarter.identity.v1.ListMembershipsResponse
-	(*HouseRegistration)(nil),                    // 16: smartquarter.identity.v1.HouseRegistration
-	(*JoinRequest)(nil),                          // 17: smartquarter.identity.v1.JoinRequest
-	(*HouseInvitation)(nil),                      // 18: smartquarter.identity.v1.HouseInvitation
-	(*CreatedInvitation)(nil),                    // 19: smartquarter.identity.v1.CreatedInvitation
-	(*ChairmanTransfer)(nil),                     // 20: smartquarter.identity.v1.ChairmanTransfer
-	(*HouseSummary)(nil),                         // 21: smartquarter.identity.v1.HouseSummary
-	(*HouseMember)(nil),                          // 22: smartquarter.identity.v1.HouseMember
-	(*HouseAccessState)(nil),                     // 23: smartquarter.identity.v1.HouseAccessState
-	(*NotificationPreferences)(nil),              // 24: smartquarter.identity.v1.NotificationPreferences
-	(*NotificationRecipient)(nil),                // 25: smartquarter.identity.v1.NotificationRecipient
-	(*HouseRegistrationList)(nil),                // 26: smartquarter.identity.v1.HouseRegistrationList
-	(*JoinRequestList)(nil),                      // 27: smartquarter.identity.v1.JoinRequestList
-	(*HouseInvitationList)(nil),                  // 28: smartquarter.identity.v1.HouseInvitationList
-	(*ChairmanTransferList)(nil),                 // 29: smartquarter.identity.v1.ChairmanTransferList
-	(*HouseMemberList)(nil),                      // 30: smartquarter.identity.v1.HouseMemberList
-	(*NotificationRecipientList)(nil),            // 31: smartquarter.identity.v1.NotificationRecipientList
-	(*HouseSearchResult)(nil),                    // 32: smartquarter.identity.v1.HouseSearchResult
-	(*CreateHouseRegistrationRequest)(nil),       // 33: smartquarter.identity.v1.CreateHouseRegistrationRequest
-	(*GetHouseRegistrationRequest)(nil),          // 34: smartquarter.identity.v1.GetHouseRegistrationRequest
-	(*ListMyHouseRegistrationsRequest)(nil),      // 35: smartquarter.identity.v1.ListMyHouseRegistrationsRequest
-	(*CancelHouseRegistrationRequest)(nil),       // 36: smartquarter.identity.v1.CancelHouseRegistrationRequest
-	(*ListPendingHouseRegistrationsRequest)(nil), // 37: smartquarter.identity.v1.ListPendingHouseRegistrationsRequest
-	(*ApproveHouseRegistrationRequest)(nil),      // 38: smartquarter.identity.v1.ApproveHouseRegistrationRequest
-	(*RejectHouseRegistrationRequest)(nil),       // 39: smartquarter.identity.v1.RejectHouseRegistrationRequest
-	(*SearchHousesRequest)(nil),                  // 40: smartquarter.identity.v1.SearchHousesRequest
-	(*CreateJoinRequestRequest)(nil),             // 41: smartquarter.identity.v1.CreateJoinRequestRequest
-	(*ListMyJoinRequestsRequest)(nil),            // 42: smartquarter.identity.v1.ListMyJoinRequestsRequest
-	(*CancelJoinRequestRequest)(nil),             // 43: smartquarter.identity.v1.CancelJoinRequestRequest
-	(*ListHouseJoinRequestsRequest)(nil),         // 44: smartquarter.identity.v1.ListHouseJoinRequestsRequest
-	(*ApproveJoinRequestRequest)(nil),            // 45: smartquarter.identity.v1.ApproveJoinRequestRequest
-	(*RejectJoinRequestRequest)(nil),             // 46: smartquarter.identity.v1.RejectJoinRequestRequest
-	(*CreateHouseInvitationRequest)(nil),         // 47: smartquarter.identity.v1.CreateHouseInvitationRequest
-	(*ListHouseInvitationsRequest)(nil),          // 48: smartquarter.identity.v1.ListHouseInvitationsRequest
-	(*GetHouseInvitationRequest)(nil),            // 49: smartquarter.identity.v1.GetHouseInvitationRequest
-	(*RevokeHouseInvitationRequest)(nil),         // 50: smartquarter.identity.v1.RevokeHouseInvitationRequest
-	(*RedeemHouseInvitationRequest)(nil),         // 51: smartquarter.identity.v1.RedeemHouseInvitationRequest
-	(*PreviewHouseInvitationRequest)(nil),        // 52: smartquarter.identity.v1.PreviewHouseInvitationRequest
-	(*CreateChairmanTransferRequest)(nil),        // 53: smartquarter.identity.v1.CreateChairmanTransferRequest
-	(*ListChairmanTransfersRequest)(nil),         // 54: smartquarter.identity.v1.ListChairmanTransfersRequest
-	(*AcceptChairmanTransferRequest)(nil),        // 55: smartquarter.identity.v1.AcceptChairmanTransferRequest
-	(*RejectChairmanTransferRequest)(nil),        // 56: smartquarter.identity.v1.RejectChairmanTransferRequest
-	(*CancelChairmanTransferRequest)(nil),        // 57: smartquarter.identity.v1.CancelChairmanTransferRequest
-	(*ListHouseMembersRequest)(nil),              // 58: smartquarter.identity.v1.ListHouseMembersRequest
-	(*DeactivateMembershipRequest)(nil),          // 59: smartquarter.identity.v1.DeactivateMembershipRequest
-	(*ReactivateMembershipRequest)(nil),          // 60: smartquarter.identity.v1.ReactivateMembershipRequest
-	(*RemoveMembershipRequest)(nil),              // 61: smartquarter.identity.v1.RemoveMembershipRequest
-	(*GetHouseAccessStateRequest)(nil),           // 62: smartquarter.identity.v1.GetHouseAccessStateRequest
-	(*GetNotificationPreferencesRequest)(nil),    // 63: smartquarter.identity.v1.GetNotificationPreferencesRequest
-	(*UpdateNotificationPreferencesRequest)(nil), // 64: smartquarter.identity.v1.UpdateNotificationPreferencesRequest
-	(*ListNotificationRecipientsRequest)(nil),    // 65: smartquarter.identity.v1.ListNotificationRecipientsRequest
-	(*timestamppb.Timestamp)(nil),                // 66: google.protobuf.Timestamp
+	(*PlatformUser)(nil),                         // 16: smartquarter.identity.v1.PlatformUser
+	(*PlatformUserList)(nil),                     // 17: smartquarter.identity.v1.PlatformUserList
+	(*AdminHouse)(nil),                           // 18: smartquarter.identity.v1.AdminHouse
+	(*AdminHouseList)(nil),                       // 19: smartquarter.identity.v1.AdminHouseList
+	(*HouseRegistration)(nil),                    // 20: smartquarter.identity.v1.HouseRegistration
+	(*JoinRequest)(nil),                          // 21: smartquarter.identity.v1.JoinRequest
+	(*HouseInvitation)(nil),                      // 22: smartquarter.identity.v1.HouseInvitation
+	(*CreatedInvitation)(nil),                    // 23: smartquarter.identity.v1.CreatedInvitation
+	(*ChairmanTransfer)(nil),                     // 24: smartquarter.identity.v1.ChairmanTransfer
+	(*HouseSummary)(nil),                         // 25: smartquarter.identity.v1.HouseSummary
+	(*HouseMember)(nil),                          // 26: smartquarter.identity.v1.HouseMember
+	(*HouseAccessState)(nil),                     // 27: smartquarter.identity.v1.HouseAccessState
+	(*NotificationPreferences)(nil),              // 28: smartquarter.identity.v1.NotificationPreferences
+	(*NotificationRecipient)(nil),                // 29: smartquarter.identity.v1.NotificationRecipient
+	(*HouseRegistrationList)(nil),                // 30: smartquarter.identity.v1.HouseRegistrationList
+	(*JoinRequestList)(nil),                      // 31: smartquarter.identity.v1.JoinRequestList
+	(*HouseInvitationList)(nil),                  // 32: smartquarter.identity.v1.HouseInvitationList
+	(*ChairmanTransferList)(nil),                 // 33: smartquarter.identity.v1.ChairmanTransferList
+	(*HouseMemberList)(nil),                      // 34: smartquarter.identity.v1.HouseMemberList
+	(*NotificationRecipientList)(nil),            // 35: smartquarter.identity.v1.NotificationRecipientList
+	(*HouseSearchResult)(nil),                    // 36: smartquarter.identity.v1.HouseSearchResult
+	(*ListPlatformUsersRequest)(nil),             // 37: smartquarter.identity.v1.ListPlatformUsersRequest
+	(*GrantChairmanPermissionRequest)(nil),       // 38: smartquarter.identity.v1.GrantChairmanPermissionRequest
+	(*RevokeChairmanPermissionRequest)(nil),      // 39: smartquarter.identity.v1.RevokeChairmanPermissionRequest
+	(*ListAdminHousesRequest)(nil),               // 40: smartquarter.identity.v1.ListAdminHousesRequest
+	(*AssignHouseChairmanRequest)(nil),           // 41: smartquarter.identity.v1.AssignHouseChairmanRequest
+	(*RemoveHouseChairmanRequest)(nil),           // 42: smartquarter.identity.v1.RemoveHouseChairmanRequest
+	(*CreateHouseRegistrationRequest)(nil),       // 43: smartquarter.identity.v1.CreateHouseRegistrationRequest
+	(*GetHouseRegistrationRequest)(nil),          // 44: smartquarter.identity.v1.GetHouseRegistrationRequest
+	(*ListMyHouseRegistrationsRequest)(nil),      // 45: smartquarter.identity.v1.ListMyHouseRegistrationsRequest
+	(*CancelHouseRegistrationRequest)(nil),       // 46: smartquarter.identity.v1.CancelHouseRegistrationRequest
+	(*ListPendingHouseRegistrationsRequest)(nil), // 47: smartquarter.identity.v1.ListPendingHouseRegistrationsRequest
+	(*ApproveHouseRegistrationRequest)(nil),      // 48: smartquarter.identity.v1.ApproveHouseRegistrationRequest
+	(*RejectHouseRegistrationRequest)(nil),       // 49: smartquarter.identity.v1.RejectHouseRegistrationRequest
+	(*SearchHousesRequest)(nil),                  // 50: smartquarter.identity.v1.SearchHousesRequest
+	(*CreateJoinRequestRequest)(nil),             // 51: smartquarter.identity.v1.CreateJoinRequestRequest
+	(*ListMyJoinRequestsRequest)(nil),            // 52: smartquarter.identity.v1.ListMyJoinRequestsRequest
+	(*CancelJoinRequestRequest)(nil),             // 53: smartquarter.identity.v1.CancelJoinRequestRequest
+	(*ListHouseJoinRequestsRequest)(nil),         // 54: smartquarter.identity.v1.ListHouseJoinRequestsRequest
+	(*ApproveJoinRequestRequest)(nil),            // 55: smartquarter.identity.v1.ApproveJoinRequestRequest
+	(*RejectJoinRequestRequest)(nil),             // 56: smartquarter.identity.v1.RejectJoinRequestRequest
+	(*CreateHouseInvitationRequest)(nil),         // 57: smartquarter.identity.v1.CreateHouseInvitationRequest
+	(*ListHouseInvitationsRequest)(nil),          // 58: smartquarter.identity.v1.ListHouseInvitationsRequest
+	(*GetHouseInvitationRequest)(nil),            // 59: smartquarter.identity.v1.GetHouseInvitationRequest
+	(*RevokeHouseInvitationRequest)(nil),         // 60: smartquarter.identity.v1.RevokeHouseInvitationRequest
+	(*RedeemHouseInvitationRequest)(nil),         // 61: smartquarter.identity.v1.RedeemHouseInvitationRequest
+	(*PreviewHouseInvitationRequest)(nil),        // 62: smartquarter.identity.v1.PreviewHouseInvitationRequest
+	(*CreateChairmanTransferRequest)(nil),        // 63: smartquarter.identity.v1.CreateChairmanTransferRequest
+	(*ListChairmanTransfersRequest)(nil),         // 64: smartquarter.identity.v1.ListChairmanTransfersRequest
+	(*AcceptChairmanTransferRequest)(nil),        // 65: smartquarter.identity.v1.AcceptChairmanTransferRequest
+	(*RejectChairmanTransferRequest)(nil),        // 66: smartquarter.identity.v1.RejectChairmanTransferRequest
+	(*CancelChairmanTransferRequest)(nil),        // 67: smartquarter.identity.v1.CancelChairmanTransferRequest
+	(*ListHouseMembersRequest)(nil),              // 68: smartquarter.identity.v1.ListHouseMembersRequest
+	(*DeactivateMembershipRequest)(nil),          // 69: smartquarter.identity.v1.DeactivateMembershipRequest
+	(*ReactivateMembershipRequest)(nil),          // 70: smartquarter.identity.v1.ReactivateMembershipRequest
+	(*RemoveMembershipRequest)(nil),              // 71: smartquarter.identity.v1.RemoveMembershipRequest
+	(*GetHouseAccessStateRequest)(nil),           // 72: smartquarter.identity.v1.GetHouseAccessStateRequest
+	(*GetNotificationPreferencesRequest)(nil),    // 73: smartquarter.identity.v1.GetNotificationPreferencesRequest
+	(*UpdateNotificationPreferencesRequest)(nil), // 74: smartquarter.identity.v1.UpdateNotificationPreferencesRequest
+	(*ListNotificationRecipientsRequest)(nil),    // 75: smartquarter.identity.v1.ListNotificationRecipientsRequest
+	(*timestamppb.Timestamp)(nil),                // 76: google.protobuf.Timestamp
 }
 var file_smartquarter_identity_v1_identity_proto_depIdxs = []int32{
-	66, // 0: smartquarter.identity.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	66, // 1: smartquarter.identity.v1.User.updated_at:type_name -> google.protobuf.Timestamp
-	66, // 2: smartquarter.identity.v1.House.created_at:type_name -> google.protobuf.Timestamp
-	66, // 3: smartquarter.identity.v1.House.updated_at:type_name -> google.protobuf.Timestamp
+	76, // 0: smartquarter.identity.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	76, // 1: smartquarter.identity.v1.User.updated_at:type_name -> google.protobuf.Timestamp
+	76, // 2: smartquarter.identity.v1.House.created_at:type_name -> google.protobuf.Timestamp
+	76, // 3: smartquarter.identity.v1.House.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 4: smartquarter.identity.v1.Membership.role:type_name -> smartquarter.identity.v1.Role
 	1,  // 5: smartquarter.identity.v1.Membership.status:type_name -> smartquarter.identity.v1.MembershipStatus
-	66, // 6: smartquarter.identity.v1.Membership.created_at:type_name -> google.protobuf.Timestamp
+	76, // 6: smartquarter.identity.v1.Membership.created_at:type_name -> google.protobuf.Timestamp
 	7,  // 7: smartquarter.identity.v1.UserContext.user:type_name -> smartquarter.identity.v1.User
 	8,  // 8: smartquarter.identity.v1.UserContext.houses:type_name -> smartquarter.identity.v1.House
 	9,  // 9: smartquarter.identity.v1.UserContext.memberships:type_name -> smartquarter.identity.v1.Membership
 	9,  // 10: smartquarter.identity.v1.ListMembershipsResponse.items:type_name -> smartquarter.identity.v1.Membership
-	2,  // 11: smartquarter.identity.v1.HouseRegistration.status:type_name -> smartquarter.identity.v1.HouseRegistrationStatus
-	66, // 12: smartquarter.identity.v1.HouseRegistration.created_at:type_name -> google.protobuf.Timestamp
-	66, // 13: smartquarter.identity.v1.HouseRegistration.reviewed_at:type_name -> google.protobuf.Timestamp
-	6,  // 14: smartquarter.identity.v1.JoinRequest.source:type_name -> smartquarter.identity.v1.JoinRequestSource
-	3,  // 15: smartquarter.identity.v1.JoinRequest.status:type_name -> smartquarter.identity.v1.JoinRequestStatus
-	66, // 16: smartquarter.identity.v1.JoinRequest.created_at:type_name -> google.protobuf.Timestamp
-	66, // 17: smartquarter.identity.v1.JoinRequest.reviewed_at:type_name -> google.protobuf.Timestamp
-	66, // 18: smartquarter.identity.v1.HouseInvitation.expires_at:type_name -> google.protobuf.Timestamp
-	4,  // 19: smartquarter.identity.v1.HouseInvitation.status:type_name -> smartquarter.identity.v1.InvitationStatus
-	66, // 20: smartquarter.identity.v1.HouseInvitation.created_at:type_name -> google.protobuf.Timestamp
-	18, // 21: smartquarter.identity.v1.CreatedInvitation.invitation:type_name -> smartquarter.identity.v1.HouseInvitation
-	5,  // 22: smartquarter.identity.v1.ChairmanTransfer.status:type_name -> smartquarter.identity.v1.ChairmanTransferStatus
-	66, // 23: smartquarter.identity.v1.ChairmanTransfer.expires_at:type_name -> google.protobuf.Timestamp
-	66, // 24: smartquarter.identity.v1.ChairmanTransfer.created_at:type_name -> google.protobuf.Timestamp
-	16, // 25: smartquarter.identity.v1.HouseRegistrationList.items:type_name -> smartquarter.identity.v1.HouseRegistration
-	17, // 26: smartquarter.identity.v1.JoinRequestList.items:type_name -> smartquarter.identity.v1.JoinRequest
-	18, // 27: smartquarter.identity.v1.HouseInvitationList.items:type_name -> smartquarter.identity.v1.HouseInvitation
-	20, // 28: smartquarter.identity.v1.ChairmanTransferList.items:type_name -> smartquarter.identity.v1.ChairmanTransfer
-	22, // 29: smartquarter.identity.v1.HouseMemberList.items:type_name -> smartquarter.identity.v1.HouseMember
-	25, // 30: smartquarter.identity.v1.NotificationRecipientList.items:type_name -> smartquarter.identity.v1.NotificationRecipient
-	21, // 31: smartquarter.identity.v1.HouseSearchResult.items:type_name -> smartquarter.identity.v1.HouseSummary
-	11, // 32: smartquarter.identity.v1.IdentityService.UpsertMaxUser:input_type -> smartquarter.identity.v1.UpsertMaxUserRequest
-	12, // 33: smartquarter.identity.v1.IdentityService.GetUserContext:input_type -> smartquarter.identity.v1.GetUserContextRequest
-	13, // 34: smartquarter.identity.v1.IdentityService.GetMembership:input_type -> smartquarter.identity.v1.GetMembershipRequest
-	14, // 35: smartquarter.identity.v1.IdentityService.ListMemberships:input_type -> smartquarter.identity.v1.ListMembershipsRequest
-	33, // 36: smartquarter.identity.v1.HouseService.CreateHouseRegistration:input_type -> smartquarter.identity.v1.CreateHouseRegistrationRequest
-	34, // 37: smartquarter.identity.v1.HouseService.GetHouseRegistration:input_type -> smartquarter.identity.v1.GetHouseRegistrationRequest
-	35, // 38: smartquarter.identity.v1.HouseService.ListMyHouseRegistrations:input_type -> smartquarter.identity.v1.ListMyHouseRegistrationsRequest
-	36, // 39: smartquarter.identity.v1.HouseService.CancelHouseRegistration:input_type -> smartquarter.identity.v1.CancelHouseRegistrationRequest
-	37, // 40: smartquarter.identity.v1.HouseService.ListPendingHouseRegistrations:input_type -> smartquarter.identity.v1.ListPendingHouseRegistrationsRequest
-	38, // 41: smartquarter.identity.v1.HouseService.ApproveHouseRegistration:input_type -> smartquarter.identity.v1.ApproveHouseRegistrationRequest
-	39, // 42: smartquarter.identity.v1.HouseService.RejectHouseRegistration:input_type -> smartquarter.identity.v1.RejectHouseRegistrationRequest
-	40, // 43: smartquarter.identity.v1.HouseService.SearchHouses:input_type -> smartquarter.identity.v1.SearchHousesRequest
-	41, // 44: smartquarter.identity.v1.HouseService.CreateJoinRequest:input_type -> smartquarter.identity.v1.CreateJoinRequestRequest
-	42, // 45: smartquarter.identity.v1.HouseService.ListMyJoinRequests:input_type -> smartquarter.identity.v1.ListMyJoinRequestsRequest
-	43, // 46: smartquarter.identity.v1.HouseService.CancelJoinRequest:input_type -> smartquarter.identity.v1.CancelJoinRequestRequest
-	44, // 47: smartquarter.identity.v1.HouseService.ListHouseJoinRequests:input_type -> smartquarter.identity.v1.ListHouseJoinRequestsRequest
-	45, // 48: smartquarter.identity.v1.HouseService.ApproveJoinRequest:input_type -> smartquarter.identity.v1.ApproveJoinRequestRequest
-	46, // 49: smartquarter.identity.v1.HouseService.RejectJoinRequest:input_type -> smartquarter.identity.v1.RejectJoinRequestRequest
-	47, // 50: smartquarter.identity.v1.HouseService.CreateHouseInvitation:input_type -> smartquarter.identity.v1.CreateHouseInvitationRequest
-	48, // 51: smartquarter.identity.v1.HouseService.ListHouseInvitations:input_type -> smartquarter.identity.v1.ListHouseInvitationsRequest
-	49, // 52: smartquarter.identity.v1.HouseService.GetHouseInvitation:input_type -> smartquarter.identity.v1.GetHouseInvitationRequest
-	50, // 53: smartquarter.identity.v1.HouseService.RevokeHouseInvitation:input_type -> smartquarter.identity.v1.RevokeHouseInvitationRequest
-	51, // 54: smartquarter.identity.v1.HouseService.RedeemHouseInvitation:input_type -> smartquarter.identity.v1.RedeemHouseInvitationRequest
-	52, // 55: smartquarter.identity.v1.HouseService.PreviewHouseInvitation:input_type -> smartquarter.identity.v1.PreviewHouseInvitationRequest
-	53, // 56: smartquarter.identity.v1.HouseService.CreateChairmanTransfer:input_type -> smartquarter.identity.v1.CreateChairmanTransferRequest
-	54, // 57: smartquarter.identity.v1.HouseService.ListChairmanTransfers:input_type -> smartquarter.identity.v1.ListChairmanTransfersRequest
-	55, // 58: smartquarter.identity.v1.HouseService.AcceptChairmanTransfer:input_type -> smartquarter.identity.v1.AcceptChairmanTransferRequest
-	56, // 59: smartquarter.identity.v1.HouseService.RejectChairmanTransfer:input_type -> smartquarter.identity.v1.RejectChairmanTransferRequest
-	57, // 60: smartquarter.identity.v1.HouseService.CancelChairmanTransfer:input_type -> smartquarter.identity.v1.CancelChairmanTransferRequest
-	58, // 61: smartquarter.identity.v1.HouseService.ListHouseMembers:input_type -> smartquarter.identity.v1.ListHouseMembersRequest
-	59, // 62: smartquarter.identity.v1.HouseService.DeactivateMembership:input_type -> smartquarter.identity.v1.DeactivateMembershipRequest
-	60, // 63: smartquarter.identity.v1.HouseService.ReactivateMembership:input_type -> smartquarter.identity.v1.ReactivateMembershipRequest
-	61, // 64: smartquarter.identity.v1.HouseService.RemoveMembership:input_type -> smartquarter.identity.v1.RemoveMembershipRequest
-	62, // 65: smartquarter.identity.v1.HouseService.GetHouseAccessState:input_type -> smartquarter.identity.v1.GetHouseAccessStateRequest
-	63, // 66: smartquarter.identity.v1.HouseService.GetNotificationPreferences:input_type -> smartquarter.identity.v1.GetNotificationPreferencesRequest
-	64, // 67: smartquarter.identity.v1.HouseService.UpdateNotificationPreferences:input_type -> smartquarter.identity.v1.UpdateNotificationPreferencesRequest
-	65, // 68: smartquarter.identity.v1.HouseService.ListNotificationRecipients:input_type -> smartquarter.identity.v1.ListNotificationRecipientsRequest
-	7,  // 69: smartquarter.identity.v1.IdentityService.UpsertMaxUser:output_type -> smartquarter.identity.v1.User
-	10, // 70: smartquarter.identity.v1.IdentityService.GetUserContext:output_type -> smartquarter.identity.v1.UserContext
-	9,  // 71: smartquarter.identity.v1.IdentityService.GetMembership:output_type -> smartquarter.identity.v1.Membership
-	15, // 72: smartquarter.identity.v1.IdentityService.ListMemberships:output_type -> smartquarter.identity.v1.ListMembershipsResponse
-	16, // 73: smartquarter.identity.v1.HouseService.CreateHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
-	16, // 74: smartquarter.identity.v1.HouseService.GetHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
-	26, // 75: smartquarter.identity.v1.HouseService.ListMyHouseRegistrations:output_type -> smartquarter.identity.v1.HouseRegistrationList
-	16, // 76: smartquarter.identity.v1.HouseService.CancelHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
-	26, // 77: smartquarter.identity.v1.HouseService.ListPendingHouseRegistrations:output_type -> smartquarter.identity.v1.HouseRegistrationList
-	16, // 78: smartquarter.identity.v1.HouseService.ApproveHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
-	16, // 79: smartquarter.identity.v1.HouseService.RejectHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
-	32, // 80: smartquarter.identity.v1.HouseService.SearchHouses:output_type -> smartquarter.identity.v1.HouseSearchResult
-	17, // 81: smartquarter.identity.v1.HouseService.CreateJoinRequest:output_type -> smartquarter.identity.v1.JoinRequest
-	27, // 82: smartquarter.identity.v1.HouseService.ListMyJoinRequests:output_type -> smartquarter.identity.v1.JoinRequestList
-	17, // 83: smartquarter.identity.v1.HouseService.CancelJoinRequest:output_type -> smartquarter.identity.v1.JoinRequest
-	27, // 84: smartquarter.identity.v1.HouseService.ListHouseJoinRequests:output_type -> smartquarter.identity.v1.JoinRequestList
-	17, // 85: smartquarter.identity.v1.HouseService.ApproveJoinRequest:output_type -> smartquarter.identity.v1.JoinRequest
-	17, // 86: smartquarter.identity.v1.HouseService.RejectJoinRequest:output_type -> smartquarter.identity.v1.JoinRequest
-	19, // 87: smartquarter.identity.v1.HouseService.CreateHouseInvitation:output_type -> smartquarter.identity.v1.CreatedInvitation
-	28, // 88: smartquarter.identity.v1.HouseService.ListHouseInvitations:output_type -> smartquarter.identity.v1.HouseInvitationList
-	18, // 89: smartquarter.identity.v1.HouseService.GetHouseInvitation:output_type -> smartquarter.identity.v1.HouseInvitation
-	18, // 90: smartquarter.identity.v1.HouseService.RevokeHouseInvitation:output_type -> smartquarter.identity.v1.HouseInvitation
-	17, // 91: smartquarter.identity.v1.HouseService.RedeemHouseInvitation:output_type -> smartquarter.identity.v1.JoinRequest
-	21, // 92: smartquarter.identity.v1.HouseService.PreviewHouseInvitation:output_type -> smartquarter.identity.v1.HouseSummary
-	20, // 93: smartquarter.identity.v1.HouseService.CreateChairmanTransfer:output_type -> smartquarter.identity.v1.ChairmanTransfer
-	29, // 94: smartquarter.identity.v1.HouseService.ListChairmanTransfers:output_type -> smartquarter.identity.v1.ChairmanTransferList
-	20, // 95: smartquarter.identity.v1.HouseService.AcceptChairmanTransfer:output_type -> smartquarter.identity.v1.ChairmanTransfer
-	20, // 96: smartquarter.identity.v1.HouseService.RejectChairmanTransfer:output_type -> smartquarter.identity.v1.ChairmanTransfer
-	20, // 97: smartquarter.identity.v1.HouseService.CancelChairmanTransfer:output_type -> smartquarter.identity.v1.ChairmanTransfer
-	30, // 98: smartquarter.identity.v1.HouseService.ListHouseMembers:output_type -> smartquarter.identity.v1.HouseMemberList
-	22, // 99: smartquarter.identity.v1.HouseService.DeactivateMembership:output_type -> smartquarter.identity.v1.HouseMember
-	22, // 100: smartquarter.identity.v1.HouseService.ReactivateMembership:output_type -> smartquarter.identity.v1.HouseMember
-	22, // 101: smartquarter.identity.v1.HouseService.RemoveMembership:output_type -> smartquarter.identity.v1.HouseMember
-	23, // 102: smartquarter.identity.v1.HouseService.GetHouseAccessState:output_type -> smartquarter.identity.v1.HouseAccessState
-	24, // 103: smartquarter.identity.v1.HouseService.GetNotificationPreferences:output_type -> smartquarter.identity.v1.NotificationPreferences
-	24, // 104: smartquarter.identity.v1.HouseService.UpdateNotificationPreferences:output_type -> smartquarter.identity.v1.NotificationPreferences
-	31, // 105: smartquarter.identity.v1.HouseService.ListNotificationRecipients:output_type -> smartquarter.identity.v1.NotificationRecipientList
-	69, // [69:106] is the sub-list for method output_type
-	32, // [32:69] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	16, // 11: smartquarter.identity.v1.PlatformUserList.items:type_name -> smartquarter.identity.v1.PlatformUser
+	18, // 12: smartquarter.identity.v1.AdminHouseList.items:type_name -> smartquarter.identity.v1.AdminHouse
+	2,  // 13: smartquarter.identity.v1.HouseRegistration.status:type_name -> smartquarter.identity.v1.HouseRegistrationStatus
+	76, // 14: smartquarter.identity.v1.HouseRegistration.created_at:type_name -> google.protobuf.Timestamp
+	76, // 15: smartquarter.identity.v1.HouseRegistration.reviewed_at:type_name -> google.protobuf.Timestamp
+	6,  // 16: smartquarter.identity.v1.JoinRequest.source:type_name -> smartquarter.identity.v1.JoinRequestSource
+	3,  // 17: smartquarter.identity.v1.JoinRequest.status:type_name -> smartquarter.identity.v1.JoinRequestStatus
+	76, // 18: smartquarter.identity.v1.JoinRequest.created_at:type_name -> google.protobuf.Timestamp
+	76, // 19: smartquarter.identity.v1.JoinRequest.reviewed_at:type_name -> google.protobuf.Timestamp
+	76, // 20: smartquarter.identity.v1.HouseInvitation.expires_at:type_name -> google.protobuf.Timestamp
+	4,  // 21: smartquarter.identity.v1.HouseInvitation.status:type_name -> smartquarter.identity.v1.InvitationStatus
+	76, // 22: smartquarter.identity.v1.HouseInvitation.created_at:type_name -> google.protobuf.Timestamp
+	22, // 23: smartquarter.identity.v1.CreatedInvitation.invitation:type_name -> smartquarter.identity.v1.HouseInvitation
+	5,  // 24: smartquarter.identity.v1.ChairmanTransfer.status:type_name -> smartquarter.identity.v1.ChairmanTransferStatus
+	76, // 25: smartquarter.identity.v1.ChairmanTransfer.expires_at:type_name -> google.protobuf.Timestamp
+	76, // 26: smartquarter.identity.v1.ChairmanTransfer.created_at:type_name -> google.protobuf.Timestamp
+	20, // 27: smartquarter.identity.v1.HouseRegistrationList.items:type_name -> smartquarter.identity.v1.HouseRegistration
+	21, // 28: smartquarter.identity.v1.JoinRequestList.items:type_name -> smartquarter.identity.v1.JoinRequest
+	22, // 29: smartquarter.identity.v1.HouseInvitationList.items:type_name -> smartquarter.identity.v1.HouseInvitation
+	24, // 30: smartquarter.identity.v1.ChairmanTransferList.items:type_name -> smartquarter.identity.v1.ChairmanTransfer
+	26, // 31: smartquarter.identity.v1.HouseMemberList.items:type_name -> smartquarter.identity.v1.HouseMember
+	29, // 32: smartquarter.identity.v1.NotificationRecipientList.items:type_name -> smartquarter.identity.v1.NotificationRecipient
+	25, // 33: smartquarter.identity.v1.HouseSearchResult.items:type_name -> smartquarter.identity.v1.HouseSummary
+	11, // 34: smartquarter.identity.v1.IdentityService.UpsertMaxUser:input_type -> smartquarter.identity.v1.UpsertMaxUserRequest
+	12, // 35: smartquarter.identity.v1.IdentityService.GetUserContext:input_type -> smartquarter.identity.v1.GetUserContextRequest
+	13, // 36: smartquarter.identity.v1.IdentityService.GetMembership:input_type -> smartquarter.identity.v1.GetMembershipRequest
+	14, // 37: smartquarter.identity.v1.IdentityService.ListMemberships:input_type -> smartquarter.identity.v1.ListMembershipsRequest
+	37, // 38: smartquarter.identity.v1.HouseService.ListPlatformUsers:input_type -> smartquarter.identity.v1.ListPlatformUsersRequest
+	38, // 39: smartquarter.identity.v1.HouseService.GrantChairmanPermission:input_type -> smartquarter.identity.v1.GrantChairmanPermissionRequest
+	39, // 40: smartquarter.identity.v1.HouseService.RevokeChairmanPermission:input_type -> smartquarter.identity.v1.RevokeChairmanPermissionRequest
+	40, // 41: smartquarter.identity.v1.HouseService.ListAdminHouses:input_type -> smartquarter.identity.v1.ListAdminHousesRequest
+	41, // 42: smartquarter.identity.v1.HouseService.AssignHouseChairman:input_type -> smartquarter.identity.v1.AssignHouseChairmanRequest
+	42, // 43: smartquarter.identity.v1.HouseService.RemoveHouseChairman:input_type -> smartquarter.identity.v1.RemoveHouseChairmanRequest
+	43, // 44: smartquarter.identity.v1.HouseService.CreateHouseRegistration:input_type -> smartquarter.identity.v1.CreateHouseRegistrationRequest
+	44, // 45: smartquarter.identity.v1.HouseService.GetHouseRegistration:input_type -> smartquarter.identity.v1.GetHouseRegistrationRequest
+	45, // 46: smartquarter.identity.v1.HouseService.ListMyHouseRegistrations:input_type -> smartquarter.identity.v1.ListMyHouseRegistrationsRequest
+	46, // 47: smartquarter.identity.v1.HouseService.CancelHouseRegistration:input_type -> smartquarter.identity.v1.CancelHouseRegistrationRequest
+	47, // 48: smartquarter.identity.v1.HouseService.ListPendingHouseRegistrations:input_type -> smartquarter.identity.v1.ListPendingHouseRegistrationsRequest
+	48, // 49: smartquarter.identity.v1.HouseService.ApproveHouseRegistration:input_type -> smartquarter.identity.v1.ApproveHouseRegistrationRequest
+	49, // 50: smartquarter.identity.v1.HouseService.RejectHouseRegistration:input_type -> smartquarter.identity.v1.RejectHouseRegistrationRequest
+	50, // 51: smartquarter.identity.v1.HouseService.SearchHouses:input_type -> smartquarter.identity.v1.SearchHousesRequest
+	51, // 52: smartquarter.identity.v1.HouseService.CreateJoinRequest:input_type -> smartquarter.identity.v1.CreateJoinRequestRequest
+	52, // 53: smartquarter.identity.v1.HouseService.ListMyJoinRequests:input_type -> smartquarter.identity.v1.ListMyJoinRequestsRequest
+	53, // 54: smartquarter.identity.v1.HouseService.CancelJoinRequest:input_type -> smartquarter.identity.v1.CancelJoinRequestRequest
+	54, // 55: smartquarter.identity.v1.HouseService.ListHouseJoinRequests:input_type -> smartquarter.identity.v1.ListHouseJoinRequestsRequest
+	55, // 56: smartquarter.identity.v1.HouseService.ApproveJoinRequest:input_type -> smartquarter.identity.v1.ApproveJoinRequestRequest
+	56, // 57: smartquarter.identity.v1.HouseService.RejectJoinRequest:input_type -> smartquarter.identity.v1.RejectJoinRequestRequest
+	57, // 58: smartquarter.identity.v1.HouseService.CreateHouseInvitation:input_type -> smartquarter.identity.v1.CreateHouseInvitationRequest
+	58, // 59: smartquarter.identity.v1.HouseService.ListHouseInvitations:input_type -> smartquarter.identity.v1.ListHouseInvitationsRequest
+	59, // 60: smartquarter.identity.v1.HouseService.GetHouseInvitation:input_type -> smartquarter.identity.v1.GetHouseInvitationRequest
+	60, // 61: smartquarter.identity.v1.HouseService.RevokeHouseInvitation:input_type -> smartquarter.identity.v1.RevokeHouseInvitationRequest
+	61, // 62: smartquarter.identity.v1.HouseService.RedeemHouseInvitation:input_type -> smartquarter.identity.v1.RedeemHouseInvitationRequest
+	62, // 63: smartquarter.identity.v1.HouseService.PreviewHouseInvitation:input_type -> smartquarter.identity.v1.PreviewHouseInvitationRequest
+	63, // 64: smartquarter.identity.v1.HouseService.CreateChairmanTransfer:input_type -> smartquarter.identity.v1.CreateChairmanTransferRequest
+	64, // 65: smartquarter.identity.v1.HouseService.ListChairmanTransfers:input_type -> smartquarter.identity.v1.ListChairmanTransfersRequest
+	65, // 66: smartquarter.identity.v1.HouseService.AcceptChairmanTransfer:input_type -> smartquarter.identity.v1.AcceptChairmanTransferRequest
+	66, // 67: smartquarter.identity.v1.HouseService.RejectChairmanTransfer:input_type -> smartquarter.identity.v1.RejectChairmanTransferRequest
+	67, // 68: smartquarter.identity.v1.HouseService.CancelChairmanTransfer:input_type -> smartquarter.identity.v1.CancelChairmanTransferRequest
+	68, // 69: smartquarter.identity.v1.HouseService.ListHouseMembers:input_type -> smartquarter.identity.v1.ListHouseMembersRequest
+	69, // 70: smartquarter.identity.v1.HouseService.DeactivateMembership:input_type -> smartquarter.identity.v1.DeactivateMembershipRequest
+	70, // 71: smartquarter.identity.v1.HouseService.ReactivateMembership:input_type -> smartquarter.identity.v1.ReactivateMembershipRequest
+	71, // 72: smartquarter.identity.v1.HouseService.RemoveMembership:input_type -> smartquarter.identity.v1.RemoveMembershipRequest
+	72, // 73: smartquarter.identity.v1.HouseService.GetHouseAccessState:input_type -> smartquarter.identity.v1.GetHouseAccessStateRequest
+	73, // 74: smartquarter.identity.v1.HouseService.GetNotificationPreferences:input_type -> smartquarter.identity.v1.GetNotificationPreferencesRequest
+	74, // 75: smartquarter.identity.v1.HouseService.UpdateNotificationPreferences:input_type -> smartquarter.identity.v1.UpdateNotificationPreferencesRequest
+	75, // 76: smartquarter.identity.v1.HouseService.ListNotificationRecipients:input_type -> smartquarter.identity.v1.ListNotificationRecipientsRequest
+	7,  // 77: smartquarter.identity.v1.IdentityService.UpsertMaxUser:output_type -> smartquarter.identity.v1.User
+	10, // 78: smartquarter.identity.v1.IdentityService.GetUserContext:output_type -> smartquarter.identity.v1.UserContext
+	9,  // 79: smartquarter.identity.v1.IdentityService.GetMembership:output_type -> smartquarter.identity.v1.Membership
+	15, // 80: smartquarter.identity.v1.IdentityService.ListMemberships:output_type -> smartquarter.identity.v1.ListMembershipsResponse
+	17, // 81: smartquarter.identity.v1.HouseService.ListPlatformUsers:output_type -> smartquarter.identity.v1.PlatformUserList
+	16, // 82: smartquarter.identity.v1.HouseService.GrantChairmanPermission:output_type -> smartquarter.identity.v1.PlatformUser
+	16, // 83: smartquarter.identity.v1.HouseService.RevokeChairmanPermission:output_type -> smartquarter.identity.v1.PlatformUser
+	19, // 84: smartquarter.identity.v1.HouseService.ListAdminHouses:output_type -> smartquarter.identity.v1.AdminHouseList
+	18, // 85: smartquarter.identity.v1.HouseService.AssignHouseChairman:output_type -> smartquarter.identity.v1.AdminHouse
+	18, // 86: smartquarter.identity.v1.HouseService.RemoveHouseChairman:output_type -> smartquarter.identity.v1.AdminHouse
+	20, // 87: smartquarter.identity.v1.HouseService.CreateHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
+	20, // 88: smartquarter.identity.v1.HouseService.GetHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
+	30, // 89: smartquarter.identity.v1.HouseService.ListMyHouseRegistrations:output_type -> smartquarter.identity.v1.HouseRegistrationList
+	20, // 90: smartquarter.identity.v1.HouseService.CancelHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
+	30, // 91: smartquarter.identity.v1.HouseService.ListPendingHouseRegistrations:output_type -> smartquarter.identity.v1.HouseRegistrationList
+	20, // 92: smartquarter.identity.v1.HouseService.ApproveHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
+	20, // 93: smartquarter.identity.v1.HouseService.RejectHouseRegistration:output_type -> smartquarter.identity.v1.HouseRegistration
+	36, // 94: smartquarter.identity.v1.HouseService.SearchHouses:output_type -> smartquarter.identity.v1.HouseSearchResult
+	21, // 95: smartquarter.identity.v1.HouseService.CreateJoinRequest:output_type -> smartquarter.identity.v1.JoinRequest
+	31, // 96: smartquarter.identity.v1.HouseService.ListMyJoinRequests:output_type -> smartquarter.identity.v1.JoinRequestList
+	21, // 97: smartquarter.identity.v1.HouseService.CancelJoinRequest:output_type -> smartquarter.identity.v1.JoinRequest
+	31, // 98: smartquarter.identity.v1.HouseService.ListHouseJoinRequests:output_type -> smartquarter.identity.v1.JoinRequestList
+	21, // 99: smartquarter.identity.v1.HouseService.ApproveJoinRequest:output_type -> smartquarter.identity.v1.JoinRequest
+	21, // 100: smartquarter.identity.v1.HouseService.RejectJoinRequest:output_type -> smartquarter.identity.v1.JoinRequest
+	23, // 101: smartquarter.identity.v1.HouseService.CreateHouseInvitation:output_type -> smartquarter.identity.v1.CreatedInvitation
+	32, // 102: smartquarter.identity.v1.HouseService.ListHouseInvitations:output_type -> smartquarter.identity.v1.HouseInvitationList
+	22, // 103: smartquarter.identity.v1.HouseService.GetHouseInvitation:output_type -> smartquarter.identity.v1.HouseInvitation
+	22, // 104: smartquarter.identity.v1.HouseService.RevokeHouseInvitation:output_type -> smartquarter.identity.v1.HouseInvitation
+	21, // 105: smartquarter.identity.v1.HouseService.RedeemHouseInvitation:output_type -> smartquarter.identity.v1.JoinRequest
+	25, // 106: smartquarter.identity.v1.HouseService.PreviewHouseInvitation:output_type -> smartquarter.identity.v1.HouseSummary
+	24, // 107: smartquarter.identity.v1.HouseService.CreateChairmanTransfer:output_type -> smartquarter.identity.v1.ChairmanTransfer
+	33, // 108: smartquarter.identity.v1.HouseService.ListChairmanTransfers:output_type -> smartquarter.identity.v1.ChairmanTransferList
+	24, // 109: smartquarter.identity.v1.HouseService.AcceptChairmanTransfer:output_type -> smartquarter.identity.v1.ChairmanTransfer
+	24, // 110: smartquarter.identity.v1.HouseService.RejectChairmanTransfer:output_type -> smartquarter.identity.v1.ChairmanTransfer
+	24, // 111: smartquarter.identity.v1.HouseService.CancelChairmanTransfer:output_type -> smartquarter.identity.v1.ChairmanTransfer
+	34, // 112: smartquarter.identity.v1.HouseService.ListHouseMembers:output_type -> smartquarter.identity.v1.HouseMemberList
+	26, // 113: smartquarter.identity.v1.HouseService.DeactivateMembership:output_type -> smartquarter.identity.v1.HouseMember
+	26, // 114: smartquarter.identity.v1.HouseService.ReactivateMembership:output_type -> smartquarter.identity.v1.HouseMember
+	26, // 115: smartquarter.identity.v1.HouseService.RemoveMembership:output_type -> smartquarter.identity.v1.HouseMember
+	27, // 116: smartquarter.identity.v1.HouseService.GetHouseAccessState:output_type -> smartquarter.identity.v1.HouseAccessState
+	28, // 117: smartquarter.identity.v1.HouseService.GetNotificationPreferences:output_type -> smartquarter.identity.v1.NotificationPreferences
+	28, // 118: smartquarter.identity.v1.HouseService.UpdateNotificationPreferences:output_type -> smartquarter.identity.v1.NotificationPreferences
+	35, // 119: smartquarter.identity.v1.HouseService.ListNotificationRecipients:output_type -> smartquarter.identity.v1.NotificationRecipientList
+	77, // [77:120] is the sub-list for method output_type
+	34, // [34:77] is the sub-list for method input_type
+	34, // [34:34] is the sub-list for extension type_name
+	34, // [34:34] is the sub-list for extension extendee
+	0,  // [0:34] is the sub-list for field type_name
 }
 
 func init() { file_smartquarter_identity_v1_identity_proto_init() }
@@ -4154,7 +4744,7 @@ func file_smartquarter_identity_v1_identity_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_smartquarter_identity_v1_identity_proto_rawDesc), len(file_smartquarter_identity_v1_identity_proto_rawDesc)),
 			NumEnums:      7,
-			NumMessages:   59,
+			NumMessages:   69,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

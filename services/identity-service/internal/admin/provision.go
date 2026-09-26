@@ -48,6 +48,9 @@ func Provision(args []string, dsn string, out io.Writer) error {
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if _, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock(1937135231)"); err != nil {
+		return err
+	}
 	var exists bool
 	if err = tx.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM houses WHERE id=$1)", *houseID).Scan(&exists); err != nil {
 		return err
@@ -70,6 +73,11 @@ func Provision(args []string, dsn string, out io.Writer) error {
 		return err
 	}
 	if *state == "ACTIVE" {
+		if *role == "CHAIRMAN" {
+			if _, err = tx.Exec(ctx, `INSERT INTO chairman_permissions(user_id) VALUES($1) ON CONFLICT DO NOTHING`, userID); err != nil {
+				return err
+			}
+		}
 		if _, err = tx.Exec(ctx, "UPDATE users SET default_house_id=COALESCE(default_house_id,$2),updated_at=now() WHERE id=$1", userID, *houseID); err != nil {
 			return err
 		}

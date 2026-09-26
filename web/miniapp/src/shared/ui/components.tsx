@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, LoaderCircle, TriangleAlert, Inbox } from 'lucide-react';
 import { ApiError } from '../api/client';
 import type { Issue, IssueStatus, IssueCategory, TimelineEvent } from '../api/models';
@@ -15,11 +15,18 @@ export function PageHeader({
   back?: string;
   action?: ReactNode;
 }) {
+  const { pathname } = useLocation();
+  const parent = pathname.startsWith('/community/')
+    ? '/community'
+    : pathname.startsWith('/admin/')
+      ? '/admin'
+      : '/';
+  const backPath = back && back !== pathname ? back : pathname !== '/' ? parent : undefined;
   return (
     <header className="page-header">
       <div>
-        {back && (
-          <Link className="back-link" to={back}>
+        {backPath && (
+          <Link className="back-link" to={backPath}>
             <ArrowLeft size={18} /> Назад
           </Link>
         )}

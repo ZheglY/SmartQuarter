@@ -1,7 +1,7 @@
 # CI audit - 22 September 2026
 
 Base: main `9c4e70d6f49efb00210668423e13f1de143de62f`.
-Local repair branch: `codex/fix-ci-deployment-guide`.
+Historical audit of the deployment repair. Current checks are defined in `.github/workflows/ci.yml`.
 
 ## Confirmed failure
 

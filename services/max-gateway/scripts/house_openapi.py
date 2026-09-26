@@ -9,6 +9,8 @@ def register(S,route,paths,ref,obj,string,array):
   S[name]=string(enum=[prefix+'_'+v for v in values])
  def field(t,f):
   if t=='string':
+   if f=='chairman_user_id':return string(description='Chairman UUID or empty when vacant')
+   if f=='max_user_id':return string(pattern='^[0-9]+$')
    if f=='id' or f.endswith('_user_id') or f=='house_id' or f=='created_by':return string(format='uuid')
    if f=='resulting_house_id':return string(description='Created house UUID; empty before approval')
    return string()
@@ -27,7 +29,7 @@ def register(S,route,paths,ref,obj,string,array):
    if f in fields:fields[f].update(maxLength={'name':255,'city':100,'address':1000,'query':255,'token':43,'reason':1000}[f])
   if 'expires_in_hours' in fields:fields['expires_in_hours'].update(minimum=1,maximum=168)
   if 'max_uses' in fields:fields['max_uses'].update(minimum=1,maximum=100)
-  role={'session':'Authenticated user, including without membership','manager':'Current ACTIVE CHAIRMAN or house ADMIN; Identity verifies scope','admin':'Explicit platform administrator allowlist'}[o['access']]
+  role={'session':'Authenticated user, including without membership','chairman':'Administrator-approved chairman or platform administrator','manager':'Current ACTIVE CHAIRMAN or house ADMIN; Identity verifies scope','admin':'Explicit platform administrator allowlist'}[o['access']]
   route(method,p,o['name'],ref(o['response']),None if method=='get' else obj(fields,[f for f in fields if f not in ['reason','platform_admin_override']]),code=o['code'],role=role,rpc='Identity.HouseService.'+o['name'],idem=method!='get')
   if method=='get':paths[p][method]['parameters'] += [{'name':f,'in':'query','required':True,'schema':schema} for f,schema in fields.items()]
   paths[p][method]['description']+=' List responses are bounded to 100 records (members: 500). Mutation requests require a JSON object, including {} for commands without fields.'

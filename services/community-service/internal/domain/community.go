@@ -7,11 +7,13 @@ import (
 )
 
 var (
-	ErrAlreadyVoted = errors.New("already voted")
-	ErrPollClosed   = errors.New("poll is closed")
-	ErrInvalidDate  = errors.New("ends_at must be strictly after starts_at")
-	ErrAccessDenied = errors.New("access denied")
-	ErrNotFound     = errors.New("resource not found")
+	ErrInvalidArgument  = errors.New("invalid request")
+	ErrInitiativeClosed = errors.New("initiative is closed")
+	ErrAlreadyVoted     = errors.New("already voted")
+	ErrPollClosed       = errors.New("poll is closed")
+	ErrInvalidDate      = errors.New("ends_at must be strictly after starts_at")
+	ErrAccessDenied     = errors.New("access denied")
+	ErrNotFound         = errors.New("resource not found")
 )
 
 type Announcement struct {
@@ -86,6 +88,11 @@ type OutboxEvent struct {
 }
 
 type CommunityRepository interface {
+	ClosePoll(context.Context, string, string) error
+	UpdateCalendarEvent(context.Context, *CalendarEvent) error
+	DeleteCalendarEvent(context.Context, string, string) error
+	GetInitiative(context.Context, string, string, string) (*Initiative, error)
+	CloseInitiative(context.Context, string, string) error
 	CreateAnnouncement(ctx context.Context, a *Announcement) error
 	ListAnnouncements(ctx context.Context, houseID string, limit, offset int) ([]Announcement, error)
 
@@ -106,6 +113,10 @@ type CommunityRepository interface {
 }
 
 type CommunityService interface {
+	ClosePoll(context.Context, string, string, string) (*PollDetails, error)
+	UpdateCalendarEvent(context.Context, string, string, string, string, time.Time, time.Time) (*CalendarEvent, error)
+	DeleteCalendarEvent(context.Context, string, string) error
+	CloseInitiative(context.Context, string, string, string) (*Initiative, error)
 	CreateAnnouncement(ctx context.Context, houseID, authorID, title, body string) (*Announcement, error)
 	ListAnnouncements(ctx context.Context, houseID string, limit, offset int) ([]Announcement, error)
 

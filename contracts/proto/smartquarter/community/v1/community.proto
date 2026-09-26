@@ -7,6 +7,10 @@ option go_package = "github.com/ZheglY/SmartQuarter/services/community-service/i
 import "google/protobuf/timestamp.proto";
 
 service CommunityService {
+  rpc ClosePoll(GetPollRequest) returns (PollDetails);
+  rpc UpdateCalendarEvent(UpdateCalendarEventRequest) returns (CalendarEvent);
+  rpc DeleteCalendarEvent(DeleteCalendarEventRequest) returns (DeleteCalendarEventResponse);
+  rpc CloseInitiative(SupportInitiativeRequest) returns (Initiative);
   rpc CreateServiceContact(CreateServiceContactRequest) returns (ServiceContact);
   rpc ListServiceContacts(ListServiceContactsRequest) returns (ListServiceContactsResponse);
   rpc GetServiceContact(GetServiceContactRequest) returns (ServiceContact);
@@ -205,6 +209,17 @@ message SupportInitiativeResponse {
   int32 supports_count = 2;
   bool supported_by_me = 3;
 }
+
+message UpdateCalendarEventRequest {
+  string house_id = 1;
+  string id = 2;
+  string title = 3;
+  string description = 4;
+  google.protobuf.Timestamp starts_at = 5;
+  google.protobuf.Timestamp ends_at = 6;
+}
+message DeleteCalendarEventRequest { string house_id = 1; string id = 2; }
+message DeleteCalendarEventResponse { string id = 1; }
 
 // Service contacts (additive contract).
 message ServiceContactInput {

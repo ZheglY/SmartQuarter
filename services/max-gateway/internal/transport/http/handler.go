@@ -44,6 +44,7 @@ func (a *API) Handler() http.Handler {
 	mux.HandleFunc("GET /livez", func(w http.ResponseWriter, r *http.Request) { write(w, 200, map[string]string{"status": "ok"}) })
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { write(w, 200, map[string]string{"status": "ok"}) })
 	mux.HandleFunc("GET /readyz", a.ready)
+	mux.HandleFunc("GET /api/v1/health", a.ready)
 	mux.Handle("GET /metrics", promhttp.HandlerFor(a.Metrics.Registry, promhttp.HandlerOpts{}))
 	mux.HandleFunc("POST /api/v1/session/max", a.origin(a.bootstrap))
 	mux.HandleFunc("POST /webhooks/max", a.webhook)
@@ -54,6 +55,7 @@ func (a *API) Handler() http.Handler {
 		mux.HandleFunc(pattern, a.origin(a.authenticate(true, manager, h)))
 	}
 	session("GET /api/v1/me", a.me)
+	a.communityRoutes(business)
 	session("POST /api/v1/session/active-house", a.switchHouse)
 	session("POST /api/v1/session/logout", a.logout)
 	business("POST /api/v1/uploads", false, a.createUpload)

@@ -161,6 +161,8 @@ func (s *Service) Execute(ctx context.Context, op string, c Command) (result []b
 	}
 	var data record
 	switch op {
+	case "ListPlatformUsers", "GrantChairmanPermission", "RevokeChairmanPermission", "ListAdminHouses", "AssignHouseChairman", "RemoveHouseChairman":
+		data, err = s.administration(ctx, tx, a, op, c)
 	case "CreateHouseRegistration", "GetHouseRegistration", "ListMyHouseRegistrations", "CancelHouseRegistration", "ListPendingHouseRegistrations", "ApproveHouseRegistration", "RejectHouseRegistration", "SearchHouses":
 		data, err = s.registration(ctx, tx, a, op, c)
 	case "CancelJoinRequest", "CreateJoinRequest", "ListMyJoinRequests", "ListHouseJoinRequests", "ApproveJoinRequest", "RejectJoinRequest":

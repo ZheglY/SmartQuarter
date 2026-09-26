@@ -11,8 +11,8 @@ Do not substitute the production Compose file in this cleanup command.
 All database names end in _test. Credentials are synthetic, network ports are private,
 and no real MAX messages are sent. Identity is the real service; the old test-only
 protocol is retained solely for legacy isolated notification tests. Unit and browser
-fixture tests run separately. This stack covers the implemented MVP, not deferred
-polls/calendar/initiatives or manual government submission.
+fixture tests run separately. This stack covers house access, issues, contacts and community participation.
+Official government submission is performed outside the application.
 
 `TestHouseWorkflowHTTP` additionally covers registration/platform approval, contacts
 CRUD/archive, search/join approval, bounded invitations, chairman transfer, stale

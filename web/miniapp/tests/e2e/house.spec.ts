@@ -61,6 +61,7 @@ async function setup(page: Page, role: 'NONE' | 'RESIDENT' | 'CHAIRMAN') {
     if (path === '/house-access')
       return reply({
         platform_admin: false,
+        can_register_house: true,
         can_manage_active_house: currentRole === 'CHAIRMAN',
         pending_registrations: 0,
         pending_join_requests: 0,
@@ -157,7 +158,7 @@ async function setup(page: Page, role: 'NONE' | 'RESIDENT' | 'CHAIRMAN') {
   });
 }
 
-test('new user registers and cancels a house without membership', async ({ page }) => {
+test('approved chairman registers and cancels a house without membership', async ({ page }) => {
   await setup(page, 'NONE');
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Мои дома' })).toBeVisible();
