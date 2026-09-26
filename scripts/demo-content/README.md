@@ -32,13 +32,12 @@ python3 scripts/demo-content/seed.py --house HOUSE_UUID \
 
 ## Иллюстрации
 
-Изображения созданы встроенным инструментом imagegen специально для демонстрации.
-Финальные файлы находятся в `images/`. Это вымышленные иллюстрации, не фотографии дома.
-Использованные промпты:
+Файлы находятся в `images/`. Это вымышленные демонстрационные иллюстрации,
+а не фотографии реальных происшествий в доме.
 
-- `radiator-leak.png`: Photorealistic landscape 3:2 smartphone photograph for a clearly labeled DEMO residential maintenance report. Close view of a white metal radiator in an ordinary apartment building entrance hall, a small visible drip at the pipe joint, shallow water puddle on neutral gray ceramic floor tiles, slight damp staining under the fitting. Plain beige wall, realistic everyday lighting, natural imperfections, factual neutral composition, unedited phone photo appearance. No people, no toys, no animals, no humor, no text, no watermark, no logos. Fictional generic building, not a claim about a real location.
-- `stair-light.png`: Photorealistic landscape 3:2 ordinary smartphone photo for a labeled DEMO apartment building maintenance report. A stairwell landing in a generic residential building, one ceiling bulkhead light visibly unlit while weak daylight comes through a side window, neutral off-white walls, gray concrete steps and a dark metal handrail. Underexposed but clearly readable real-looking phone camera photo, factual inspection framing, no dramatic effects. No people, no animals, no toys, no humor, no text or logos, no watermark. Fictional generic building, no identifiable real location.
-- `damaged-bench.png`: Photorealistic landscape 3:2 straightforward smartphone inspection photograph for a labeled DEMO residential maintenance report. Weathered wooden bench on a paved courtyard path of a generic apartment complex, one seat slat cracked with a small piece missing and a loosened screw visible. Normal overcast daylight, background shrubs and generic blurred apartment facade, natural wear and realistic wood grain. Documentary-style plain composition, no cinematic treatment. No people, no animals, no toys, no humor, no text, no logos, no watermark. Fictional generic courtyard, not evidence of a real incident.
+- `radiator-leak.png` — протечка соединения радиатора.
+- `stair-light.png` — неисправное освещение лестничной площадки.
+- `damaged-bench.png` — повреждённая доска скамейки.
 
 ## Уведомления
 

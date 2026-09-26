@@ -214,6 +214,23 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 	done := make(chan struct{})
 	go func() { defer close(done); worker.Run(ctx) }()
 	defer func() { cancel(); <-done }()
+	waitNotifications := func(t *testing.T) {
+		t.Helper()
+		deadline := time.Now().Add(12 * time.Second)
+		for time.Now().Before(deadline) {
+			groups, err := r.XInfoGroups(ctx, "stream:notifications").Result()
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, g := range groups {
+				if g.Name == group && g.Lag == 0 && g.Pending == 0 {
+					return
+				}
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+		t.Fatal("notification consumer did not acknowledge all events")
+	}
 	for run := 1; run <= 5; run++ {
 		t.Run(strconv.Itoa(run), func(t *testing.T) {
 			var photo bytes.Buffer
@@ -289,16 +306,9 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 			if e = db.QueryRow(ctx, "SELECT count(*) FROM outbox_events WHERE aggregate_id=$1", issueID).Scan(&outbox); e != nil || outbox != 4 {
 				t.Fatalf("outbox %d: %v", outbox, e)
 			}
-			deadline := time.Now().Add(12 * time.Second)
-			for delivered.Load() < int64(run*4) && time.Now().Before(deadline) {
-				time.Sleep(50 * time.Millisecond)
-			}
-			if delivered.Load() < int64(run*4) {
-				t.Fatal("notifications not delivered", delivered.Load())
-			}
 			var pending int
 			// Delivery can finish before the publisher commits published_at.
-			deadline = time.Now().Add(12 * time.Second)
+			deadline := time.Now().Add(12 * time.Second)
 			for {
 				if e = db.QueryRow(ctx, "SELECT count(*) FROM outbox_events WHERE aggregate_id=$1 AND published_at IS NULL", issueID).Scan(&pending); e != nil {
 					t.Fatal(e)
@@ -311,6 +321,11 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 				}
 				time.Sleep(50 * time.Millisecond)
 			}
+			waitNotifications(t)
+			// All four domain events are published, but only statement/status changes notify the author.
+			if delivered.Load() != int64(run*2) {
+				t.Fatalf("expected %d important notifications, got %d", run*2, delivered.Load())
+			}
 			entries, e := r.XRange(ctx, "stream:notifications", "-", "+").Result()
 			if e != nil {
 				t.Fatal(e)
@@ -322,10 +337,17 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 				_ = json.Unmarshal([]byte(raw), &event)
 				if event.Payload.IssueID == issueID {
 					found++
-					if found == 1 {
+					if event.Type == "statement.generated" || event.Type == "issue.status_changed" {
+						if r.Exists(ctx, "gateway:notification:"+event.ID+":done").Val() != 1 {
+							t.Fatalf("important event not delivered: %s", event.Type)
+						}
+					}
+					if event.Type == "issue.status_changed" {
 						before := delivered.Load()
-						r.XAdd(ctx, &redis.XAddArgs{Stream: "stream:notifications", Values: entry.Values})
-						time.Sleep(200 * time.Millisecond)
+						if err := r.XAdd(ctx, &redis.XAddArgs{Stream: "stream:notifications", Values: entry.Values}).Err(); err != nil {
+							t.Fatal(err)
+						}
+						waitNotifications(t)
 						if delivered.Load() != before {
 							t.Fatal("duplicate event delivered")
 						}
@@ -369,6 +391,7 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 		api.Identity = ids
 	}
 	// Actual MAX Update envelope and deduplication, still using a fake MAX endpoint.
+	beforeWebhook := delivered.Load()
 	body := map[string]any{"update_type": "bot_started", "timestamp": time.Now().UnixMilli(), "user": map[string]any{"user_id": 101, "is_bot": false}}
 	for i := 0; i < 2; i++ {
 		b, _ := json.Marshal(body)
@@ -383,7 +406,7 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 			t.Fatal("webhook", res.StatusCode)
 		}
 	}
-	if delivered.Load() != 21 {
+	if delivered.Load() != beforeWebhook+1 {
 		t.Fatal("webhook dedup", delivered.Load())
 	}
 

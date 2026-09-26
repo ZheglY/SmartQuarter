@@ -246,7 +246,7 @@ func TestHouseWorkflowHTTP(t *testing.T) {
 		}
 		t.Fatal("notification condition timed out")
 	}
-	text := "В вашем доме началось голосование."
+	text := "🗳 Время решать вместе! В доме открыт новый опрос."
 	wait(func() bool {
 		return count(fmt.Sprint(chairID), text) == 1 && count(fmt.Sprint(residentID), text) == 1 && r.Exists(ctx, "gateway:notification:"+eventID+":done").Val() == 1
 	})
