@@ -43,18 +43,16 @@ export function ProfilePage({ embedded = false }: { embedded?: boolean }) {
         <h2>{user.user.display_name || 'Житель'}</h2>
         {user.user.username && <p>@{user.user.username}</p>}
         <p>MAX ID: {user.user.max_user_id}</p>
-        <span className="category-badge">
-          {access.data?.platform_admin
-            ? 'Администратор платформы'
-            : access.data?.can_register_house
-              ? 'Председатель'
-              : role
-                ? roleLabels[role]
-                : 'Гражданин'}
-        </span>
+        <span className="category-badge">{role ? roleLabels[role] : 'Гражданин'}</span>
         <p>
           {role ? 'Участие в активном доме: активно' : 'Нет активного участия в выбранном доме'}
         </p>
+        {access.data?.platform_admin && <p>Администратор платформы</p>}
+        {access.data?.can_register_house && (
+          <p>
+            Доступна регистрация новых домов. Председатель назначается отдельно для каждого дома.
+          </p>
+        )}
       </section>
       <section className="issue-block">
         <Link className="management-link" to="/houses">

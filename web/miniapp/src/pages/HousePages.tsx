@@ -95,7 +95,7 @@ export function HousesPage() {
         </section>
       )}
       {access.data?.can_register_house && (
-        <section className="house-registration-section" aria-label="Полномочия председателя">
+        <section className="house-registration-section" aria-label="Регистрация новых домов">
           <Link className="secondary-btn" to="/houses/register">
             Зарегистрировать дом
           </Link>
@@ -122,7 +122,7 @@ export function RegisterHousePage() {
       <WorkflowFrame title="Регистрация дома">
         <QueryState query={access} />
         {access.data && (
-          <EmptyState title="Нужны полномочия председателя">
+          <EmptyState title="Нужно право регистрировать дома">
             Обратитесь к администратору платформы. Для вступления в существующий дом используйте
             поиск.
           </EmptyState>

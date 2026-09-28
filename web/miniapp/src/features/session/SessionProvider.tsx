@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef, type ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../../shared/api';
 import { setUnauthorizedHandler } from '../../shared/api/client';
 import {
@@ -28,6 +28,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient(),
     navigate = useNavigate(),
     drafts = useDrafts();
+  const { pathname } = useLocation();
+  const previousPath = useRef(pathname);
   const [raw, setRaw] = useState<string | null>(() => rawInitData() || null);
   const [expired, setExpired] = useState(false),
     [switching, setSwitching] = useState(false);
@@ -83,8 +85,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     retry: false,
     staleTime: 30000,
     refetchInterval: 60000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: 'always',
   });
+  useEffect(() => {
+    if (previousPath.current === pathname) return;
+    previousPath.current = pathname;
+    if (raw && !expired && !switching) void qc.invalidateQueries({ queryKey: ['session'] });
+  }, [pathname, raw, expired, switching, qc]);
   useEffect(() => {
     if (session.data && !launched.current) {
       launched.current = true;
