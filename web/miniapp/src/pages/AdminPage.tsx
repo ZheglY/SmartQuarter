@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { houseApi } from '../shared/api/house';
 import { useHouseAction, useHouseQuery, QueryState } from '../features/session/houseWorkflow';
@@ -18,6 +18,7 @@ export function AdminPage() {
       action: (key: string) => Promise<unknown>;
     }>();
   const allowed = access.data?.platform_admin === true;
+  const houseSection = useRef<HTMLElement>(null);
   const users = useHouseQuery(
       'admin-users:' + query,
       (s) => houseApi.ListPlatformUsers({ query }, s),
@@ -72,10 +73,8 @@ export function AdminPage() {
                   <h3>{u.display_name}</h3>
                   <p>MAX ID: {u.max_user_id}</p>
                   <p>
-                    {u.can_register_house
-                      ? 'Председатель · может регистрировать дома'
-                      : 'Гражданин'}{' '}
-                    · Управляет домами: {u.managed_houses}
+                    Управляет домами: {u.managed_houses}. Регистрация новых домов:{' '}
+                    {u.can_register_house ? 'разрешена' : 'недоступна'}.
                   </p>
                   <div className="workflow-links">
                     <button
@@ -85,28 +84,36 @@ export function AdminPage() {
                         setConfirmation(
                           u.can_register_house
                             ? {
-                                title: 'Снять полномочия председателя?',
+                                title: 'Снять все полномочия?',
                                 body: `${u.display_name} станет жителем во всех своих домах. Нерассмотренные регистрации и передачи полномочий будут отменены.`,
                                 action: (key) =>
                                   houseApi.RevokeChairmanPermission({ user_id: u.id }, key),
                               }
                             : {
-                                title: 'Назначить председателем?',
-                                body: `${u.display_name} сможет подавать заявки на регистрацию домов. Для существующего дома назначьте его ниже.`,
+                                title: 'Разрешить регистрацию домов?',
+                                body: `${u.display_name} сможет подавать заявки на регистрацию новых домов. Роль в существующих домах не изменится.`,
                                 action: (key) =>
                                   houseApi.GrantChairmanPermission({ user_id: u.id }, key),
                               },
                         )
                       }
                     >
-                      {u.can_register_house ? 'Снять полномочия' : 'Назначить председателем'}
+                      {u.can_register_house
+                        ? 'Снять все полномочия'
+                        : 'Разрешить регистрацию домов'}
                     </button>
                     <button
                       className="secondary-btn"
                       disabled={action.isPending}
-                      onClick={() => setSelected({ id: u.id, name: u.display_name })}
+                      onClick={() => {
+                        setSelected({ id: u.id, name: u.display_name });
+                        houseSection.current?.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                      }}
                     >
-                      {selected?.id === u.id ? 'Выбран для назначения' : 'Выбрать для дома'}
+                      {selected?.id === u.id ? 'Выберите дом ниже' : 'Назначить председателем дома'}
                     </button>
                   </div>
                 </article>
@@ -115,7 +122,7 @@ export function AdminPage() {
                 <EmptyState title="Пользователи не найдены" />
               )}
             </section>
-            <section>
+            <section ref={houseSection}>
               <h2>Председатели домов</h2>
               <p>
                 {selected
@@ -154,7 +161,7 @@ export function AdminPage() {
                         selected &&
                         setConfirmation({
                           title: 'Назначить председателя дома?',
-                          body: `${selected.name} получит управление домом «${h.name}». Текущий председатель останется жителем.`,
+                          body: `${selected.name} получит управление домом «${h.name}» (${h.address}). ${h.chairman_display_name ? `Текущий председатель ${h.chairman_display_name} останется жителем.` : 'Сейчас председатель не назначен.'}`,
                           action: (key) =>
                             houseApi.AssignHouseChairman(
                               { house_id: h.id, target_user_id: selected.id },

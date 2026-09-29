@@ -4,7 +4,12 @@ const pollID = 'b1111111-1111-4111-8111-111111111111',
   optID = 'b2222222-2222-4222-8222-222222222222',
   eventID = 'b3333333-3333-4333-8333-333333333333',
   initiativeID = 'b4444444-4444-4444-8444-444444444444';
-async function setup(page: Page, role: 'RESIDENT' | 'CHAIRMAN' | 'ADMIN' | 'NONE', launch = '') {
+async function setup(
+  page: Page,
+  role: 'RESIDENT' | 'CHAIRMAN' | 'ADMIN' | 'NONE',
+  launch = '',
+  registrationAllowed = role === 'ADMIN' || role === 'CHAIRMAN',
+) {
   await page.route('https://st.max.ru/**', (r) => r.abort());
   await page.addInitScript((launch) => {
     window.WebApp = {
@@ -54,12 +59,16 @@ async function setup(page: Page, role: 'RESIDENT' | 'CHAIRMAN' | 'ADMIN' | 'NONE
       return reply({ active_house_id: uc.active_house_id, role: 'RESIDENT' });
     }
     if (path === '/house/service-contacts') return reply({ items: [] });
+    if (['/issues', '/chairman/issues', '/announcements'].includes(path))
+      return reply({ items: [], next_page_token: '' });
     if (path === '/house-registrations' || path === '/join-requests') return reply({ items: [] });
     if (path === '/house-access')
       return reply({
         platform_admin: role === 'ADMIN',
-        can_register_house: role === 'ADMIN' || role === 'CHAIRMAN',
-        can_manage_active_house: role === 'CHAIRMAN',
+        can_register_house: registrationAllowed,
+        can_manage_active_house: uc.memberships.some(
+          (m) => m.house_id === uc.active_house_id && m.role === 'CHAIRMAN',
+        ),
         pending_registrations: 0,
         pending_join_requests: 0,
         incoming_join_requests: 0,
@@ -157,6 +166,13 @@ async function setup(page: Page, role: 'RESIDENT' | 'CHAIRMAN' | 'ADMIN' | 'NONE
     }
     return reply({ error: { code: 'NOT_FOUND' } }, 404);
   });
+  return {
+    setActiveRole(next: 'RESIDENT' | 'CHAIRMAN') {
+      uc.memberships = uc.memberships.map((m) =>
+        m.house_id === uc.active_house_id ? { ...m, role: next } : m,
+      );
+    },
+  };
 }
 test('resident votes once and sees results with persistent navigation', async ({ page }) => {
   await setup(page, 'RESIDENT');
@@ -219,10 +235,12 @@ test('admin without house grants role assigns and removes chairman', async ({ pa
   await setup(page, 'ADMIN');
   await page.goto('/profile');
   await page.getByRole('link', { name: 'Администрирование платформы →' }).click();
-  await page.getByRole('button', { name: 'Назначить председателем', exact: true }).click();
+  await page.getByRole('button', { name: 'Разрешить регистрацию домов', exact: true }).click();
+  await expect(page.getByText(/Роль в существующих домах не изменится/)).toBeVisible();
   await page.getByRole('button', { name: 'Подтвердить' }).click();
-  await expect(page.getByRole('button', { name: 'Снять полномочия' })).toBeVisible();
-  await page.getByRole('button', { name: 'Выбрать для дома' }).click();
+  await expect(page.getByRole('button', { name: 'Снять все полномочия' })).toBeVisible();
+  await expect(page.getByText('Председатель: не назначен')).toBeVisible();
+  await page.getByRole('button', { name: 'Назначить председателем дома' }).click();
   await page.getByRole('button', { name: 'Назначить выбранного' }).click();
   await page.getByRole('button', { name: 'Подтвердить' }).click();
   await expect(page.getByText('Председатель: Анна')).toBeVisible();
@@ -251,7 +269,7 @@ test('citizen cannot register house or access admin and never loses navigation',
   }
   await expect(page.getByRole('link', { name: 'Дома', exact: true })).toBeVisible();
   await page.goto('/houses/register');
-  await expect(page.getByText('Нужны полномочия председателя')).toBeVisible();
+  await expect(page.getByText('Нужно право регистрировать дома')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Отправить на рассмотрение' })).toHaveCount(0);
 });
 
@@ -289,6 +307,43 @@ test('chairman sees management panel and approved registration action', async ({
   await expect(page.getByRole('link', { name: 'Зарегистрировать дом' })).toBeVisible();
   await page.screenshot({ path: info.outputPath('chairman-houses.png'), fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('registration permission does not impersonate the active house chairman', async ({ page }) => {
+  await setup(page, 'RESIDENT', '', true);
+  await page.goto('/profile');
+  await expect(page.locator('.profile-card .category-badge')).toHaveText('Житель');
+  await expect(page.getByText(/Доступна регистрация новых домов/)).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Кабинет председателя →' })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Главная', exact: true }).click();
+  await expect(page.locator('.house-card')).toContainText('Житель');
+  await expect(page.getByRole('region', { name: 'Кабинет председателя' })).toHaveCount(0);
+  await page.goto('/chairman');
+  await expect(page.getByRole('heading', { name: 'Доступ ограничен' })).toBeVisible();
+});
+
+test('assignment and removal refresh the existing session on navigation', async ({
+  page,
+}, info) => {
+  const session = await setup(page, 'RESIDENT', '', true);
+  await page.goto('/profile');
+  await expect(page.locator('.profile-card .category-badge')).toHaveText('Житель');
+  session.setActiveRole('CHAIRMAN');
+  await page.getByRole('link', { name: 'Главная', exact: true }).click();
+  await expect(page.locator('.house-card')).toContainText('Председатель');
+  await expect(page.getByRole('region', { name: 'Кабинет председателя' })).toBeVisible();
+  await page.getByRole('link', { name: 'Профиль', exact: true }).click();
+  await expect(page.locator('.profile-card .category-badge')).toHaveText('Председатель');
+  await page.screenshot({ path: info.outputPath('chairman-profile.png'), fullPage: true });
+  await page.getByRole('link', { name: 'Сообщество', exact: true }).click();
+  await page.getByRole('link', { name: /^Опросы/ }).click();
+  await expect(page.getByRole('link', { name: /Создать опрос/ })).toBeVisible();
+  session.setActiveRole('RESIDENT');
+  await page.getByRole('link', { name: 'Главная', exact: true }).click();
+  await expect(page.locator('.house-card')).toContainText('Житель');
+  await expect(page.getByRole('region', { name: 'Кабинет председателя' })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Профиль', exact: true }).click();
+  await expect(page.locator('.profile-card .category-badge')).toHaveText('Житель');
 });
 
 test('resident opens all community sections without manager controls', async ({ page }, info) => {

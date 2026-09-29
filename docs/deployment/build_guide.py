@@ -58,7 +58,7 @@ def decorate(canvas, doc):
     canvas.setStrokeColor(colors.HexColor('#DAE4E9'))
     canvas.line(MARGIN, 36, WIDTH - MARGIN, 36)
     canvas.setFont('Body', 8)
-    canvas.drawString(MARGIN, 23, 'Ubuntu 24.04 LTS  •  Docker Compose  |  26.09.2026')
+    canvas.drawString(MARGIN, 23, 'Ubuntu 24.04 LTS  •  Docker Compose  |  28.09.2026')
     canvas.drawRightString(WIDTH - MARGIN, 23, f'{doc.page:02d}')
     canvas.restoreState()
 
