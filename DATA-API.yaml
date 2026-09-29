@@ -1,207 +1,1210 @@
-schemaVersion: "1.0"
+# DATA-API 1.0. Credentials supplied separately, never committed.
+# Three distinct MAX accounts: resident (author), neighbor, chairman in one dedicated review house.
+# S3 binary PUT/GET require the documented external step: tools/data-api/README.md.
+# Dates are fixed for the 2026 review; update poll ends_at before June 2030.
+# No DELETE API for issues/announcements/polls/initiatives: history remains in the review house.
+schemaVersion: '1.0'
 solution:
-  name: "Умный Квартал"
+  name: Умный Квартал
 api:
-  baseUrl: "https://maxhack.ru"
-  openapi: "./contracts/openapi/openapi.yaml"
+  baseUrl: https://maxhack.ru
+  openapi: ./contracts/openapi/openapi.yaml
   defaultHeaders:
-    Accept: "application/json"
-    Content-Type: "application/json"
-    Origin: "https://maxhack.ru"
-
-# Session cookies for resident, chairman and admin are supplied separately.
-# Use a dedicated review house. Never store credentials in this document.
+    Accept: application/json
+    Content-Type: application/json
+    Origin: https://maxhack.ru
 checks:
-  - id: health
-    name: "Готовность сервисов приложения"
-    method: GET
-    path: /api/v1/health
-    role: public
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [status]
-      bodySchema:
-        type: object
-        required: [status]
-        properties:
-          status: {const: ready}
-    timeoutMs: 5000
-    repeatable: true
-  - id: anonymous-denied
-    name: "Защита персональных данных без сессии"
-    method: GET
-    path: /api/v1/me
-    role: public
-    expected:
-      statusCodes: [401]
-      contentType: application/json
-      requiredFields: [error.code, error.request_id]
-    repeatable: true
-  - id: resident-context
-    name: "Профиль жителя и активный дом"
-    method: GET
-    path: /api/v1/me
-    role: resident
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [user.id, houses, memberships, active_house_id]
-    repeatable: true
-  - id: role-state
-    name: "Состояние полномочий"
-    method: GET
-    path: /api/v1/house-access
-    role: resident
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [platform_admin, can_register_house, can_manage_active_house]
-    repeatable: true
-  - id: resident-admin-denied
-    name: "Житель не может просматривать админку"
-    method: GET
-    path: /api/v1/admin/users
-    role: resident
-    expected:
-      statusCodes: [403]
-      contentType: application/json
-      requiredFields: [error.code]
-    repeatable: true
-  - id: admin-houses
-    name: "Администратор видит дома и председателей"
-    method: GET
-    path: /api/v1/admin/houses
-    role: admin
-    request:
-      query: {query: ""}
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [items]
-    repeatable: true
-  - id: issues
-    name: "Проблемы активного дома"
-    method: GET
-    path: /api/v1/issues
-    role: resident
-    request:
-      query: {page_size: 20}
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [items, next_page_token]
-    repeatable: true
-  - id: announcements
-    name: "Объявления дома"
-    method: GET
-    path: /api/v1/announcements
-    role: resident
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [items, next_page_token]
-    repeatable: true
-  - id: polls
-    name: "Опросы дома"
-    method: GET
-    path: /api/v1/polls
-    role: resident
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [items, next_page_token]
-    repeatable: true
-  - id: initiatives
-    name: "Инициативы и поддержка жильцов"
-    method: GET
-    path: /api/v1/initiatives
-    role: resident
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [items, next_page_token]
-    repeatable: true
-  - id: contacts
-    name: "Справочник служб"
-    method: GET
-    path: /api/v1/house/service-contacts
-    role: resident
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [items]
-    repeatable: true
-  - id: create-event-denied
-    name: "Житель не может создавать события"
-    method: POST
-    path: /api/v1/calendar
-    role: resident
-    request:
-      body: {title: "DATA-API: проверка", description: "Тест", starts_at: "2030-06-01T10:00:00Z", ends_at: "2030-06-01T11:00:00Z"}
-    expected:
-      statusCodes: [403]
-      contentType: application/json
-      requiredFields: [error.code]
-    repeatable: true
-  - id: create-event
-    name: "Председатель создаёт событие"
-    description: "Создаётся только тестовая запись; ID используется в следующих шагах и cleanup."
-    method: POST
-    path: /api/v1/calendar
-    role: chairman
-    request:
-      body: {title: "DATA-API: проверка", description: "Удаляется после проверки", starts_at: "2030-06-01T10:00:00Z", ends_at: "2030-06-01T11:00:00Z"}
-    expected:
-      statusCodes: [201]
-      contentType: application/json
-      requiredFields: [id, title, starts_at, ends_at]
-    timeoutMs: 10000
-    repeatable: false
-    extract: {eventId: "$.id"}
-  - id: read-calendar
-    name: "Житель видит календарь"
-    method: GET
-    path: /api/v1/calendar
-    role: resident
-    dependsOn: [create-event]
-    request:
-      query: {from: "2030-06-01T00:00:00Z", to: "2030-06-02T00:00:00Z"}
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [items]
-      bodySchema:
-        type: object
-        properties:
-          items: {type: array, minItems: 1}
-    repeatable: true
-  - id: edit-event
-    name: "Председатель редактирует созданное событие"
-    method: PATCH
-    path: /api/v1/calendar/{id}
-    role: chairman
-    dependsOn: [create-event]
-    request:
-      path: {id: "${eventId}"}
-      body: {title: "DATA-API: событие изменено", description: "Удаляется после проверки", starts_at: "2030-06-01T12:00:00Z", ends_at: "2030-06-01T13:00:00Z"}
-    expected:
-      statusCodes: [200]
-      contentType: application/json
-      requiredFields: [id, title]
-      bodySchema:
-        type: object
-        properties:
-          title: {const: "DATA-API: событие изменено"}
-    repeatable: true
+- id: health
+  name: Готовность приложения
+  method: GET
+  path: /api/v1/health
+  role: public
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: ready
+  timeoutMs: 10000
+  repeatable: true
+- id: anonymous-denied
+  name: Вход обязателен
+  method: GET
+  path: /api/v1/me
+  role: public
+  expected:
+    statusCodes:
+    - 401
+    contentType: application/json
+    requiredFields:
+    - error.code
+    - error.request_id
+  timeoutMs: 10000
+  repeatable: true
+- id: resident-context
+  name: 'Профиль и активный дом: resident'
+  method: GET
+  path: /api/v1/me
+  role: resident
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - user.id
+    - active_house_id
+    - memberships
+    - houses
+  timeoutMs: 10000
+  repeatable: true
+- id: neighbor-context
+  name: 'Профиль и активный дом: neighbor'
+  method: GET
+  path: /api/v1/me
+  role: neighbor
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - user.id
+    - active_house_id
+    - memberships
+    - houses
+  timeoutMs: 10000
+  repeatable: true
+- id: chairman-context
+  name: 'Профиль и активный дом: chairman'
+  method: GET
+  path: /api/v1/me
+  role: chairman
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - user.id
+    - active_house_id
+    - memberships
+    - houses
+  timeoutMs: 10000
+  repeatable: true
+- id: role-state
+  name: Права жителя
+  method: GET
+  path: /api/v1/house-access
+  role: resident
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - platform_admin
+    - can_register_house
+    - can_manage_active_house
+    bodySchema:
+      type: object
+      required:
+      - can_manage_active_house
+      properties:
+        can_manage_active_house:
+          const: false
+  timeoutMs: 10000
+  repeatable: true
+- id: chairman-state
+  name: Права председателя выбранного дома
+  method: GET
+  path: /api/v1/house-access
+  role: chairman
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - can_manage_active_house
+    bodySchema:
+      type: object
+      required:
+      - can_manage_active_house
+      properties:
+        can_manage_active_house:
+          const: true
+  timeoutMs: 10000
+  repeatable: true
+- id: resident-admin-denied
+  name: Админка недоступна жителю
+  method: GET
+  path: /api/v1/admin/users
+  role: resident
+  request:
+    query: {query: DATA-API}
+  expected:
+    statusCodes:
+    - 403
+    contentType: application/json
+    requiredFields:
+    - error.code
+    - error.request_id
+  timeoutMs: 10000
+  repeatable: true
+- id: issues
+  name: Список заявок
+  method: GET
+  path: /api/v1/issues
+  role: resident
+  request:
+    query:
+      page_size: 20
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - items
+    - next_page_token
+  timeoutMs: 10000
+  repeatable: true
+- id: photo-upload
+  name: Получение ссылки на загрузку фотографии
+  method: POST
+  path: /api/v1/uploads
+  role: resident
+  request:
+    body:
+      filename: stair-light.png
+      mime_type: image/png
+      size_bytes: 2093740
+  expected:
+    statusCodes:
+    - 201
+    contentType: application/json
+    requiredFields:
+    - upload_id
+    - presigned_url
+    - required_headers
+    - expires_at
+  timeoutMs: 10000
+  repeatable: false
+  extract:
+    uploadId: $.upload_id
+    uploadUrl: $.presigned_url
+  description: До photo-complete загрузить scripts/demo-content/images/stair-light.png методом PUT по presigned_url
+    с required_headers из этого ответа. Это внешний S3, не endpoint Gateway. tools/data-api/run_checks.py выполняет
+    шаг автоматически; другому исполнителю нужен такой же hook или пауза. Cookie приложения в S3 не передаётся.
+- id: photo-complete
+  name: Проверка загруженного объекта
+  method: POST
+  path: /api/v1/uploads/{id}/complete
+  role: resident
+  request:
+    path:
+      id: ${uploadId}
+    body: {}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - status
+    - size_bytes
+    - sha256
+    - issue_id
+    bodySchema:
+      type: object
+      required:
+      - status
+      - issue_id
+      properties:
+        status:
+          const: READY
+        issue_id:
+          type: 'null'
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - photo-upload
+- id: create-issue
+  name: Житель создаёт заявку с фотографией
+  method: POST
+  path: /api/v1/issues
+  role: resident
+  request:
+    body:
+      category: INFRASTRUCTURE
+      description: '[DATA-API] Не работает освещение лестничной площадки. Демонстрационная заявка для технической
+        проверки.'
+      location_text: Учебный подъезд, второй этаж
+      attachment_ids:
+      - ${uploadId}
+  expected:
+    statusCodes:
+    - 201
+    contentType: application/json
+    requiredFields:
+    - id
+    - house_id
+    - created_by
+    - status
+    - confirmations_count
+    bodySchema:
+      type: object
+      required:
+      - status
+      - confirmations_count
+      properties:
+        status:
+          const: DETECTED
+        confirmations_count:
+          const: 0
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - photo-complete
+  extract:
+    issueId: $.id
+- id: issue-details
+  name: Фото и история созданной заявки
+  method: GET
+  path: /api/v1/issues/{id}
+  role: resident
+  request:
+    path:
+      id: ${issueId}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - issue.id
+    - attachments
+    - timeline
+    - confirmed_by_me
+    bodySchema:
+      type: object
+      required:
+      - attachments
+      - confirmed_by_me
+      properties:
+        attachments:
+          type: array
+          minItems: 1
+        confirmed_by_me:
+          const: false
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - create-issue
+- id: photo-download
+  name: Подписанная ссылка на просмотр фото
+  method: GET
+  path: /api/v1/attachments/{id}/download-url
+  role: resident
+  request:
+    path:
+      id: ${uploadId}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - url
+    - expires_at
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - create-issue
+  description: run_checks.py также скачивает файл без cookie и сравнивает байты с исходной фотографией; внешний
+    GET не является endpoint Gateway.
+- id: confirm-issue
+  name: Другой житель подтверждает заявку
+  method: POST
+  path: /api/v1/issues/{id}/confirm
+  role: neighbor
+  request:
+    path:
+      id: ${issueId}
+    body: {}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - confirmation_count
+    - confirmed_by_me
+    bodySchema:
+      type: object
+      required:
+      - confirmation_count
+      - confirmed_by_me
+      properties:
+        confirmation_count:
+          const: 1
+        confirmed_by_me:
+          const: true
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - create-issue
+- id: duplicate-confirmation
+  name: Повторное подтверждение не увеличивает счётчик
+  method: POST
+  path: /api/v1/issues/{id}/confirm
+  role: neighbor
+  request:
+    path:
+      id: ${issueId}
+    body: {}
+  expected:
+    statusCodes:
+    - 409
+    contentType: application/json
+    requiredFields:
+    - error.code
+    - error.request_id
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - confirm-issue
+- id: resident-statement-denied
+  name: Житель не формирует заявление
+  method: POST
+  path: /api/v1/issues/{id}/statement
+  role: resident
+  request:
+    path:
+      id: ${issueId}
+    body: {}
+  expected:
+    statusCodes:
+    - 403
+    contentType: application/json
+    requiredFields:
+    - error.code
+    - error.request_id
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - create-issue
+- id: resident-status-denied
+  name: Житель не меняет статус
+  method: PATCH
+  path: /api/v1/issues/{id}/status
+  role: resident
+  request:
+    path:
+      id: ${issueId}
+    body:
+      new_status: RESOLVED
+  expected:
+    statusCodes:
+    - 403
+    contentType: application/json
+    requiredFields:
+    - error.code
+    - error.request_id
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - create-issue
+- id: chairman-queue
+  name: Очередь председателя
+  method: GET
+  path: /api/v1/chairman/issues
+  role: chairman
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - items
+    - next_page_token
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - create-issue
+- id: generate-statement
+  name: Председатель формирует черновик заявления
+  method: POST
+  path: /api/v1/issues/{id}/statement
+  role: chairman
+  request:
+    path:
+      id: ${issueId}
+    body:
+      chairman_note: '[DATA-API] Учебный пример, не направлять во внешние службы.'
+  expected:
+    statusCodes:
+    - 201
+    contentType: application/json
+    requiredFields:
+    - id
+    - issue_id
+    - body
+    - version
+    - status
+    - source_snapshot
+    bodySchema:
+      type: object
+      required:
+      - status
+      - version
+      - body
+      properties:
+        status:
+          const: DRAFT
+        version:
+          const: 1
+        body:
+          type: string
+          minLength: 20
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - confirm-issue
+- id: read-statement
+  name: Чтение сформированного заявления
+  method: GET
+  path: /api/v1/issues/{id}/statement
+  role: chairman
+  request:
+    path:
+      id: ${issueId}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - body
+    - source_snapshot
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - generate-statement
+- id: issue-confirming
+  name: 'Статус заявки: CONFIRMING'
+  method: PATCH
+  path: /api/v1/issues/{id}/status
+  role: chairman
+  request:
+    path:
+      id: ${issueId}
+    body:
+      new_status: CONFIRMING
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: CONFIRMING
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - generate-statement
+- id: issue-ready-for-appeal
+  name: 'Статус заявки: READY_FOR_APPEAL'
+  method: PATCH
+  path: /api/v1/issues/{id}/status
+  role: chairman
+  request:
+    path:
+      id: ${issueId}
+    body:
+      new_status: READY_FOR_APPEAL
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: READY_FOR_APPEAL
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - issue-confirming
+- id: issue-handed-to-chairman
+  name: 'Статус заявки: HANDED_TO_CHAIRMAN'
+  method: PATCH
+  path: /api/v1/issues/{id}/status
+  role: chairman
+  request:
+    path:
+      id: ${issueId}
+    body:
+      new_status: HANDED_TO_CHAIRMAN
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: HANDED_TO_CHAIRMAN
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - issue-ready-for-appeal
+- id: issue-marked-sent
+  name: 'Статус заявки: MARKED_SENT'
+  method: PATCH
+  path: /api/v1/issues/{id}/status
+  role: chairman
+  request:
+    path:
+      id: ${issueId}
+    body:
+      new_status: MARKED_SENT
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: MARKED_SENT
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - issue-handed-to-chairman
+- id: issue-waiting-result
+  name: 'Статус заявки: WAITING_RESULT'
+  method: PATCH
+  path: /api/v1/issues/{id}/status
+  role: chairman
+  request:
+    path:
+      id: ${issueId}
+    body:
+      new_status: WAITING_RESULT
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: WAITING_RESULT
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - issue-marked-sent
+- id: issue-resolved
+  name: 'Статус заявки: RESOLVED'
+  method: PATCH
+  path: /api/v1/issues/{id}/status
+  role: chairman
+  request:
+    path:
+      id: ${issueId}
+    body:
+      new_status: RESOLVED
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: RESOLVED
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - issue-waiting-result
+- id: resident-sees-resolution
+  name: Житель видит итоговый статус
+  method: GET
+  path: /api/v1/issues/{id}
+  role: resident
+  request:
+    path:
+      id: ${issueId}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - issue.status
+    - issue.resolved_at
+    - timeline
+    bodySchema:
+      type: object
+      required:
+      - issue
+      properties:
+        issue:
+          type: object
+          required:
+          - status
+          - resolved_at
+          properties:
+            status:
+              const: RESOLVED
+            resolved_at:
+              type: string
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - issue-resolved
+- id: create-announcement
+  name: Председатель публикует объявление
+  method: POST
+  path: /api/v1/announcements
+  role: chairman
+  request:
+    body:
+      title: '[DATA-API] Проверка освещения'
+      body: 'Демонстрационное объявление: осмотр освещения в учебном подъезде. Реальные работы не запланированы.'
+  expected:
+    statusCodes:
+    - 201
+    contentType: application/json
+    requiredFields:
+    - id
+    - title
+    - body
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: PUBLISHED
+  timeoutMs: 10000
+  repeatable: false
+  extract:
+    announcementId: $.id
+- id: announcements
+  name: Житель читает объявления
+  method: GET
+  path: /api/v1/announcements
+  role: resident
+  request:
+    query:
+      page_size: 100
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - items
+    - next_page_token
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - create-announcement
+- id: resident-poll-denied
+  name: Житель не создаёт опрос
+  method: POST
+  path: /api/v1/polls
+  role: resident
+  request:
+    body: &id001
+      question: '[DATA-API] Какой срок учебного осмотра удобнее?'
+      options:
+      - Утро
+      - Вечер
+      ends_at: '2030-06-01T18:00:00Z'
+  expected:
+    statusCodes:
+    - 403
+    contentType: application/json
+    requiredFields:
+    - error.code
+    - error.request_id
+  timeoutMs: 10000
+  repeatable: true
+- id: create-poll
+  name: Председатель создаёт опрос
+  method: POST
+  path: /api/v1/polls
+  role: chairman
+  request:
+    body: *id001
+  expected:
+    statusCodes:
+    - 201
+    contentType: application/json
+    requiredFields:
+    - id
+    - options
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      - options
+      properties:
+        status:
+          const: POLL_STATUS_OPEN
+        options:
+          type: array
+          minItems: 2
+  timeoutMs: 10000
+  repeatable: false
+  extract:
+    pollId: $.id
+    optionId: $.options[0].id
+- id: vote
+  name: Житель голосует
+  method: POST
+  path: /api/v1/polls/{id}/vote
+  role: resident
+  request:
+    path:
+      id: ${pollId}
+    body:
+      option_id: ${optionId}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - poll_id
+    - option_id
+    - total_votes
+    - my_option_id
+    bodySchema:
+      type: object
+      required:
+      - total_votes
+      properties:
+        total_votes:
+          const: 1
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - create-poll
+- id: duplicate-vote
+  name: Повторный голос отклонён
+  method: POST
+  path: /api/v1/polls/{id}/vote
+  role: resident
+  request:
+    path:
+      id: ${pollId}
+    body:
+      option_id: ${optionId}
+  expected:
+    statusCodes:
+    - 409
+    contentType: application/json
+    requiredFields:
+    - error.code
+    - error.request_id
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - vote
+- id: poll-results
+  name: Результаты опроса
+  method: GET
+  path: /api/v1/polls/{id}
+  role: resident
+  request:
+    path:
+      id: ${pollId}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - poll.id
+    - results
+    - total_votes
+    - my_option_id
+    bodySchema:
+      type: object
+      required:
+      - total_votes
+      properties:
+        total_votes:
+          const: 1
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - vote
+- id: close-poll
+  name: Председатель завершает опрос
+  method: POST
+  path: /api/v1/polls/{id}/close
+  role: chairman
+  request:
+    path:
+      id: ${pollId}
+    body: {}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - poll.status
+    bodySchema:
+      type: object
+      required:
+      - poll
+      properties:
+        poll:
+          type: object
+          required:
+          - status
+          properties:
+            status:
+              const: POLL_STATUS_CLOSED
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - poll-results
+- id: polls
+  name: Список опросов
+  method: GET
+  path: /api/v1/polls
+  role: resident
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - items
+    - next_page_token
+  timeoutMs: 10000
+  repeatable: true
+- id: create-event-denied
+  name: Житель не создаёт событие
+  method: POST
+  path: /api/v1/calendar
+  role: resident
+  request:
+    body: &id002
+      title: '[DATA-API] Учебный осмотр освещения'
+      description: Тестовое событие, удаляется после проверки.
+      starts_at: '2030-06-01T10:00:00Z'
+      ends_at: '2030-06-01T11:00:00Z'
+  expected:
+    statusCodes:
+    - 403
+    contentType: application/json
+    requiredFields:
+    - error.code
+    - error.request_id
+  timeoutMs: 10000
+  repeatable: true
+- id: create-event
+  name: Председатель создаёт событие
+  method: POST
+  path: /api/v1/calendar
+  role: chairman
+  request:
+    body: *id002
+  expected:
+    statusCodes:
+    - 201
+    contentType: application/json
+    requiredFields:
+    - id
+    - title
+    - starts_at
+    - ends_at
+  timeoutMs: 10000
+  repeatable: false
+  extract:
+    eventId: $.id
+- id: read-calendar
+  name: Житель видит календарь
+  method: GET
+  path: /api/v1/calendar
+  role: resident
+  request:
+    query:
+      from: '2030-06-01T00:00:00Z'
+      to: '2030-06-02T00:00:00Z'
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - items
+    bodySchema:
+      type: object
+      required:
+      - items
+      properties:
+        items:
+          type: array
+          minItems: 1
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - create-event
+- id: edit-event
+  name: Председатель редактирует событие
+  method: PATCH
+  path: /api/v1/calendar/{id}
+  role: chairman
+  request:
+    path:
+      id: ${eventId}
+    body:
+      title: '[DATA-API] Учебный осмотр перенесён'
+      description: Тестовое событие, удаляется после проверки.
+      starts_at: '2030-06-01T10:00:00Z'
+      ends_at: '2030-06-01T11:00:00Z'
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - title
+    bodySchema:
+      type: object
+      required:
+      - title
+      properties:
+        title:
+          const: '[DATA-API] Учебный осмотр перенесён'
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - create-event
+- id: create-initiative
+  name: Житель предлагает инициативу
+  method: POST
+  path: /api/v1/initiatives
+  role: resident
+  request:
+    body:
+      title: '[DATA-API] Дополнительное освещение'
+      description: 'Учебное предложение: установить светильник у входа. Не является реальным сбором средств.'
+  expected:
+    statusCodes:
+    - 201
+    contentType: application/json
+    requiredFields:
+    - id
+    - title
+    - status
+    - supports_count
+    bodySchema:
+      type: object
+      required:
+      - status
+      - supports_count
+      properties:
+        status:
+          const: INITIATIVE_STATUS_OPEN
+        supports_count:
+          const: 0
+  timeoutMs: 10000
+  repeatable: false
+  extract:
+    initiativeId: $.id
+- id: support
+  name: Сосед поддерживает инициативу
+  method: POST
+  path: /api/v1/initiatives/{id}/support
+  role: neighbor
+  request:
+    path:
+      id: ${initiativeId}
+    body: {}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - initiative_id
+    - supports_count
+    - supported_by_me
+    bodySchema:
+      type: object
+      required:
+      - supports_count
+      - supported_by_me
+      properties:
+        supports_count:
+          const: 1
+        supported_by_me:
+          const: true
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - create-initiative
+- id: duplicate-support
+  name: Повторная поддержка отклонена
+  method: POST
+  path: /api/v1/initiatives/{id}/support
+  role: neighbor
+  request:
+    path:
+      id: ${initiativeId}
+    body: {}
+  expected:
+    statusCodes:
+    - 409
+    contentType: application/json
+    requiredFields:
+    - error.code
+    - error.request_id
+  timeoutMs: 10000
+  repeatable: true
+  dependsOn:
+  - support
+- id: close-initiative
+  name: Председатель завершает инициативу
+  method: POST
+  path: /api/v1/initiatives/{id}/close
+  role: chairman
+  request:
+    path:
+      id: ${initiativeId}
+    body: {}
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - id
+    - status
+    bodySchema:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          const: INITIATIVE_STATUS_CLOSED
+  timeoutMs: 10000
+  repeatable: false
+  dependsOn:
+  - support
+- id: initiatives
+  name: Список инициатив
+  method: GET
+  path: /api/v1/initiatives
+  role: resident
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - items
+    - next_page_token
+  timeoutMs: 10000
+  repeatable: true
+- id: contacts
+  name: Контакты служб
+  method: GET
+  path: /api/v1/house/service-contacts
+  role: resident
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - items
+  timeoutMs: 10000
+  repeatable: true
+- id: notification-settings
+  name: Настройки уведомлений
+  method: GET
+  path: /api/v1/notifications/settings
+  role: resident
+  expected:
+    statusCodes:
+    - 200
+    contentType: application/json
+    requiredFields:
+    - notifications_enabled
+    - bot_notifications_enabled
+  timeoutMs: 10000
+  repeatable: true
 cleanup:
-  - id: delete-event
-    method: DELETE
-    path: /api/v1/calendar/{id}
-    role: chairman
-    request:
-      path: {id: "${eventId}"}
-      body: {}
-    expected:
-      statusCodes: [200, 404]
-    timeoutMs: 10000
+- id: delete-event
+  method: DELETE
+  path: /api/v1/calendar/{id}
+  role: chairman
+  request:
+    path:
+      id: ${eventId}
+    body: {}
+  expected:
+    statusCodes:
+    - 200
+    - 404
+    contentType: application/json
+  timeoutMs: 10000
+- id: close-poll
+  method: POST
+  path: /api/v1/polls/{id}/close
+  role: chairman
+  request:
+    path:
+      id: ${pollId}
+    body: {}
+  expected:
+    statusCodes:
+    - 200
+    - 404
+    contentType: application/json
+  timeoutMs: 10000
+- id: close-initiative
+  method: POST
+  path: /api/v1/initiatives/{id}/close
+  role: chairman
+  request:
+    path:
+      id: ${initiativeId}
+    body: {}
+  expected:
+    statusCodes:
+    - 200
+    - 404
+    contentType: application/json
+  timeoutMs: 10000

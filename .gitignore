@@ -11,3 +11,6 @@ tmp/pdfs/
 .idea/
 .vscode/
 __pycache__/
+# Private sessions for submission checks; prefer storing them outside the repository.
+sessions.json
+*.sessions.json

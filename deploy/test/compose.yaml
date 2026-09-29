@@ -105,7 +105,13 @@ services:
     build:
       context: ../../services/max-gateway
       dockerfile: Dockerfile.integration
+      target: submission
+    volumes:
+      - ../../DATA-API.yaml:/submission/DATA-API.yaml:ro
+      - ../../tools/data-api:/submission/tools/data-api:ro
+      - ../../scripts/demo-content/images/stair-light.png:/submission/scripts/demo-content/images/stair-light.png:ro
     environment:
+      SUBMISSION_MANIFEST: /submission/DATA-API.yaml
       GATEWAY_E2E: '1'
       TEST_DATABASE_URL: postgres://test:acceptance-only@issue-db:5432/issue_test?sslmode=disable
       IDENTITY_TEST_DATABASE_URL: postgres://test:acceptance-only@identity-db:5432/identity_test?sslmode=disable

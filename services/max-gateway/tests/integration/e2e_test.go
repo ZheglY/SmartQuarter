@@ -32,6 +32,7 @@ import (
 
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/config"
 	cpb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/community/v1"
+	ipb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/identity/v1"
 	pb "github.com/ZheglY/SmartQuarter/services/max-gateway/internal/gen/smartquarter/issue/v1"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/identity"
 	"github.com/ZheglY/SmartQuarter/services/max-gateway/internal/maxapi"
@@ -464,6 +465,34 @@ func TestGatewayIssueE2EFiveRuns(t *testing.T) {
 	call(t, author, "POST", "/api/v1/session/logout", map[string]any{}, "", 204)
 	call(t, author, "GET", "/api/v1/issues", nil, "", 401)
 	t.Logf("PASS: five Issue workflows and notification delivery; real Identity=%v Community=%v", os.Getenv("IDENTITY_TEST_ADDR") != "", api.Community != nil)
+	if manifest := os.Getenv("SUBMISSION_MANIFEST"); manifest != "" {
+		houseConn, err := rpc.Dial(os.Getenv("IDENTITY_TEST_ADDR"), 10*time.Second, zap.NewNop(), metrics)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer houseConn.Close()
+		api.House = ipb.NewHouseServiceClient(houseConn)
+		// The submission creates community events for several actors. Notification
+		// delivery was tested above; stop its single-recipient assertion here.
+		cancel()
+		<-done
+		sessions, err := json.Marshal(map[string]string{
+			"resident": login(101).Value, "neighbor": login(102).Value, "chairman": login(103).Value,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		cmd := exec.Command("python3", "/submission/tools/data-api/run_checks.py",
+			"--manifest", manifest, "--execute", "--base-url", gateway.URL,
+			"--origin", "https://test.example", "--house", testdata.House,
+			"--sessions-stdin", "--s3-origin", "http://minio:9000", "--allow-http-for-tests")
+		cmd.Stdin = bytes.NewReader(sessions)
+		output, err := cmd.CombinedOutput()
+		t.Log(string(output))
+		if err != nil {
+			t.Fatal("DATA-API checks against the real acceptance services failed", err)
+		}
+	}
 }
 
 func env(key, fallback string) string {

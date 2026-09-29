@@ -1,7 +1,6 @@
 # Isolated application acceptance
 
-From repository root: `docker compose -f deploy/test/compose.yaml build`, then
-`docker compose -f deploy/test/compose.yaml run --rm test`.
+From repository root: `docker compose -f deploy/test/compose.yaml run --build --rm test`.
 The exit code is the test result. Diagnostics: `docker compose -f deploy/test/compose.yaml logs`.
 After a successful run, `bash deploy/test/check-provision.sh` verifies operator onboarding,
 repeat updates without duplicate memberships or profile loss, and access revocation.
@@ -13,6 +12,13 @@ and no real MAX messages are sent. Identity is the real service; the old test-on
 protocol is retained solely for legacy isolated notification tests. Unit and browser
 fixture tests run separately. This stack covers house access, issues, contacts and community participation.
 Official government submission is performed outside the application.
+
+The test image's `submission` target includes Python and the pinned DATA-API dependencies.
+The manifest, runner and photograph are mounted read-only. After the Issue scenarios,
+the test executes all 48 `DATA-API.yaml` checks against the same real services, including
+the external S3 PUT/GET. Temporary test cookies are passed to Python through stdin.
+The runner does not create or change users/roles; the isolated fixture provides them.
+See `tools/data-api/README.md` for use with real MAX sessions and cleanup limitations.
 
 `TestHouseWorkflowHTTP` additionally covers registration/platform approval, contacts
 CRUD/archive, search/join approval, bounded invitations, chairman transfer, stale

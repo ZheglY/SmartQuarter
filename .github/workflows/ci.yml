@@ -89,6 +89,7 @@ jobs:
         run: |
           python3 -m pip install --disable-pip-version-check -r tools/data-api/requirements.txt
           python3 tools/data-api/validate_data_api.py DATA-API.yaml --openapi contracts/openapi/openapi.yaml
+          python3 -m unittest discover -s tools/data-api -p 'test_*.py'
 
   frontend:
     name: Mini App
